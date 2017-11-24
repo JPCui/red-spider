@@ -6,12 +6,15 @@ import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.processor.example.ZhihuPageProcessor;
 
-public class JPProcessor implements PageProcessor {
+public class SimpleProcessor implements PageProcessor {
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
 
     @Override
     public void process(Page page) {
+        String url = page.getUrl().get();
+        
+
         page.addTargetRequests(
                 page.getHtml().links().regex("https://www\\.zhihu\\.com/question/\\d+/answer/\\d+.*").all());
         page.putField("title", page.getHtml().xpath("//h1[@class='QuestionHeader-title']/text()").toString());
