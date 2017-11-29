@@ -15,7 +15,7 @@ import cn.cjp.utils.StringUtil;
 public class RequestUtil {
 
 	/**
-	 * 禁止出现数组
+	 * NOTE 禁止出现数组
 	 * 
 	 * @param request
 	 * @return

@@ -2,27 +2,21 @@ package cn.cjp.spider.core.processor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSONObject;
 
-import cn.cjp.spider.core.enums.PageType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.model.Attr;
-import cn.cjp.utils.Assert;
-import cn.cjp.utils.StringUtil;
-import cn.cjp.utils.URLUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
+import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Selectable;
 
-public class SimpleProcessor implements PageProcessor {
+public class XicidailiProcessor implements PageProcessor {
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
-
-    private PageType pageType = PageType.HTML;
 
     /**
      * 方便查找dom列表
@@ -35,78 +29,25 @@ public class SimpleProcessor implements PageProcessor {
 
     private int isList = 0;
 
-    private String findSeedPattern;
-
     @Override
     public void process(Page page) {
-        Assert.assertNotNull(attrs);
 
         if (isList == 1) {
-            Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
-            List<Selectable> domList = this.parse(root, parentAttr).nodes();
+            List<Selectable> domList = this
+                    .parse(this.parse(page, ParserType.fromValue(parentAttr.getParserType())), parentAttr).nodes();
             List<JSONObject> jsons = this.parseNodes(domList, attrs);
 
             page.putField("jsons", jsons);
         } else {
-            Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
-            Selectable dom = this.parse(root, parentAttr);
+            Selectable dom = this.parse(this.parse(page, ParserType.fromValue(parentAttr.getParserType())), parentAttr);
             JSONObject json = this.parseNode(dom, attrs);
 
             page.putField("json", json);
         }
 
-        this.findSeeds(page);
-
         if (skip == 1) {
             page.setSkip(true);
         }
-    }
-
-    /**
-     * 发现新URL
-     * 
-     * @param page
-     */
-    private void findSeeds(Page page) {
-        if (StringUtil.isEmpty(findSeedPattern)) {
-            return;
-        }
-
-        List<String> foundUrlList = new ArrayList<>();
-
-        switch (pageType) {
-        case JSON:
-            Pattern pattern = Pattern.compile(this.findSeedPattern);
-            Matcher matcher = pattern.matcher(page.getUrl().get());
-            if (matcher.find()) {
-                // System.out.println(matcher.groupCount());
-                // System.out.println(matcher.group(1));
-                // System.out.println(matcher.group(2));
-                String pageNumStr = matcher.group(2);
-                if (pageNumStr != null) {
-                    int pageNum = Integer.parseInt(pageNumStr);
-                    String foundUrl = matcher.replaceFirst(Integer.toString(pageNum + 1));
-                    foundUrlList.add(foundUrl);
-                }
-            }
-            break;
-        case HTML:
-            List<String> allUrls = page.getHtml().$("a", "href").all();
-            allUrls.forEach(url -> {
-                if (url.startsWith("/")) {
-                    // 相对路径的处理
-                    String currUrl = URLUtil.relative(page.getUrl().get(), url);
-                    foundUrlList.add(currUrl);
-                } else if (url.matches(this.findSeedPattern)) {
-                    foundUrlList.add(url);
-                }
-            });
-            break;
-        default:
-            throw new UnsupportedOperationException();
-        }
-
-        page.addTargetRequests(foundUrlList);
     }
 
     public List<JSONObject> parseNodes(List<Selectable> domList, List<Attr> attrs) {
@@ -168,11 +109,8 @@ public class SimpleProcessor implements PageProcessor {
     }
 
     private Selectable parse(Selectable dom, Attr attr) {
-        if (StringUtil.isEmpty(attr.getParserPath())) {
-            return dom;
-        }
-
         Selectable value = null;
+
         ParserType parserType = ParserType.fromValue(attr.getParserType());
         if (parserType != null) {
             switch (parserType) {
@@ -181,7 +119,7 @@ public class SimpleProcessor implements PageProcessor {
                 break;
             }
             case DOM: {
-                value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
+                value = dom.css(attr.getParserPath(), "text");
                 break;
             }
             case JSON: {
@@ -197,6 +135,30 @@ public class SimpleProcessor implements PageProcessor {
             }
         }
         return value;
+    }
+
+    public static void main(String[] args) {
+
+        String url = "http://www.xicidaili.com/nn";
+
+        Attr parentAttr = new Attr("#ip_list tr:gt(1)", "", ParserType.DOM);
+
+        List<Attr> attrs = new ArrayList<>();
+        attrs.add(new Attr("td:eq(1)", "ip", ParserType.DOM));
+        attrs.add(new Attr("td:eq(2)", "port", ParserType.DOM));
+        attrs.add(new Attr("td:eq(5)", "protocol", ParserType.DOM));
+
+        int skip = 1;
+
+        int isList = 1;
+
+        XicidailiProcessor processor = new XicidailiProcessor();
+        processor.setAttrs(attrs);
+        processor.setIsList(isList);
+        processor.setParentAttr(parentAttr);
+        processor.setSkip(skip);
+
+        Spider.create(processor).addUrl(url).addPipeline(new ConsolePipeline()).run();
     }
 
     @Override
@@ -240,11 +202,4 @@ public class SimpleProcessor implements PageProcessor {
         this.site = site;
     }
 
-    public String getFindSeedPattern() {
-        return findSeedPattern;
-    }
-
-    public void setFindSeedPattern(String findSeedPattern) {
-        this.findSeedPattern = findSeedPattern;
-    }
 }

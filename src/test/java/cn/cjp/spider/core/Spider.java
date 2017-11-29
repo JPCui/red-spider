@@ -18,7 +18,7 @@ public class Spider {
         String s = FileUtils.readFileToString(new File("C:/__HOME__/b.txt"));
         Selectable select = null;
 
-        if (ParserType.HTML.equals(parserType)) {
+        if (ParserType.DOM.equals(parserType)) {
             Html html = new Html(s);
             select = html.$("h1");
         } else if (ParserType.JSON.equals(parserType)) {

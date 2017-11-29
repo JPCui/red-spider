@@ -10,8 +10,6 @@ public class SimpleDownloader implements Downloader {
     @Override
     public Page download(Request request, Task task) {
         
-        
-        
         return null;
     }
 

@@ -9,15 +9,11 @@ import java.util.List;
  * @author sucre
  *
  */
-public enum ParserType {
+public enum PageType {
 
     JSON(10, "JSON"),
 
-    DOM(20, "CSS"),
-
-    REGEX(30, "REGEX"),
-    
-    XPATH(40, "XPATH"),
+    HTML(20, "HTML"),
 
     ;
 
@@ -50,7 +46,7 @@ public enum ParserType {
         return jobTags;
     }
 
-    ParserType(int code, String message) {
+    PageType(int code, String message) {
         this.code = code;
         this.message = message;
     }
