@@ -14,8 +14,11 @@ import com.alibaba.fastjson.JSONObject;
 import cn.cjp.spider.core.model.PageModel;
 import cn.cjp.utils.JacksonUtil;
 import cn.cjp.utils.PropertiesUtil;
+import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
+import us.codecraft.webmagic.scheduler.RedisPriorityScheduler;
+import us.codecraft.webmagic.scheduler.Scheduler;
 
 public class SimpleProcessorTest {
 
@@ -24,7 +27,7 @@ public class SimpleProcessorTest {
     String url;
 
     public SimpleProcessorTest() throws IOException {
-        InputStream is = PropertiesUtil.getInputStream("/spider/module/proxy.json");
+        InputStream is = PropertiesUtil.getInputStream("/spider/module/blog.csdn.com.json");
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         StringBuilder jsonBuilder = new StringBuilder();
         String s = null;
@@ -57,7 +60,12 @@ public class SimpleProcessorTest {
 
     @Test
     public void testProcessor() {
-        Spider.create(simpleProcessor).addPipeline(new ConsolePipeline()).addUrl(url).run();
+
+        JedisPool jedisPool = new JedisPool("localhost");
+
+        Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
+
+        Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(new ConsolePipeline()).addUrl(url).run();
     }
 
     @Test

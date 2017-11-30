@@ -93,12 +93,13 @@ public class SimpleProcessor implements PageProcessor {
         case HTML:
             List<String> allUrls = page.getHtml().$("a", "href").all();
             allUrls.forEach(url -> {
-                if (url.startsWith("/")) {
+                String currUrl = url;
+                if (currUrl.startsWith("/")) {
                     // 相对路径的处理
-                    String currUrl = URLUtil.relative(page.getUrl().get(), url);
+                    currUrl = URLUtil.relative(page.getUrl().get(), url);
+                }
+                if (currUrl.matches(this.findSeedPattern)) {
                     foundUrlList.add(currUrl);
-                } else if (url.matches(this.findSeedPattern)) {
-                    foundUrlList.add(url);
                 }
             });
             break;
