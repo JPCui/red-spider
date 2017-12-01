@@ -11,6 +11,8 @@ import java.util.List;
  */
 public enum SeedDiscoveryType {
 
+    COMMON(0, "通用"),
+
     /**
      * 
      * 在所有 a 标签中找出匹配的链接
