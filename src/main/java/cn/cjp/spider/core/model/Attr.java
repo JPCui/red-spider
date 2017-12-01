@@ -37,6 +37,8 @@ public class Attr {
      */
     Integer parserType;
 
+    private Attr nested;
+
     public String getParserPath() {
         return parserPath;
     }
@@ -67,6 +69,14 @@ public class Attr {
 
     public void setParserPathAttr(String parserPathAttr) {
         this.parserPathAttr = parserPathAttr;
+    }
+
+    public Attr getNested() {
+        return nested;
+    }
+
+    public void setNested(Attr nested) {
+        this.nested = nested;
     }
 
 }

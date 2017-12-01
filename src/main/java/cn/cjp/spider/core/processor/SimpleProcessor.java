@@ -127,7 +127,7 @@ public class SimpleProcessor implements PageProcessor {
     public JSONObject parseNode(Selectable dom, List<Attr> attrs) {
         JSONObject json = new JSONObject();
         attrs.forEach(attr -> {
-            String value = this.parse(dom, attr).get();
+            String value = this.parse(dom, attr).get().trim();
             json.put(attr.getField(), value);
         });
         return json;
@@ -168,6 +168,13 @@ public class SimpleProcessor implements PageProcessor {
         return value;
     }
 
+    /**
+     * 可嵌套的解析方法
+     * 
+     * @param dom
+     * @param attr
+     * @return
+     */
     private Selectable parse(Selectable dom, Attr attr) {
         if (StringUtil.isEmpty(attr.getParserPath())) {
             return dom;
@@ -197,7 +204,9 @@ public class SimpleProcessor implements PageProcessor {
                 throw new UnsupportedOperationException();
             }
         }
-        return value;
+
+        // 嵌套
+        return attr.getNested() == null ? value : this.parse(value, attr.getNested());
     }
 
     @Override
