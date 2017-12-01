@@ -47,11 +47,7 @@ public class SimpleProcessorTest {
             PageModel siteModel = JacksonUtil.fromJsonToObj(value, PageModel.class);
 
             simpleProcessor = new SimpleProcessor();
-            simpleProcessor.setAttrs(siteModel.getAttrs());
-            simpleProcessor.setIsList(siteModel.getIsList());
-            simpleProcessor.setParentAttr(siteModel.getParentAttr());
-            simpleProcessor.setSkip(siteModel.getSkip());
-            simpleProcessor.setFindSeedPattern(siteModel.getFindSeedPattern());
+            simpleProcessor.setPageModel(siteModel);
 
             url = siteModel.getUrl();
         });
@@ -64,8 +60,10 @@ public class SimpleProcessorTest {
         JedisPool jedisPool = new JedisPool("localhost");
 
         Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
-
+        
         Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(new ConsolePipeline()).addUrl(url).run();
+        // Spider.create(simpleProcessor).addPipeline(new
+        // ConsolePipeline()).addUrl(url).run();
     }
 
     @Test
