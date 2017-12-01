@@ -31,7 +31,7 @@ public class CommonDiscovery implements Discovery {
         SeedDiscoveryType discoveryType = SeedDiscoveryType.fromValue(type);
 
         for (Discovery disc : discoveries) {
-            if (getDiscoveryType().equals(discoveryType)) {
+            if (disc.getDiscoveryType().equals(discoveryType)) {
                 disc.discover(page, discovery);
                 break;
             }
@@ -40,7 +40,7 @@ public class CommonDiscovery implements Discovery {
 
     @Override
     public SeedDiscoveryType getDiscoveryType() {
-        return null;
+        return SeedDiscoveryType.COMMON;
     }
 
 }
