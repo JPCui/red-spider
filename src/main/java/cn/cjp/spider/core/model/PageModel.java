@@ -2,11 +2,22 @@ package cn.cjp.spider.core.model;
 
 import java.util.List;
 
+/**
+ * 目标页爬取规则定义
+ * 
+ * @author sucre
+ *
+ */
 public class PageModel {
 
     private String url;
-    
+
+    /**
+     * @deprecated use {@link #seedDiscoveries}
+     */
     private String findSeedPattern;
+
+    private List<SeedDiscoveryRule> seedDiscoveries;
 
     private Attr parentAttr;
 
@@ -62,6 +73,14 @@ public class PageModel {
 
     public void setFindSeedPattern(String findSeedPattern) {
         this.findSeedPattern = findSeedPattern;
+    }
+
+    public List<SeedDiscoveryRule> getSeedDiscoveries() {
+        return seedDiscoveries;
+    }
+
+    public void setSeedDiscoveries(List<SeedDiscoveryRule> seedDiscoveries) {
+        this.seedDiscoveries = seedDiscoveries;
     }
 
 }

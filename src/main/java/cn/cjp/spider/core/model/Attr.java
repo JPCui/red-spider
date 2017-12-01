@@ -3,6 +3,7 @@ package cn.cjp.spider.core.model;
 import cn.cjp.spider.core.enums.ParserType;
 
 /**
+ * 字段爬取规则Model
  * 
  * @author sucre
  *

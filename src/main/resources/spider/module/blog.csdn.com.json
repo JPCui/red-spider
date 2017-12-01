@@ -1,7 +1,10 @@
 {
 	"blog.csdn.com": {
 		"url": "http://blog.csdn.net/king624498030/article/list/1",
-		"findSeedPattern": "http://blog.csdn.net/king624498030/article/list/(.*)",
+        "seedDiscoveries": [{
+            "pattern": "http://blog.csdn.net/king624498030/article/list/(.*)",
+            "type" : "10"
+		}],
         // 列表页中，用于定位列表DOM
         "parentAttr" : {
             "parserPath" : "#article_list div.list_item.article_item",
