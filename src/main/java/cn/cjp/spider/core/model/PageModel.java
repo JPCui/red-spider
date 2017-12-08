@@ -9,6 +9,8 @@ import java.util.List;
  *
  */
 public class PageModel {
+    
+    private String db;
 
     private String url;
 
@@ -81,6 +83,14 @@ public class PageModel {
 
     public void setSeedDiscoveries(List<SeedDiscoveryRule> seedDiscoveries) {
         this.seedDiscoveries = seedDiscoveries;
+    }
+
+    public String getDb() {
+        return db;
+    }
+
+    public void setDb(String db) {
+        this.db = db;
     }
 
 }
