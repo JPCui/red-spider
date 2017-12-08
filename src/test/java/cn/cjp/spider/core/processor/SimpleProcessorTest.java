@@ -1,10 +1,8 @@
 package cn.cjp.spider.core.processor;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -12,8 +10,8 @@ import org.junit.Test;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.utils.FileUtil;
 import cn.cjp.utils.JacksonUtil;
-import cn.cjp.utils.PropertiesUtil;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
@@ -27,18 +25,13 @@ public class SimpleProcessorTest {
     String url;
 
     public SimpleProcessorTest() throws IOException {
-        InputStream is = PropertiesUtil.getInputStream("/spider/module/blog.csdn.com.json");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-        StringBuilder jsonBuilder = new StringBuilder();
-        String s = null;
-        while ((s = reader.readLine()) != null) {
-            s = s.trim();
-            if (!s.startsWith("//")) {
-                jsonBuilder.append(s);
-            }
-        }
-
-        String jsonStr = jsonBuilder.toString();
+        String dir = "./spider/module";
+        File path = new File(dir);
+        File[] files = path.listFiles();
+        List<String> list = FileUtil.read(files[0]);
+        String jsonStr = list.stream().filter(s -> {
+            return !s.trim().startsWith("//");
+        }).reduce((a, b) -> a + b).get();
 
         JSONObject json = JSONObject.parseObject(jsonStr);
         Set<String> keySet = json.keySet();
@@ -60,18 +53,17 @@ public class SimpleProcessorTest {
         JedisPool jedisPool = new JedisPool("localhost");
 
         Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
-        
+
         Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(new ConsolePipeline()).addUrl(url).run();
         // Spider.create(simpleProcessor).addPipeline(new
         // ConsolePipeline()).addUrl(url).run();
     }
 
-    @Test
-    public void test() {
-        String p = "http://www.xicidaili.com/nn/(.*)";
-        String s = "http://www.xicidaili.com/nn/1";
+    public static void main(String[] args) {
+        File file = new File("./spider/module/blog.csdn.com.json");
 
-        System.out.println(s.matches(p));
+        System.out.println(file.getAbsolutePath());
+
     }
 
 }

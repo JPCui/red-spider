@@ -52,6 +52,8 @@ public class SimpleProcessor implements PageProcessor {
         final Integer skip = pageModel.getSkip();
 
         Assert.assertNotNull(attrs);
+        
+        page.putField("db", pageModel.getDb());
 
         if (isList == 1) {
             Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));

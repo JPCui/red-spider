@@ -30,6 +30,7 @@ public class CommonDiscovery implements Discovery {
         int type = discovery.getType();
         SeedDiscoveryType discoveryType = SeedDiscoveryType.fromValue(type);
 
+        // 用合适的Discovery解析子页面
         for (Discovery disc : discoveries) {
             if (disc.getDiscoveryType().equals(discoveryType)) {
                 disc.discover(page, discovery);
