@@ -10,15 +10,16 @@
 	<name>red-spider</name>
 	<url>http://maven.apache.org</url>
 
-	<properties>
-		<jp-base.version>v2017.1030</jp-base.version>
-		<junit.version>4.11</junit.version>
-		<spring.version>4.3.7.RELEASE</spring.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jackson.version>1.9.12</jackson.version>
-		<spring-boot.version>1.3.6.RELEASE</spring-boot.version>
-		<jsoup.version>1.10.1</jsoup.version>
-	</properties>
+    <properties>
+        <jp-base.version>v2017.1030</jp-base.version>
+        <junit.version>4.11</junit.version>
+        <spring.version>4.3.7.RELEASE</spring.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jackson.version>1.9.12</jackson.version>
+        <spring-boot.version>1.3.6.RELEASE</spring-boot.version>
+        <jsoup.version>1.10.1</jsoup.version>
+        <mongodb.version>3.4.0</mongodb.version>
+    </properties>
 
 	<!-- 发布到本地目录 -->
 	<distributionManagement>
@@ -132,13 +133,6 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.25</version>
 		</dependency>
-		<!-- MongoDB Begin -->
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<!-- MongoDB End -->
 		<!-- spring boot begin -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -187,7 +181,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<version>${spring-boot.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<!-- spring boot end -->
 		<dependency>
@@ -207,6 +200,19 @@
 			<version>1.8.5</version>
 		</dependency>
 	</dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 	<profiles>
 		<!-- 线上环境 -->
