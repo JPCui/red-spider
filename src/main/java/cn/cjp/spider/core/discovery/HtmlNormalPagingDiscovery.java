@@ -1,10 +1,12 @@
 package cn.cjp.spider.core.discovery;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.cjp.spider.core.enums.SeedDiscoveryType;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
+import cn.cjp.utils.Logger;
 import cn.cjp.utils.StringUtil;
 import cn.cjp.utils.URLUtil;
 import us.codecraft.webmagic.Page;
@@ -17,35 +19,41 @@ import us.codecraft.webmagic.Page;
  */
 public class HtmlNormalPagingDiscovery implements Discovery {
 
-    @Override
-    public void discover(Page page, SeedDiscoveryRule discovery) {
-        final String findSeedPattern = discovery.getPattern();
+	private static final Logger LOGGER = Logger.getLogger(HtmlNormalPagingDiscovery.class);
 
-        if (StringUtil.isEmpty(findSeedPattern)) {
-            return;
-        }
+	@Override
+	public void discover(Page page, SeedDiscoveryRule discovery) {
+		final String findSeedPattern = discovery.getPattern();
 
-        List<String> foundUrlList = new ArrayList<>();
+		if (StringUtil.isEmpty(findSeedPattern)) {
+			return;
+		}
 
-        List<String> allUrls = page.getHtml().$("a", "href").all();
-        allUrls.forEach(url -> {
-            String currUrl = url;
-            if (currUrl.startsWith("/")) {
-                // 相对路径的处理
-                currUrl = URLUtil.relative(page.getUrl().get(), url);
-            }
-            if (currUrl.matches(findSeedPattern)) {
-                foundUrlList.add(currUrl);
-            }
-        });
+		List<String> foundUrlList = new ArrayList<>();
 
-        page.addTargetRequests(foundUrlList);
+		List<String> allUrls = page.getHtml().$("a", "href").all();
+		allUrls.forEach(url -> {
+			String currUrl = url;
+			if (currUrl.startsWith("/")) {
+				// 相对路径的处理
+				try {
+					currUrl = URLUtil.relative(page.getUrl().get(), url);
+				} catch (MalformedURLException e) {
+					LOGGER.warn(e.getMessage());
+				}
+			}
+			if (currUrl.matches(findSeedPattern)) {
+				foundUrlList.add(currUrl);
+			}
+		});
 
-    }
+		page.addTargetRequests(foundUrlList);
 
-    @Override
-    public SeedDiscoveryType getDiscoveryType() {
-        return SeedDiscoveryType.HTML_NORMAL_PAGING;
-    }
+	}
+
+	@Override
+	public SeedDiscoveryType getDiscoveryType() {
+		return SeedDiscoveryType.HTML_NORMAL_PAGING;
+	}
 
 }
