@@ -1,11 +1,13 @@
 package cn.cjp.spider.core.processor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.springframework.util.ResourceUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -25,25 +27,24 @@ public class SimpleProcessorTest {
     String url;
 
     public SimpleProcessorTest() throws IOException {
-        String dir = "./spider/module";
-        File path = new File(dir);
-        File[] files = path.listFiles();
-        List<String> list = FileUtil.read(files[0]);
+        File file = ResourceUtils.getFile("classpath:spider/module/99lib.json");
+        if (!file.exists()) {
+            throw new IOException("file not found");
+        }
+        @SuppressWarnings("unchecked")
+        List<String> list = FileUtils.readLines(file);
         String jsonStr = list.stream().filter(s -> {
             return !s.trim().startsWith("//");
         }).reduce((a, b) -> a + b).get();
 
         JSONObject json = JSONObject.parseObject(jsonStr);
-        Set<String> keySet = json.keySet();
-        keySet.forEach(key -> {
-            String value = json.getString(key);
-            PageModel siteModel = JacksonUtil.fromJsonToObj(value, PageModel.class);
+        String value = json.toString();
+        PageModel siteModel = JacksonUtil.fromJsonToObj(value, PageModel.class);
 
-            simpleProcessor = new SimpleProcessor();
-            simpleProcessor.setPageModel(siteModel);
+        simpleProcessor = new SimpleProcessor();
+        simpleProcessor.setPageModel(siteModel);
 
-            url = siteModel.getUrl();
-        });
+        url = siteModel.getUrl();
 
     }
 
@@ -59,10 +60,9 @@ public class SimpleProcessorTest {
         // ConsolePipeline()).addUrl(url).run();
     }
 
-    public static void main(String[] args) {
-        File file = new File("./spider/module/blog.csdn.com.json");
-
-        System.out.println(file.getAbsolutePath());
+    public static void main(String[] args) throws FileNotFoundException {
+        File file = ResourceUtils.getFile("classpath:spider/module/99lib.json");
+        System.out.println(file.exists());
 
     }
 
