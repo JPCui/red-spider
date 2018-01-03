@@ -4,8 +4,7 @@
 	"url": "http://blog.csdn.net/dQCFKyQDXYm3F8rB0",
     "seedDiscoveries": [{
         "pattern": "http://blog.csdn.net/.*/article/list/(.*)",
-        "type" : "10",
-        "" : 0,
+        "type" : "10"
 	}],
     // 列表页中，用于定位列表DOM
     "parentAttr" : {
