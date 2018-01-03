@@ -1,34 +1,33 @@
 {
-    "xicidaili.com" : {
-        "url" : "http://www.xicidaili.com/nn",
-        "findSeedPattern" : "http://www.xicidaili.com/nn/(.*)",
-        // 列表页中，用于定位列表DOM
-        "parentAttr" : {
-            "parserPath" : "#ip_list tr:gt(1)",
-            "field" : "",
+    "siteName" : "xicidaili.com",
+    "url" : "http://www.xicidaili.com/nn",
+    "findSeedPattern" : "http://www.xicidaili.com/nn/(.*)",
+    // 列表页中，用于定位列表DOM
+    "parentAttr" : {
+        "parserPath" : "#ip_list tr:gt(1)",
+        "field" : "",
+        "parserType" : 20
+    },
+    // 属性列表
+    "attrs" : [{
+            "parserPath" : "td:eq(1)",
+            "parserPathAttr" : "text",
+            "field" : "ip",
             "parserType" : 20
-        },
-        // 属性列表
-        "attrs" : [{
-                "parserPath" : "td:eq(1)",
-                "parserPathAttr" : "text",
-                "field" : "ip",
-                "parserType" : 20
-            },{
-                "parserPath" : "td:eq(2)",
-                "parserPathAttr" : "text",
-                "field" : "port",
-                "parserType" : 20
-            },{
-                "parserPath" : "td:eq(5)",
-                "parserPathAttr" : "text",
-                "field" : "protocol",
-                "parserType" : 20
-            }
-        ],
-        // 是否是列表页
-        "isList" : 1,
-        // 是否跳过存储
-        "skip" : 0
-    }
+        },{
+            "parserPath" : "td:eq(2)",
+            "parserPathAttr" : "text",
+            "field" : "port",
+            "parserType" : 20
+        },{
+            "parserPath" : "td:eq(5)",
+            "parserPathAttr" : "text",
+            "field" : "protocol",
+            "parserType" : 20
+        }
+    ],
+    // 是否是列表页
+    "isList" : 1,
+    // 是否跳过存储
+    "skip" : 0
 }
