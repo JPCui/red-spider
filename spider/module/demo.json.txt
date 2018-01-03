@@ -1,0 +1,23 @@
+{
+    "siteName" : "站点名称",
+    "url" : "爬取的页面URL",
+    "findSeedPattern" : "待爬取的URL正则表达式",
+    // 列表页中，用于定位列表DOM，非必须
+    "parentAttr" : {
+        "parserPath" : "路径",
+        "field" : "字段名、非必须",
+        "parserType" : 解析方法
+    },
+    // 属性列表
+    "attrs" : [{
+            "parserPath" : "解析路径",
+            "parserPathAttr" : "text",
+            "field" : "字段名",
+            "parserType" : 解析方法
+        }
+    ],
+    // 是否是列表页
+    "isList" : 1,
+    // 是否跳过存储
+    "skip" : 0
+}
