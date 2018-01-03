@@ -11,6 +11,9 @@ import java.util.List;
  */
 public enum SeedDiscoveryType {
 
+    /**
+     * 尝试所有方法
+     */
     COMMON(0, "通用"),
 
     /**
@@ -24,9 +27,14 @@ public enum SeedDiscoveryType {
 
     /**
      * 在json接口上，获取分页字段，在原基础上+1
+     * 
+     * http://xxx.com/xxx.json?page=(.*)
      */
     JSON_NORMAL_PAGING(20, "JSON_NORMAL_PAGING"),
 
+    /**
+     * 使用正则表达式
+     */
     REGEX(30, "REGEX"),
 
     ;
