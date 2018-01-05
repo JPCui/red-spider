@@ -9,15 +9,12 @@ import java.util.List;
  *
  */
 public class PageModel {
-    
+
     private String db;
 
     private String url;
 
-    /**
-     * @deprecated use {@link #seedDiscoveries}
-     */
-    private String findSeedPattern;
+    private String urlPattern;
 
     private List<SeedDiscoveryRule> seedDiscoveries;
 
@@ -69,14 +66,6 @@ public class PageModel {
         this.isList = isList;
     }
 
-    public String getFindSeedPattern() {
-        return findSeedPattern;
-    }
-
-    public void setFindSeedPattern(String findSeedPattern) {
-        this.findSeedPattern = findSeedPattern;
-    }
-
     public List<SeedDiscoveryRule> getSeedDiscoveries() {
         return seedDiscoveries;
     }
@@ -91,6 +80,14 @@ public class PageModel {
 
     public void setDb(String db) {
         this.db = db;
+    }
+
+    public String getUrlPattern() {
+        return urlPattern;
+    }
+
+    public void setUrlPattern(String urlPattern) {
+        this.urlPattern = urlPattern;
     }
 
 }

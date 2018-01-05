@@ -1,5 +1,6 @@
 {
     "siteName" : "99lib.net",
+    "description" : "爬取列表",
     "url" : "http://www.99lib.net/article/index.php",
     "seedDiscoveries": [{
         "pattern": "http://www.99lib.net/article/index.php?page=(.*)",

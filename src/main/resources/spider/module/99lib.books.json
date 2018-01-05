@@ -1,0 +1,21 @@
+{
+    "siteName" : "99lib.net",
+    "description" : "爬取列表",
+    "url" : "http://www.99lib.net/book/index.php",
+    // URL规则，别的线程爬取到的URL符合该规则，则由当前规则解析
+    "urlPattern" : "http://www.99lib.net/book/index.php?page=(.*)",
+    "seedDiscoveries": [{
+        "pattern": "http://www.99lib.net/book/index.php?page=(.*)",
+        "type" : "10"
+    },{
+        "pattern": "http://www.99lib.net/book/(.*)/index.htm",
+        "type" : "10"
+    }],
+    // 属性列表
+    "attrs" : [
+    ],
+    // 是否是列表页
+    "isList" : 1,
+    // 是否跳过存储
+    "skip" : 0
+}

@@ -3,6 +3,9 @@ package cn.cjp.spider.core.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alibaba.fastjson.JSONObject;
 
 import cn.cjp.spider.core.discovery.CommonDiscovery;
@@ -34,6 +37,8 @@ import us.codecraft.webmagic.selector.Selectable;
  */
 public class SimpleProcessor implements PageProcessor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleProcessor.class);
+
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
 
     private PageModel pageModel;
@@ -46,13 +51,14 @@ public class SimpleProcessor implements PageProcessor {
 
     @Override
     public void process(Page page) {
+        LOGGER.debug("process: " + page.toString());
         final List<Attr> attrs = pageModel.getAttrs();
         final Integer isList = pageModel.getIsList();
         final Attr parentAttr = pageModel.getParentAttr();
         final Integer skip = pageModel.getSkip();
 
         Assert.assertNotNull(attrs);
-        
+
         page.putField("db", pageModel.getDb());
 
         if (isList == 1) {
@@ -125,24 +131,24 @@ public class SimpleProcessor implements PageProcessor {
 
         if (parserType != null) {
             switch (parserType) {
-            case XPATH: {
-                value = page.getHtml();
-                break;
-            }
-            case DOM: {
-                value = page.getHtml();
-                break;
-            }
-            case JSON: {
-                value = page.getJson();
-                break;
-            }
-            case REGEX: {
-                value = page.getHtml();
-                break;
-            }
-            default:
-                throw new UnsupportedOperationException();
+                case XPATH: {
+                    value = page.getHtml();
+                    break;
+                }
+                case DOM: {
+                    value = page.getHtml();
+                    break;
+                }
+                case JSON: {
+                    value = page.getJson();
+                    break;
+                }
+                case REGEX: {
+                    value = page.getHtml();
+                    break;
+                }
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
         return value;
@@ -164,24 +170,24 @@ public class SimpleProcessor implements PageProcessor {
         ParserType parserType = ParserType.fromValue(attr.getParserType());
         if (parserType != null) {
             switch (parserType) {
-            case XPATH: {
-                value = dom.xpath(attr.getParserPath());
-                break;
-            }
-            case DOM: {
-                value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
-                break;
-            }
-            case JSON: {
-                value = dom.jsonPath(attr.getParserPath());
-                break;
-            }
-            case REGEX: {
-                value = dom.regex(attr.getParserPath());
-                break;
-            }
-            default:
-                throw new UnsupportedOperationException();
+                case XPATH: {
+                    value = dom.xpath(attr.getParserPath());
+                    break;
+                }
+                case DOM: {
+                    value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
+                    break;
+                }
+                case JSON: {
+                    value = dom.jsonPath(attr.getParserPath());
+                    break;
+                }
+                case REGEX: {
+                    value = dom.regex(attr.getParserPath());
+                    break;
+                }
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
 
