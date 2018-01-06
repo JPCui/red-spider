@@ -1,69 +1,90 @@
 package cn.cjp.spider.core.processor;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
 import cn.cjp.spider.core.model.PageModel;
-import cn.cjp.utils.FileUtil;
 import cn.cjp.utils.JacksonUtil;
+import cn.cjp.utils.Logger;
 import redis.clients.jedis.JedisPool;
+import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
+import us.codecraft.webmagic.pipeline.FilePipeline;
 import us.codecraft.webmagic.scheduler.RedisPriorityScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
 public class SimpleProcessorTest {
 
-    SimpleProcessor simpleProcessor;
+	private static final Logger LOGGER = Logger.getLogger(SimpleProcessorTest.class);
 
-    String url;
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public SimpleProcessorTest() throws IOException {
-        File file = ResourceUtils.getFile("classpath:spider/module/99lib.json");
-        if (!file.exists()) {
-            throw new IOException("file not found");
-        }
-        @SuppressWarnings("unchecked")
-        List<String> list = FileUtils.readLines(file);
-        String jsonStr = list.stream().filter(s -> {
-            return !s.trim().startsWith("//");
-        }).reduce((a, b) -> a + b).get();
+	private JedisPool jedisPool = new JedisPool("localhost");
 
-        JSONObject json = JSONObject.parseObject(jsonStr);
-        String value = json.toString();
-        PageModel siteModel = JacksonUtil.fromJsonToObj(value, PageModel.class);
+	private Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
 
-        simpleProcessor = new SimpleProcessor();
-        simpleProcessor.setPageModel(siteModel);
+	public SimpleProcessorTest() throws IOException {
 
-        url = siteModel.getUrl();
+		File configPath = ResourceUtils.getFile("classpath:spider/module");
+		if (!configPath.exists()) {
+			throw new IOException("file not found");
+		}
+		File[] configFiles = configPath.listFiles();
 
-    }
+		for (File configFile : configFiles) {
+			if (!configFile.getName().endsWith("99lib.books.json")) {
+				continue;
+			}
+			@SuppressWarnings("unchecked")
+			List<String> list = FileUtils.readLines(configFile);
+			String jsonStr = list.stream().filter(s -> {
+				// 过滤注释语句
+				return !s.trim().startsWith("//");
+			}).reduce((a, b) -> a.concat(b)).get();
 
-    @Test
-    public void testProcessor() {
+			JSONObject json = JSONObject.parseObject(jsonStr);
+			String value = json.toString();
+			PageModel siteModel = JacksonUtil.fromJsonToObj(value, PageModel.class);
 
-        JedisPool jedisPool = new JedisPool("localhost");
+			SimpleProcessor simpleProcessor = new SimpleProcessor();
+			simpleProcessor.setPageModel(siteModel);
 
-        Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
+			Site site = new Site();
+			site.setDomain(siteModel.getSiteName());
+			simpleProcessor.setSite(site);
 
-        Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(new ConsolePipeline()).addUrl(url).run();
-        // Spider.create(simpleProcessor).addPipeline(new
-        // ConsolePipeline()).addUrl(url).run();
-    }
+			Spider spider = Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(new ConsolePipeline())
+					.addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl());
 
-    public static void main(String[] args) throws FileNotFoundException {
-        File file = ResourceUtils.getFile("classpath:spider/module/99lib.json");
-        System.out.println(file.exists());
+			executorService.execute(spider);
+			LOGGER.error(spider.getSite().getDomain() + " running.");
+		}
 
-    }
+	}
+
+	public void exit() {
+		while (!this.executorService.isTerminated()) {
+			try {
+				Thread.sleep(3000L);
+			} catch (InterruptedException e) {
+			}
+		}
+		executorService.shutdown();
+	}
+
+	public static void main(String[] args) throws IOException {
+		SimpleProcessorTest test = new SimpleProcessorTest();
+	}
 
 }

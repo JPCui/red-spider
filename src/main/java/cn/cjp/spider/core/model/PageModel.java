@@ -2,13 +2,18 @@ package cn.cjp.spider.core.model;
 
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * 目标页爬取规则定义
  * 
  * @author sucre
  *
  */
+@Data
 public class PageModel {
+	
+	private String siteName;
 
     private String db;
 
@@ -89,5 +94,13 @@ public class PageModel {
     public void setUrlPattern(String urlPattern) {
         this.urlPattern = urlPattern;
     }
+
+	public String getSiteName() {
+		return siteName;
+	}
+
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
+	}
 
 }

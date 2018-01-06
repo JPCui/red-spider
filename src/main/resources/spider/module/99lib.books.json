@@ -1,5 +1,5 @@
 {
-    "siteName" : "99lib.net",
+    "siteName" : "99lib.net/book",
     "description" : "爬取列表",
     "url" : "http://www.99lib.net/book/index.php",
     // URL规则，别的线程爬取到的URL符合该规则，则由当前规则解析
@@ -11,8 +11,29 @@
         "pattern": "http://www.99lib.net/book/(.*)/index.htm",
         "type" : "10"
     }],
+    // 列表页中，用于定位列表DOM，非必须
+    "parentAttr" : {
+        "parserPath" : "#list_box li",
+        "field" : "",
+        "parserType" : 20
+    },
     // 属性列表
-    "attrs" : [
+    "attrs" : [{
+            "parserPath" : "h2 a",
+            "parserPathAttr" : "text",
+            "field" : "name",
+            "parserType" : 20
+        },{
+            "parserPath" : "h4.author a",
+            "parserPathAttr" : "text",
+            "field" : "author",
+            "parserType" : 20
+        },{
+            "parserPath" : "h4:eq(1) a",
+            "parserPathAttr" : "text",
+            "field" : "name",
+            "parserType" : 20
+        }
     ],
     // 是否是列表页
     "isList" : 1,

@@ -1,5 +1,5 @@
 {
-    "siteName" : "99lib.net",
+    "siteName" : "99lib.net/article",
     "description" : "爬取列表",
     "url" : "http://www.99lib.net/article/index.php",
     "seedDiscoveries": [{

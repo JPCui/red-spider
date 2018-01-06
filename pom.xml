@@ -51,6 +51,12 @@
 	</repositories>
 
 	<dependencies>
+		<!-- GET/SET -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.10</version>
+		</dependency>
 		<dependency>
 			<groupId>com.github.liyiorg</groupId>
 			<artifactId>weixin-popular</artifactId>
