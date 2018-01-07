@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import cn.cjp.spider.core.discovery.CommonDiscovery;
 import cn.cjp.spider.core.discovery.Discovery;
 import cn.cjp.spider.core.enums.ParserType;
+import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
 import cn.cjp.spider.core.model.PageModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
@@ -19,6 +20,7 @@ import cn.cjp.utils.StringUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.selector.CssSelector;
 import us.codecraft.webmagic.selector.Selectable;
 
 /**
@@ -39,10 +41,7 @@ public class SimpleProcessor implements PageProcessor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleProcessor.class);
 
-	private Site site = Site.me()
-			.setUserAgent(
-					"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36")
-			.setRetryTimes(3).setSleepTime(3000);
+	private Site site = Site.me().setUserAgent(UserAgents.get()).setRetryTimes(3).setSleepTime(3000);
 
 	private PageModel pageModel;
 
@@ -178,7 +177,10 @@ public class SimpleProcessor implements PageProcessor {
 				break;
 			}
 			case DOM: {
-				value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
+				CssSelector cssSelector = new CssSelector(attr.getParserPath(), attr.getParserPathAttr());
+				value = dom.selectList(cssSelector);
+				// value = dom.css(attr.getParserPath(),
+				// attr.getParserPathAttr());
 				break;
 			}
 			case JSON: {

@@ -30,7 +30,7 @@
             "parserType" : 20
         },{
             "parserPath" : "h4:eq(1) a",
-            "parserPathAttr" : "text",
+            "parserPathAttr" : "allText",
             "field" : "name",
             "parserType" : 20
         }
