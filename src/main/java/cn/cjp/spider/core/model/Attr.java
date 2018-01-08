@@ -1,6 +1,7 @@
 package cn.cjp.spider.core.model;
 
 import cn.cjp.spider.core.enums.ParserType;
+import lombok.Data;
 
 /**
  * 字段爬取规则Model
@@ -8,6 +9,7 @@ import cn.cjp.spider.core.enums.ParserType;
  * @author sucre
  *
  */
+@Data
 public class Attr {
 
     public Attr() {
@@ -38,46 +40,8 @@ public class Attr {
      */
     Integer parserType;
 
+    boolean isMulti;
+
     private Attr nested;
-
-    public String getParserPath() {
-        return parserPath;
-    }
-
-    public void setParserPath(String parserPath) {
-        this.parserPath = parserPath;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
-
-    public Integer getParserType() {
-        return parserType;
-    }
-
-    public void setParserType(Integer parserType) {
-        this.parserType = parserType;
-    }
-
-    public String getParserPathAttr() {
-        return parserPathAttr;
-    }
-
-    public void setParserPathAttr(String parserPathAttr) {
-        this.parserPathAttr = parserPathAttr;
-    }
-
-    public Attr getNested() {
-        return nested;
-    }
-
-    public void setNested(Attr nested) {
-        this.nested = nested;
-    }
 
 }

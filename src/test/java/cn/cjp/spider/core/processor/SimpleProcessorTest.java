@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import cn.cjp.spider.core.pipeline.FilePipeline;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
@@ -20,7 +21,6 @@ import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
-import us.codecraft.webmagic.pipeline.FilePipeline;
 import us.codecraft.webmagic.scheduler.RedisPriorityScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 

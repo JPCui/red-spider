@@ -29,9 +29,9 @@
             "field" : "author",
             "parserType" : 20
         },{
-            "parserPath" : "h4:eq(1) a",
+            "parserPath" : "h4:eq(4) a",
             "parserPathAttr" : "allText",
-            "field" : "name",
+            "field" : "tags",
             "parserType" : 20
         }
     ],
