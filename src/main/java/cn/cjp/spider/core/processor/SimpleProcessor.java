@@ -106,7 +106,7 @@ public class SimpleProcessor implements PageProcessor {
     }
 
     /**
-     * @param dom 文档节点
+     * @param dom   文档节点
      * @param attrs 属性解析列表
      * @return
      */
@@ -182,10 +182,7 @@ public class SimpleProcessor implements PageProcessor {
                     break;
                 }
                 case DOM: {
-                    CssSelector cssSelector = new CssSelector(attr.getParserPath(), attr.getParserPathAttr());
-                    value = dom.selectList(cssSelector);
-                    // value = dom.css(attr.getParserPath(),
-                    // attr.getParserPathAttr());
+                    value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
                     break;
                 }
                 case JSON: {
