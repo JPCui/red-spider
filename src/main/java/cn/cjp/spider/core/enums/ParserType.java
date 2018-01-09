@@ -5,21 +5,29 @@ import java.util.List;
 
 /**
  * 抓取的文本类型
- * 
- * @author sucre
  *
+ * @author sucre
  */
 public enum ParserType {
+
+    BASE(0, "BASE"),
 
     JSON(10, "JSON"),
 
     DOM(20, "CSS"),
 
     REGEX(30, "REGEX"),
-    
+
     XPATH(40, "XPATH"),
 
-    ;
+    /**
+     * 从URL中提取<br>
+     * url = http://abc.com?page=100<br>
+     * pattern = http://abc.com?page=(.*)<br>
+     * group = 1<br>
+     * => 100<br>
+     */
+    URL_PATTERN(50, "URL_PATTERN"),;
 
     private final int code;
     private final String message;
