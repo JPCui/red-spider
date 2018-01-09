@@ -1,14 +1,23 @@
 {
-    "siteName" : "99lib.net",
-    "description" : "爬取列表",
-    "url" : "http://www.99lib.net/book/index.php",
-    "seedDiscoveries": [{
-        "pattern": "http://www.99lib.net/book/index.php?page=(.*)",
-        "type" : "10"
-    },{
-        "pattern": "http://www.99lib.net/book/(.*)/index.htm",
-        "type" : "10"
-    }],
-    // 指定爬取规则
-    "parserRules" : ["99lib-book-title", "99lib-book"]
+  "siteName": "99lib.net",
+  "description": "爬取列表",
+  "url": "http://www.99lib.net/book/index.php",
+  "seedDiscoveries": [
+    {
+      "pattern": "http://www.99lib.net/book/index.php?page=(.*)",
+      "type": "10"
+    },
+    {
+      "pattern": "http://www.99lib.net/book/(.*)/index.htm",
+      "type": "10"
+    }
+  ],
+  // 指定爬取规则
+  "parseRules": [
+    "99lib-book",
+    "99lib-book-chaptors",
+    "99lib-book-sections"
+  ],
+  // 是否跳过存储
+  "skip": 0
 }

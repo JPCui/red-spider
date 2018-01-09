@@ -1,24 +1,30 @@
 {
-	// 章节标题列表
-	"type" : "parser",
-	"ruleName" : "99lib-book-title",
-	"urlPattern" : "http://www.99lib.net/book/(.*)/index.htm",
-    // 列表页中，用于定位列表DOM，非必须
-    "parentAttr" : {
-        "parserPath" : "#dir",
-        "field" : "",
-        "parserType" : 20
+  // 章节标题列表
+  "type": "parser",
+  "ruleName": "99lib-book-chaptors",
+  "urlPattern": "http://www.99lib.net/book/(.*)/index.htm",
+  // 列表页中，用于定位列表DOM，非必须
+  "parentAttr": {
+    "parserPath": "#dir",
+    "field": "",
+    "parserType": 20
+  },
+  // 属性列表
+  "attrs": [
+    {
+      "field": "_tableName",
+      "defaultValue": "99lib-book-chaptors",
+      "parserType": 0
     },
-    // 属性列表
-    "attrs" : [{
-            "parserPath" : "dt,dd",
-            "parserPathAttr" : "text",
-            "field" : "titleName",
-            "parserType" : 20
-        }
-    ],
-    // 是否是列表页
-    "isList" : 1,
-    // 是否跳过存储
-    "skip" : 0
+    {
+      "parserPath": "dt,dd a",
+      "parserPathAttr": "text",
+      "field": "titleName",
+      "parserType": 20
+    }
+  ],
+  // 是否是列表页
+  "isList": 0,
+  // 是否跳过存储
+  "skip": 0
 }
