@@ -10,6 +10,10 @@
     {
       "pattern": "http://www.99lib.net/book/(.*)/index.htm",
       "type": "10"
+    },
+    {
+      "pattern": "http://www.99lib.net/book/(.*)/(.*).htm",
+      "type": "10"
     }
   ],
   // 指定爬取规则
