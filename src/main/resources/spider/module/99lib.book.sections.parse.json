@@ -18,13 +18,7 @@
     },
     {
       "parserPath": "div",
-      "parserPathAttr": "class",
-      "field": "sectionId",
-      "parserType": 20
-    },
-    {
-      "parserPath": "div",
-      "parserPathAttr": "fullText",
+      "parserPathAttr": "allText",
       "field": "content",
       "parserType": 20
     }
