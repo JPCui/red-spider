@@ -5,9 +5,8 @@ import lombok.Data;
 
 /**
  * 字段爬取规则Model
- * 
- * @author sucre
  *
+ * @author sucre
  */
 @Data
 public class Attr {
@@ -35,13 +34,21 @@ public class Attr {
 
     /**
      * 解析类型
-     * 
+     *
      * @see ParserType
      */
     Integer parserType;
 
+    /**
+     * 是否有多个值
+     */
     boolean isMulti;
 
     private Attr nested;
+
+    /**
+     * 默认值
+     */
+    private String defaultValue;
 
 }

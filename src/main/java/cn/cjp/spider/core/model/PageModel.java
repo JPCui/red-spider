@@ -4,103 +4,42 @@ import java.util.List;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 目标页爬取规则定义
- * 
- * @author sucre
  *
+ * @author sucre
  */
 @Data
 public class PageModel {
-	
-	private String siteName;
+
+    @NotNull
+    private String siteName;
+
+    private String description;
 
     private String db;
 
+    @NotNull
     private String url;
 
+    @NotNull
     private String urlPattern;
 
+    @NotNull
     private List<SeedDiscoveryRule> seedDiscoveries;
 
-    private Attr parentAttr;
+    /**
+     * 为了遵循 webmagic 的设计，同一站点的url队列使用同一个，所以把规则全部定义到一个page model里，由processor觉得该使用哪一个parse rule
+     */
+    @NotNull
+    private List<String> parseRules;
 
-    private List<Attr> attrs;
+    private List<ParseRuleModel> parseRuleModels;
 
-    private Integer skip;
+    private int isList;
 
-    private Integer isList;
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public Attr getParentAttr() {
-        return parentAttr;
-    }
-
-    public void setParentAttr(Attr parentAttr) {
-        this.parentAttr = parentAttr;
-    }
-
-    public List<Attr> getAttrs() {
-        return attrs;
-    }
-
-    public void setAttrs(List<Attr> attrs) {
-        this.attrs = attrs;
-    }
-
-    public Integer getSkip() {
-        return skip;
-    }
-
-    public void setSkip(Integer skip) {
-        this.skip = skip;
-    }
-
-    public Integer getIsList() {
-        return isList;
-    }
-
-    public void setIsList(Integer isList) {
-        this.isList = isList;
-    }
-
-    public List<SeedDiscoveryRule> getSeedDiscoveries() {
-        return seedDiscoveries;
-    }
-
-    public void setSeedDiscoveries(List<SeedDiscoveryRule> seedDiscoveries) {
-        this.seedDiscoveries = seedDiscoveries;
-    }
-
-    public String getDb() {
-        return db;
-    }
-
-    public void setDb(String db) {
-        this.db = db;
-    }
-
-    public String getUrlPattern() {
-        return urlPattern;
-    }
-
-    public void setUrlPattern(String urlPattern) {
-        this.urlPattern = urlPattern;
-    }
-
-	public String getSiteName() {
-		return siteName;
-	}
-
-	public void setSiteName(String siteName) {
-		this.siteName = siteName;
-	}
+    private int skip = 1;
 
 }

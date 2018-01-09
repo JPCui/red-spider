@@ -1,13 +1,7 @@
 package cn.cjp.spider.core.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSONObject;
-
+import cn.cjp.spider.core.config.SpiderConfig;
+import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.spider.core.discovery.CommonDiscovery;
 import cn.cjp.spider.core.discovery.Discovery;
 import cn.cjp.spider.core.enums.ParserType;
@@ -17,11 +11,20 @@ import cn.cjp.spider.core.model.PageModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.utils.Assert;
 import cn.cjp.utils.StringUtil;
+import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
-import us.codecraft.webmagic.selector.CssSelector;
+import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.selector.Selectable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 流程图如下：
@@ -51,34 +54,48 @@ public class SimpleProcessor implements PageProcessor {
 
     @Override
     public void process(Page page) {
-        LOGGER.debug("process: " + page.toString());
-        final List<Attr> attrs = pageModel.getAttrs();
-        final Integer isList = pageModel.getIsList();
-        final Attr parentAttr = pageModel.getParentAttr();
-        final Integer skip = pageModel.getSkip();
+        List<String> parseRules = pageModel.getParseRules();
 
-        Assert.assertNotNull(attrs);
+        // 按照URL对应的解析器进行解析
+        SpiderConfig.getParseRule(pageModel.getSiteName(), page.getUrl().get()).ifPresent(parseRule -> {
+            final List<Attr> attrs = parseRule.getAttrs();
+            final Attr parentAttr = parseRule.getParentAttr();
+            final int isList = parseRule.getIsList();
 
-        page.putField("db", pageModel.getDb());
+            Assert.assertNotNull(attrs);
 
-        if (isList == 1) {
-            Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
-            List<Selectable> domList = this.parse(root, parentAttr).nodes();
-            List<JSONObject> jsons = this.parseNodes(domList, attrs);
+            if (isList == 1) {
+                Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
+                List<Selectable> domList = this.parse(page, root, parentAttr).nodes();
+                List<JSONObject> jsons = this.parseNodes(page, domList, attrs);
+                jsons.forEach(json -> {
+                    setDefaultValue(page, pageModel, json);
+                });
 
-            page.putField("jsons", jsons);
-        } else {
-            Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
-            Selectable dom = this.parse(root, parentAttr);
-            JSONObject json = this.parseNode(dom, attrs);
+                page.putField("jsons", jsons);
+            } else {
+                Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
+                Selectable dom = this.parse(page, root, parentAttr);
+                JSONObject json = this.parseNode(page, dom, attrs);
+                setDefaultValue(page, pageModel, json);
 
-            page.putField("json", json);
-        }
+                page.putField("json", json);
+            }
+
+            if (parseRule.getSkip() == 1) {
+                page.setSkip(true);
+            }
+        });
 
         this.findSeeds(page);
+    }
 
-        if (skip == 1) {
-            page.setSkip(true);
+    private void setDefaultValue(Page page, PageModel pageModel, JSONObject json) {
+        json.put(SpiderConst.KEY_REFER_URL, page.getUrl().get());
+        if (StringUtil.isEmpty(pageModel.getDb())) {
+            json.put(SpiderConst.KEY_DB_NAME, pageModel.getSiteName());
+        } else {
+            json.put(SpiderConst.KEY_DB_NAME, pageModel.getDb());
         }
     }
 
@@ -96,10 +113,10 @@ public class SimpleProcessor implements PageProcessor {
         }
     }
 
-    public List<JSONObject> parseNodes(List<Selectable> domList, List<Attr> attrs) {
+    public List<JSONObject> parseNodes(Page page, List<Selectable> domList, List<Attr> attrs) {
         List<JSONObject> jsons = new ArrayList<>();
         domList.forEach(dom -> {
-            JSONObject json = this.parseNode(dom, attrs);
+            JSONObject json = this.parseNode(page, dom, attrs);
             jsons.add(json);
         });
         return jsons;
@@ -110,17 +127,22 @@ public class SimpleProcessor implements PageProcessor {
      * @param attrs 属性解析列表
      * @return
      */
-    public JSONObject parseNode(Selectable dom, List<Attr> attrs) {
+    public JSONObject parseNode(Page page, Selectable dom, List<Attr> attrs) {
         JSONObject json = new JSONObject();
         attrs.forEach(attr -> {
-            Selectable selectable = this.parse(dom, attr);
-            if (attr.isMulti()) {
-                selectable.all().stream().forEach(String::trim);
-                List<String> values = selectable.all();
-                json.put(attr.getField(), values);
-            } else {
-                String value = selectable.get().trim();
-                json.put(attr.getField(), value);
+            try {
+                Selectable selectable = this.parse(page, dom, attr);
+                if (attr.isMulti()) {
+                    List<String> values =
+                            selectable.all().stream().filter(s -> StringUtil.isEmpty(s)).collect(Collectors.toList());
+                    json.put(attr.getField(), values);
+                } else {
+                    String value = selectable.get().trim();
+                    json.put(attr.getField(), value);
+                }
+            } catch (RuntimeException e) {
+                LOGGER.error(String.format("parse fail, field=%s, parserPath=%s, dom=%s", attr.getField(), attr.getParserPath(), dom.toString()));
+                throw e;
             }
         });
         return json;
@@ -138,20 +160,14 @@ public class SimpleProcessor implements PageProcessor {
 
         if (parserType != null) {
             switch (parserType) {
+                case DOM:
+                case REGEX:
                 case XPATH: {
-                    value = page.getHtml();
-                    break;
-                }
-                case DOM: {
                     value = page.getHtml();
                     break;
                 }
                 case JSON: {
                     value = page.getJson();
-                    break;
-                }
-                case REGEX: {
-                    value = page.getHtml();
                     break;
                 }
                 default:
@@ -168,15 +184,25 @@ public class SimpleProcessor implements PageProcessor {
      * @param attr
      * @return
      */
-    private Selectable parse(Selectable dom, Attr attr) {
-        if (StringUtil.isEmpty(attr.getParserPath())) {
-            return dom;
-        }
-
+    private Selectable parse(Page page, Selectable dom, Attr attr) {
         Selectable value = null;
         ParserType parserType = ParserType.fromValue(attr.getParserType());
         if (parserType != null) {
             switch (parserType) {
+                case BASE: {
+                    value = new PlainText(attr.getDefaultValue());
+                    break;
+                }
+                case URL_PATTERN: {
+                    String url = page.getUrl().get();
+                    String regex = attr.getParserPath();
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(url);
+                    if (matcher.find()) {
+                        value = new PlainText(matcher.group(1));
+                    }
+                    break;
+                }
                 case XPATH: {
                     value = dom.xpath(attr.getParserPath());
                     break;
@@ -199,7 +225,7 @@ public class SimpleProcessor implements PageProcessor {
         }
 
         // 嵌套
-        return attr.getNested() == null ? value : this.parse(value, attr.getNested());
+        return attr.getNested() == null ? value : this.parse(page, value, attr.getNested());
     }
 
     @Override
