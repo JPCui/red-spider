@@ -17,6 +17,12 @@
       "parserType": 0
     },
     {
+    	"field" : "chaptor_id",
+    	"parserPath" : "2",
+    	"parserType" : 50,
+    	"isUnique" : 1
+    },
+    {
       "parserPath": "div",
       "parserPathAttr": "class",
       "field": "sectionId",

@@ -17,6 +17,17 @@
       "parserType": 0
     },
     {
+    	"field" : "book_id",
+    	"parserPath" : "h2 a",
+        "parserPathAttr": "href",
+    	"parserType" : 20,
+    	"isUnique" : 1,
+    	"nested" : {
+    		"parserType" : 30,
+    		"parserPath" : "/book/(.*)/index.htm"
+    	}
+    },
+    {
       "parserPath": "h4:eq(3) a",
       "parserPathAttr": "text",
       "field": "type",
