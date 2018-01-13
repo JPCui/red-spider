@@ -11,44 +11,49 @@ import lombok.Data;
 @Data
 public class Attr {
 
-    public Attr() {
-    }
+	public Attr() {
+	}
 
-    public Attr(String parserPath, String field, ParserType parserType) {
-        this.parserPath = parserPath;
-        this.field = field;
-        this.parserType = parserType.getValue();
-    }
+	public Attr(String parserPath, String field, ParserType parserType) {
+		this.parserPath = parserPath;
+		this.field = field;
+		this.parserType = parserType.getValue();
+	}
 
-    /**
-     * 解析路径
-     */
-    String parserPath;
+	/**
+	 * 解析路径
+	 */
+	String parserPath;
 
-    String parserPathAttr;
+	String parserPathAttr;
 
-    /**
-     * 字段名
-     */
-    String field;
+	/**
+	 * 字段名
+	 */
+	String field;
 
-    /**
-     * 解析类型
-     *
-     * @see ParserType
-     */
-    Integer parserType;
+	/**
+	 * 解析类型
+	 *
+	 * @see ParserType
+	 */
+	Integer parserType;
 
-    /**
-     * 是否有多个值
-     */
-    boolean isMulti;
+	/**
+	 * 是否有多个值
+	 */
+	boolean isMulti;
 
-    private Attr nested;
+	/**
+	 * 是否具有唯一性
+	 */
+	private boolean isUnique = false;
 
-    /**
-     * 默认值
-     */
-    private String defaultValue;
+	private Attr nested;
+
+	/**
+	 * 默认值
+	 */
+	private String defaultValue;
 
 }

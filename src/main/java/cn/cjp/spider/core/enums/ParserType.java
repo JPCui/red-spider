@@ -27,7 +27,9 @@ public enum ParserType {
      * group = 1<br>
      * => 100<br>
      */
-    URL_PATTERN(50, "URL_PATTERN"),;
+    URL_PATTERN(50, "URL_PATTERN"),
+    
+    ;
 
     private final int code;
     private final String message;
