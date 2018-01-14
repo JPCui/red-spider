@@ -1,26 +1,26 @@
 package cn.cjp.spider.core;
 
+import org.bson.Document;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
-import cn.cjp.spider.Application;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
-@WebAppConfiguration
 public class MongoClientTest {
-
-	@Autowired
-	MongoTemplate mongoTemplate;
 
 	@Test
 	public void test() throws Exception {
-		mongoTemplate.getCollection("test");
+		MongoClient client = new MongoClient();
+		MongoDatabase db = client.getDatabase("test");
+		MongoCollection<Document> coll = db.getCollection("test_coll");
+
+		Document doc = new Document("uu", "");
+		System.out.println(doc);
+		coll.insertOne(doc);
+		System.out.println(doc);
+
+		client.close();
 	}
 
 }
