@@ -17,12 +17,12 @@ public class NodeParserTest {
         String str = StringUtil.combine(FileUtil.read(ResourceUtils.getFile("classpath:test.txt")), "");
         System.out.println(str);
 
-        String se = "div.intro";
+        String se = "#d div";
 
         System.out.println();
 
         Html html = new Html(str);
-        System.out.println("a: " + html.css(se).all());
+        System.out.println("a: " + html.css(se).css("div", "allText").all());
         System.out.println("b: " + html.css(se, "allText").all());
     }
 

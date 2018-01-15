@@ -33,7 +33,7 @@ public class Attr {
     String field;
 
     /**
-     * 解析类型
+     * 解析类型（必需）
      *
      * @see ParserType
      */
@@ -45,6 +45,11 @@ public class Attr {
     boolean isMulti;
 
     private Attr nested;
+
+    /**
+     * 是否过滤重复的值（当isMulti=1）
+     */
+    private int filterRepeat = 0;
 
     /**
      * 默认值

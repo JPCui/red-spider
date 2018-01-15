@@ -11,6 +11,7 @@ import cn.cjp.spider.core.model.PageModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.utils.Assert;
 import cn.cjp.utils.StringUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import us.codecraft.webmagic.selector.Selectable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -54,6 +56,14 @@ public class SimpleProcessor implements PageProcessor {
 
     @Override
     public void process(Page page) {
+        try {
+            this.processInner(page);
+        } catch (Exception e) {
+            LOGGER.error(String.format("page parser fail, page=%s", page.getUrl().get()), e);
+        }
+    }
+
+    private void processInner(Page page) {
         List<String> parseRules = pageModel.getParseRules();
 
         // 按照URL对应的解析器进行解析
@@ -64,8 +74,8 @@ public class SimpleProcessor implements PageProcessor {
 
             Assert.assertNotNull(attrs);
 
+            Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
             if (isList == 1) {
-                Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
                 List<Selectable> domList = this.parse(page, root, parentAttr).nodes();
                 List<JSONObject> jsons = this.parseNodes(page, domList, attrs);
                 jsons.forEach(json -> {
@@ -74,7 +84,6 @@ public class SimpleProcessor implements PageProcessor {
 
                 page.putField("jsons", jsons);
             } else {
-                Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
                 Selectable dom = this.parse(page, root, parentAttr);
                 JSONObject json = this.parseNode(page, dom, attrs);
                 setDefaultValue(page, pageModel, json);
@@ -133,9 +142,16 @@ public class SimpleProcessor implements PageProcessor {
             try {
                 Selectable selectable = this.parse(page, dom, attr);
                 if (attr.isMulti()) {
-                    List<String> values =
-                            selectable.all().stream().filter(s -> StringUtil.isEmpty(s)).collect(Collectors.toList());
-                    json.put(attr.getField(), values);
+                    if (attr.getFilterRepeat() == 1) {
+                        // 去重（还要保证顺序不变）
+                        List<String> values =
+                                selectable.all().stream().filter(s -> StringUtil.isEmpty(s)).distinct().collect(Collectors.toList());
+                        json.put(attr.getField(), values);
+                    } else {
+                        List<String> values =
+                                selectable.all().stream().filter(s -> StringUtil.isEmpty(s)).collect(Collectors.toList());
+                        json.put(attr.getField(), values);
+                    }
                 } else {
                     String value = selectable.get().trim();
                     json.put(attr.getField(), value);
@@ -185,47 +201,57 @@ public class SimpleProcessor implements PageProcessor {
      * @return
      */
     private Selectable parse(Page page, Selectable dom, Attr attr) {
-        Selectable value = null;
-        ParserType parserType = ParserType.fromValue(attr.getParserType());
-        if (parserType != null) {
-            switch (parserType) {
-                case BASE: {
-                    value = new PlainText(attr.getDefaultValue());
-                    break;
-                }
-                case URL_PATTERN: {
-                    String url = page.getUrl().get();
-                    String regex = attr.getParserPath();
-                    Pattern pattern = Pattern.compile(regex);
-                    Matcher matcher = pattern.matcher(url);
-                    if (matcher.find()) {
-                        value = new PlainText(matcher.group(1));
-                    }
-                    break;
-                }
-                case XPATH: {
-                    value = dom.xpath(attr.getParserPath());
-                    break;
-                }
-                case DOM: {
-                    value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
-                    break;
-                }
-                case JSON: {
-                    value = dom.jsonPath(attr.getParserPath());
-                    break;
-                }
-                case REGEX: {
-                    value = dom.regex(attr.getParserPath());
-                    break;
-                }
-                default:
-                    throw new UnsupportedOperationException();
-            }
+        if ("div".equalsIgnoreCase(attr.getParserPath())) {
+            // DEBUG 在此加断点
+            LOGGER.debug(dom.toString());
         }
 
-        // 嵌套
-        return attr.getNested() == null ? value : this.parse(page, value, attr.getNested());
+        try {
+            Selectable value = null;
+            ParserType parserType = ParserType.fromValue(attr.getParserType());
+            if (parserType != null) {
+                switch (parserType) {
+                    case BASE: {
+                        value = new PlainText(attr.getDefaultValue());
+                        break;
+                    }
+                    case URL_PATTERN: {
+                        String url = page.getUrl().get();
+                        String regex = attr.getParserPath();
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(url);
+                        if (matcher.find()) {
+                            value = new PlainText(matcher.group(1));
+                        }
+                        break;
+                    }
+                    case XPATH: {
+                        value = dom.xpath(attr.getParserPath());
+                        break;
+                    }
+                    case DOM: {
+                        value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
+                        break;
+                    }
+                    case JSON: {
+                        value = dom.jsonPath(attr.getParserPath());
+                        break;
+                    }
+                    case REGEX: {
+                        value = dom.regex(attr.getParserPath());
+                        break;
+                    }
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+            }
+
+            // 嵌套
+            return attr.getNested() == null ? value : this.parse(page, value, attr.getNested());
+        } catch (Throwable t) {
+            LOGGER.error(String.format("parser fail, page=%s, dom=%s, attr=%s", page.getUrl().get(), dom.toString(), JSON.toJSONString(attr)));
+            throw t;
+        }
     }
 
     @Override
