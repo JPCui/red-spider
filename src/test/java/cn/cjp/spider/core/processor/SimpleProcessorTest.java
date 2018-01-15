@@ -1,65 +1,71 @@
 package cn.cjp.spider.core.processor;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+
+import com.mongodb.MongoClientURI;
+
 import cn.cjp.spider.core.config.SpiderConfig;
-import cn.cjp.spider.core.pipeline.FilePipeline;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
-
-import com.alibaba.fastjson.JSONObject;
-
 import cn.cjp.spider.core.model.PageModel;
-import cn.cjp.utils.JacksonUtil;
+import cn.cjp.spider.core.pipeline.FilePipeline;
+import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import cn.cjp.utils.Logger;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.scheduler.RedisPriorityScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
 public class SimpleProcessorTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SimpleProcessorTest.class);
+	private static final Logger LOGGER = Logger.getLogger(SimpleProcessorTest.class);
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private JedisPool jedisPool = new JedisPool("localhost");
+	private JedisPool jedisPool = new JedisPool("localhost");
 
-    private Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
+	private Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
 
-    public SimpleProcessorTest() throws IOException {
-        final Map<String, PageModel> map = SpiderConfig.PAGE_RULES;
+	public SimpleProcessorTest() throws Exception {
+		final Map<String, PageModel> map = SpiderConfig.PAGE_RULES;
 
-        map.forEach((siteName, siteModel) -> {
-            SimpleProcessor simpleProcessor = new SimpleProcessor();
-            simpleProcessor.setPageModel(siteModel);
+		map.forEach((siteName, siteModel) -> {
+			SimpleProcessor simpleProcessor = new SimpleProcessor();
+			simpleProcessor.setPageModel(siteModel);
 
-            Site site = new Site();
-            site.setDomain(siteModel.getSiteName());
-            simpleProcessor.setSite(site);
+			Site site = new Site();
+			site.setDomain(siteModel.getSiteName());
+			simpleProcessor.setSite(site);
 
-            Spider spider = Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(new ConsolePipeline())
-                    .addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl());
+			try {
+				Spider spider = Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(getJsonPipeline())
+						.addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl());
+				spider.run();
+				LOGGER.error(spider.getSite().getDomain() + " running.");
+			} catch (UnknownHostException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
 
-//            executorService.execute(spider);
-            spider.run();
-            LOGGER.error(spider.getSite().getDomain() + " running.");
-        });
+			// executorService.execute(spider);
+		});
 
+	}
 
-    }
+	public JsonPipeline getJsonPipeline() throws UnknownHostException {
+		SimpleMongoDbFactory factory = new SimpleMongoDbFactory(new MongoClientURI("mongodb://localhost:27017/test"));
+		MongoTemplate mongoTemplate = new MongoTemplate(factory);
+		JsonPipeline jsonPipeline = new JsonPipeline(mongoTemplate);
+		return jsonPipeline;
 
-    public static void main(String[] args) throws IOException {
-        SimpleProcessorTest test = new SimpleProcessorTest();
-    }
+	}
+
+	public static void main(String[] args) throws Exception {
+		SimpleProcessorTest test = new SimpleProcessorTest();
+	}
 
 }
