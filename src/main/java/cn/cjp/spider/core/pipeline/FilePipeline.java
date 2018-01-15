@@ -56,34 +56,12 @@ public class FilePipeline extends FilePersistentBase implements Pipeline {
             json.forEach((key, value) -> {
                 printWriter.print(key);
                 printWriter.print(":\t");
-                if (value != null) {
-                    if (value.getClass().isArray()) {
-                        Object[] vs = (Object[]) value;
-                        if (vs.length > 0) {
-                            printWriter.print(vs[0]);
-                            for (int i = 1; i < vs.length; i++) {
-                                printWriter.print(", ");
-                                printWriter.print(vs[i]);
-                            }
-                        }
-                    } else if (value instanceof Iterable) {
-                        Iterator valueIt = ((Iterable) value).iterator();
-                        if (valueIt.hasNext()) {
-                            printWriter.print(valueIt.next());
-                            while (valueIt.hasNext()) {
-                                printWriter.print(valueIt.next());
-                            }
-                        }
-                    } else {
-                        printWriter.print(value);
-                    }
-                }
-                printWriter.println("");
+                printWriter.println(value);
             });
-            printWriter.println("");
+            printWriter.println();
             printWriter.close();
         } catch (IOException e) {
-            logger.warn("write file error", e);
+            logger.error("write file error", e);
         }
     }
 }

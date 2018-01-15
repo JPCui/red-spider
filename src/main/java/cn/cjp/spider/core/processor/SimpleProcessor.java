@@ -141,15 +141,15 @@ public class SimpleProcessor implements PageProcessor {
         attrs.forEach(attr -> {
             try {
                 Selectable selectable = this.parse(page, dom, attr);
-                if (attr.isMulti()) {
+                if (attr.isHasMultiValue()) {
                     if (attr.getFilterRepeat() == 1) {
                         // 去重（还要保证顺序不变）
                         List<String> values =
-                                selectable.all().stream().filter(s -> StringUtil.isEmpty(s)).distinct().collect(Collectors.toList());
+                                selectable.all().stream().filter(s -> !StringUtil.isEmpty(s)).distinct().collect(Collectors.toList());
                         json.put(attr.getField(), values);
                     } else {
                         List<String> values =
-                                selectable.all().stream().filter(s -> StringUtil.isEmpty(s)).collect(Collectors.toList());
+                                selectable.all().stream().filter(s -> !StringUtil.isEmpty(s)).collect(Collectors.toList());
                         json.put(attr.getField(), values);
                     }
                 } else {
@@ -202,7 +202,7 @@ public class SimpleProcessor implements PageProcessor {
      * @return
      */
     private Selectable parse(Page page, Selectable dom, Attr attr) {
-        if ("div".equalsIgnoreCase(attr.getParserPath())) {
+        if ("#content div".equalsIgnoreCase(attr.getParserPath())) {
             // DEBUG 在此加断点
             LOGGER.debug(dom.toString());
         }

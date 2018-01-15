@@ -16,23 +16,22 @@
       "parserType": 0
     },
     {
-      "field": "chaptor_id",
-      "parserPath": "2",
+      "field": "section_id",
+      "parserPath": "http://www.99lib.net/book/.*/(.*).htm",
       "parserType": 50,
-      "isUnique": 1
+      "uniqueFlag": true
     },
     {
-      "parserPath": "div",
-      "parserPathAttr": "class",
-      "field": "sectionId",
-      "parserType": 20
+      "field": "chaptor_id",
+      "parserPath": "http://www.99lib.net/book/(.*)/.*.htm",
+      "parserType": 50
     },
     {
       "parserPath": "#content div",
       "parserPathAttr": "allText",
       "field": "content",
       "parserType": 20,
-      "isMulti": 1,
+      "hasMultiValue": true,
       "filterRepeat": 1
     }
   ],

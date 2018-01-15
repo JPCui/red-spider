@@ -17,20 +17,20 @@
       "parserType": 0
     },
     {
-    	"field" : "book_id",
-    	"parserPath" : "1",
-    	"parserType" : 50
+      "field": "book_id",
+      "uniqueFlag": true,
+      "parserPath": "http://www.99lib.net/book/(.*)/index.htm",
+      "parserType": 50
     },
     {
-    	"field" : "chaptor_id",
-    	"parserPath" : "dd a",
-        "parserPathAttr": "href",
-    	"parserType" : 20,
-    	"isUnique" : 1,
-    	"nested" : {
-    		"parserType" : 30,
-    		"parserPath" : "/book/.*/(.*).htm"
-    	}
+      "field": "chaptor_id",
+      "parserPath": "dd a",
+      "parserPathAttr": "href",
+      "parserType": 20,
+      "nested": {
+        "parserType": 30,
+        "parserPath": "/book/.*/(.*).htm"
+      }
     },
     {
       "parserPath": "dt,dd a",
