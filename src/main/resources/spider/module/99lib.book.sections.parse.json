@@ -16,12 +16,24 @@
       "parserType": 0
     },
     {
+      "field": "chaptor_id",
+      "parserPath": "2",
+      "parserType": 50,
+      "isUnique": 1
+    },
+    {
+      "parserPath": "div",
+      "parserPathAttr": "class",
+      "field": "sectionId",
+      "parserType": 20
+    },
+    {
       "parserPath": "#content div",
       "parserPathAttr": "allText",
       "field": "content",
       "parserType": 20,
-      "isMulti" : 1,
-      "filterRepeat" : 1
+      "isMulti": 1,
+      "filterRepeat": 1
     }
   ],
   // 是否是列表页

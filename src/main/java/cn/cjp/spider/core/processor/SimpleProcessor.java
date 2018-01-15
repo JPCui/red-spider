@@ -157,7 +157,8 @@ public class SimpleProcessor implements PageProcessor {
                     json.put(attr.getField(), value);
                 }
             } catch (RuntimeException e) {
-                LOGGER.error(String.format("parse fail, field=%s, parserPath=%s, dom=%s", attr.getField(), attr.getParserPath(), dom.toString()));
+                LOGGER.error(String.format("parse fail, field=%s, parserPath=%s, dom=%s", attr.getField(),
+                        attr.getParserPath(), dom.toString()));
                 throw e;
             }
         });
