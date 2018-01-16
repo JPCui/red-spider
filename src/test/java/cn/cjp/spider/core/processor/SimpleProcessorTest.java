@@ -44,14 +44,15 @@ public class SimpleProcessorTest {
 
 			try {
 				Spider spider = Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(getJsonPipeline())
-						.addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl());
-				spider.run();
+						.addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl())
+						.thread(executorService, 10);
+				spider.start();
+
 				LOGGER.error(spider.getSite().getDomain() + " running.");
 			} catch (UnknownHostException e) {
 				LOGGER.error(e.getMessage(), e);
 			}
 
-			// executorService.execute(spider);
 		});
 
 	}
