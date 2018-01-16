@@ -1,7 +1,7 @@
 # red-spider
 :spider:
-
 [![HitCount](http://hits.dwyl.io/jpcui/red-spider.svg)](http://hits.dwyl.io/jpcui/red-spider)
+[![Build Status](https://travis-ci.org/JPCui/red-spider.svg?branch=master)](https://travis-ci.org/JPCui/red-spider)
 
 
 # TODO
