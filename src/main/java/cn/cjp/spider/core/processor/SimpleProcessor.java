@@ -66,8 +66,6 @@ public class SimpleProcessor implements PageProcessor {
 	}
 
 	private void processInner(Page page) {
-		List<String> parseRules = pageModel.getParseRules();
-
 		// 按照URL对应的解析器进行解析
 		SpiderConfig.getParseRule(pageModel.getSiteName(), page.getUrl().get()).ifPresent(parseRule -> {
 			final List<Attr> attrs = parseRule.getAttrs();
@@ -93,7 +91,7 @@ public class SimpleProcessor implements PageProcessor {
 				page.putField("json", json);
 			}
 
-			if (parseRule.getSkip() == 1) {
+			if (pageModel.getSkip() == 1) {
 				page.setSkip(true);
 			}
 		});
@@ -124,7 +122,7 @@ public class SimpleProcessor implements PageProcessor {
 		}
 	}
 
-	public List<JSONObject> parseNodes(Page page, List<Selectable> domList, List<Attr> attrs) {
+	private List<JSONObject> parseNodes(Page page, List<Selectable> domList, List<Attr> attrs) {
 		List<JSONObject> jsons = new ArrayList<>();
 		domList.forEach(dom -> {
 			JSONObject json = this.parseNode(page, dom, attrs);
@@ -140,25 +138,15 @@ public class SimpleProcessor implements PageProcessor {
 	 *            属性解析列表
 	 * @return
 	 */
-	public JSONObject parseNode(Page page, Selectable dom, List<Attr> attrs) {
+	private JSONObject parseNode(Page page, Selectable dom, List<Attr> attrs) {
 		JSONObject json = new JSONObject();
 		attrs.forEach(attr -> {
 			try {
 				Selectable selectable = this.parse(page, dom, attr);
-				if (attr.isHasMultiValue()) {
-					if (attr.getFilterRepeat() == 1) {
-						// 去重（还要保证顺序不变）
-						List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s)).distinct()
-								.collect(Collectors.toList());
-						json.put(attr.getField(), values);
-					} else {
-						List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s))
-								.collect(Collectors.toList());
-						json.put(attr.getField(), values);
-					}
+				if (attr.isHasEmbeddedAttr()) {
+					json.put(attr.getField(), parseNodeWithEmbeddedAttr(page, selectable, attr));
 				} else {
-					String value = selectable.get().trim();
-					json.put(attr.getField(), value);
+					json.put(attr.getField(), parseNodeWithoutEmbeddedAttr(selectable, attr));
 				}
 
 				if (attr.isUniqueFlag()) {
@@ -173,6 +161,51 @@ public class SimpleProcessor implements PageProcessor {
 			}
 		});
 		return json;
+	}
+
+	/**
+	 * TODO 重构
+	 * 
+	 * @param page
+	 * @param selectable
+	 * @param attr
+	 * @return
+	 */
+	private Object parseNodeWithEmbeddedAttr(Page page, Selectable selectable, Attr attr) {
+		Object result = null;
+		if (attr.isHasMultiValue()) {
+			List<Selectable> domList = this.parse(page, selectable, attr).nodes();
+			List<JSONObject> jsons = this.parseNodes(page, domList, attr.getEmbeddedAttrs());
+			result = jsons;
+		} else {
+			Selectable dom = this.parse(page, selectable, attr);
+			JSONObject json = this.parseNode(page, dom, attr.getEmbeddedAttrs());
+			result = json;
+		}
+		return result;
+	}
+
+	private Object parseNodeWithoutEmbeddedAttr(Selectable selectable, Attr attr) {
+		Object result = null;
+		if (attr.isHasMultiValue()) {
+			if (attr.getFilterRepeat() == 1) {
+				// 去重（还要保证顺序不变）
+				List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s)).distinct()
+						.collect(Collectors.toList());
+				// json.put(attr.getField(), values);
+				result = values;
+			} else {
+				List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s))
+						.collect(Collectors.toList());
+				// json.put(attr.getField(), values);
+				result = values;
+			}
+		} else {
+			String value = selectable.get().trim();
+			// json.put(attr.getField(), value);
+			result = value;
+		}
+		return result;
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package cn.cjp.spider.core.model;
 
+import java.util.List;
+
 import cn.cjp.spider.core.enums.ParserType;
 import lombok.Data;
 
@@ -64,6 +66,11 @@ public class Attr {
 	/**
 	 * 是否内嵌Attr
 	 */
-	private boolean embeddedAttr = false;
+	private boolean hasEmbeddedAttr = false;
+
+	/**
+	 * 内嵌Attr集合, if hasMultiValue = true
+	 */
+	private List<Attr> embeddedAttrs;
 
 }

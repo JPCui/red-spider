@@ -1,10 +1,12 @@
 package cn.cjp.spider.core.model;
 
-import lombok.Data;
-import org.hibernate.validator.constraints.NotEmpty;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import lombok.Data;
 
 /**
  * 解析规则
@@ -36,13 +38,6 @@ public class ParseRuleModel {
      * 是否是列表页
      */
     private int isList;
-
-    /**
-     * 是否跳过
-     *
-     * @deprecated used in page model
-     */
-    private int skip;
 
 
 }
