@@ -4,7 +4,7 @@
   "url": "http://www.99lib.net/book/index.php",
   "seedDiscoveries": [
     {
-      "pattern": "http://www.99lib.net/book/index.php?page=(.*)",
+      "pattern": "http://www.99lib.net/book/index.php\\?page=(.*)",
       "type": "10"
     },
     {
