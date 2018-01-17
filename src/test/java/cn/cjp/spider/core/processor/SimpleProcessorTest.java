@@ -40,12 +40,17 @@ public class SimpleProcessorTest {
 
 			Site site = new Site();
 			site.setDomain(siteModel.getSiteName());
+			site.setRetrySleepTime(10_000); // 重试休息时间：10s
+			site.setRetryTimes(10); // 重试 10次
+			site.setTimeOut(30000); // 超时时间 30s
 			simpleProcessor.setSite(site);
 
 			try {
 				Spider spider = Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(getJsonPipeline())
 						.addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl())
 						.thread(executorService, 10);
+				// 结束不自动关闭，默认 true
+				spider.setExitWhenComplete(false);
 				spider.start();
 
 				LOGGER.error(spider.getSite().getDomain() + " running.");
@@ -66,7 +71,7 @@ public class SimpleProcessorTest {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SimpleProcessorTest test = new SimpleProcessorTest();
+		new SimpleProcessorTest();
 	}
 
 }

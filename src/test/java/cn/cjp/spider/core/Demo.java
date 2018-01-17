@@ -6,20 +6,11 @@ import java.util.List;
 
 public class Demo {
 
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        List<String> list = new ArrayList<>();
-        list.add("b");
-        list.add("c");
-        list.add("a");
-        list.add("a");
-        list.add("c");
-        list = null;
+	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 
-        PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("C:/test.txt"), true), "UTF-8"));
-        printWriter.println(list);
-        printWriter.flush();
-        printWriter.close();
+		System.out.println(
+				"http://www.99lib.net/book/index.php?page=2".matches("http://www.99lib.net/book/index.php?page=(.*)"));
 
-    }
+	}
 
 }
