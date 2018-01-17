@@ -35,14 +35,17 @@ public class HtmlNormalPagingDiscovery implements Discovery {
 		Set<String> foundUrlList = new TreeSet<>();
 
 		List<String> allUrls = page.getHtml().$("a", "href").all();
-		allUrls.forEach(url -> {
+		allUrls.stream().filter(s -> {
+			return !StringUtil.isEmpty(s) && !s.startsWith("#");
+		}).forEach(url -> {
 			String currUrl = url;
 			if (!(currUrl.startsWith("http:") || currUrl.startsWith("https:"))) {
 				// 相对路径的处理
 				try {
 					currUrl = URLUtil.relative(page.getUrl().get(), currUrl);
 				} catch (MalformedURLException e) {
-					LOGGER.warn(e.getMessage());
+				} catch (Exception e) {
+					LOGGER.error(String.format("parse url error, url: %s", url), e);
 				}
 			}
 			if (currUrl.matches(findSeedPattern)) {
