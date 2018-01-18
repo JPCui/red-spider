@@ -1,5 +1,6 @@
 package cn.cjp.spider.core.pipeline.mongo;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -81,6 +82,7 @@ public class JsonPipeline implements Pipeline {
 
 	private DBObject toDBObject(JSONObject json) {
 		DBObject dbo = new BasicDBObject(json);
+		dbo.put("_updateDate", new Date());
 		return dbo;
 	}
 
