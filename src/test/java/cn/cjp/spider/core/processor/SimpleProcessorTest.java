@@ -10,16 +10,16 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 
 import com.mongodb.MongoClientURI;
 
+import cn.cjp.spider.core.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
+import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.PageModel;
 import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
+import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.utils.Logger;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.scheduler.RedisPriorityScheduler;
-import us.codecraft.webmagic.scheduler.Scheduler;
 
 public class SimpleProcessorTest {
 
@@ -29,7 +29,7 @@ public class SimpleProcessorTest {
 
 	private JedisPool jedisPool = new JedisPool("localhost");
 
-	private Scheduler scheduler = new RedisPriorityScheduler(jedisPool);
+	private MyRedisScheduler scheduler = new MyRedisScheduler(jedisPool);
 
 	public SimpleProcessorTest() throws Exception {
 		final Map<String, PageModel> map = SpiderConfig.PAGE_RULES;
@@ -39,13 +39,21 @@ public class SimpleProcessorTest {
 			simpleProcessor.setPageModel(siteModel);
 
 			Site site = new Site();
+			site.addHeader("User-Agent", UserAgents.get());
 			site.setDomain(siteModel.getSiteName());
+			site.setSleepTime(3000);
+			site.setRetrySleepTime(10_000); // 重试休息时间：10s
+			site.setRetryTimes(10); // 重试 10次
+			site.setTimeOut(30000); // 超时时间 30s
 			simpleProcessor.setSite(site);
 
 			try {
-				Spider spider = Spider.create(simpleProcessor).setScheduler(scheduler).addPipeline(getJsonPipeline())
+				MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor);
+				spider.setScheduler(scheduler).addPipeline(getJsonPipeline())
 						.addPipeline(new FilePipeline("D:/spider/")).addUrl(siteModel.getUrl())
-						.thread(executorService, 10);
+						.thread(executorService, 5);
+				// 结束不自动关闭，默认 true
+				spider.setExitWhenComplete(false);
 				spider.start();
 
 				LOGGER.error(spider.getSite().getDomain() + " running.");
@@ -66,7 +74,7 @@ public class SimpleProcessorTest {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SimpleProcessorTest test = new SimpleProcessorTest();
+		new SimpleProcessorTest();
 	}
 
 }

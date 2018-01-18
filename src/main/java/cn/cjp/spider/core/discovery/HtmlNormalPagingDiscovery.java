@@ -1,8 +1,11 @@
 package cn.cjp.spider.core.discovery;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import com.google.common.collect.Lists;
 
 import cn.cjp.spider.core.enums.SeedDiscoveryType;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
@@ -29,17 +32,20 @@ public class HtmlNormalPagingDiscovery implements Discovery {
 			return;
 		}
 
-		List<String> foundUrlList = new ArrayList<>();
+		Set<String> foundUrlList = new TreeSet<>();
 
 		List<String> allUrls = page.getHtml().$("a", "href").all();
-		allUrls.forEach(url -> {
+		allUrls.stream().filter(s -> {
+			return !StringUtil.isEmpty(s) && !s.startsWith("#");
+		}).forEach(url -> {
 			String currUrl = url;
-			if (currUrl.startsWith("/")) {
+			if (!(currUrl.startsWith("http:") || currUrl.startsWith("https:"))) {
 				// 相对路径的处理
 				try {
-					currUrl = URLUtil.relative(page.getUrl().get(), url);
+					currUrl = URLUtil.relative(page.getUrl().get(), currUrl);
 				} catch (MalformedURLException e) {
-					LOGGER.warn(e.getMessage());
+				} catch (Exception e) {
+					LOGGER.error(String.format("parse url error, url: %s", url), e);
 				}
 			}
 			if (currUrl.matches(findSeedPattern)) {
@@ -47,7 +53,8 @@ public class HtmlNormalPagingDiscovery implements Discovery {
 			}
 		});
 
-		page.addTargetRequests(foundUrlList);
+		LOGGER.info(String.format("found new urls : ", foundUrlList));
+		page.addTargetRequests(Lists.newArrayList(foundUrlList));
 
 	}
 
