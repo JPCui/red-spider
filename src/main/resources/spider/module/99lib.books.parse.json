@@ -31,7 +31,8 @@
       "parserPath": "h4:eq(3) a",
       "parserPathAttr": "text",
       "field": "type",
-      "parserType": 20
+      "parserType": 20,
+      "hasMultiValue" : true
     },
     {
       "parserPath": "h2 a",
