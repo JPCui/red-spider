@@ -59,9 +59,10 @@ public class SimpleProcessor implements PageProcessor {
 	@Override
 	public void process(Page page) {
 		try {
+			LOGGER.info(String.format("parse url: %s", page.getUrl().get()));
 			this.processInner(page);
 		} catch (Exception e) {
-			LOGGER.error(String.format("page parser fail, page=%s", page.getUrl().get()), e);
+			LOGGER.error(String.format("parse fail, url=%s", page.getUrl().get()), e);
 		}
 	}
 
