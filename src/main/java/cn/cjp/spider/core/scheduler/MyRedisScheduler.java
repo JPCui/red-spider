@@ -3,8 +3,6 @@ package cn.cjp.spider.core.scheduler;
 import cn.cjp.utils.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.scheduler.RedisScheduler;
@@ -15,6 +13,15 @@ import us.codecraft.webmagic.scheduler.RedisScheduler;
 public class MyRedisScheduler extends RedisScheduler {
 
 	private static final Logger LOGGER = Logger.getLogger(MyRedisScheduler.class);
+
+	/**
+	 * 真实抓取到的URL集合（抓取成功才会入队）
+	 */
+	private static final String SET_AUTUAL_PREFIX = "set_autual_";
+
+	protected String getActualSetKey(Task task) {
+		return SET_AUTUAL_PREFIX + task.getUUID();
+	}
 
 	public MyRedisScheduler(String host) {
 		super(host);
@@ -32,7 +39,8 @@ public class MyRedisScheduler extends RedisScheduler {
 	 */
 	public void onDownloadSuccess(Request request, Task task) {
 		try (Jedis jedis = pool.getResource()) {
-			Long r = jedis.sadd(getSetKey(task), request.getUrl());
+			// Long r = jedis.sadd(getSetKey(task), request.getUrl());
+			Long r = jedis.sadd(getActualSetKey(task), request.getUrl());
 			if (Long.valueOf(1L) == r) {
 				LOGGER.info(String.format("download url success : %s", request.getUrl()));
 			} else {
@@ -41,12 +49,13 @@ public class MyRedisScheduler extends RedisScheduler {
 		}
 	}
 
-	@Override
-	public boolean isDuplicate(Request request, Task task) {
-		try (Jedis jedis = pool.getResource()) {
-			ScanResult<String> scanResult = jedis.sscan(getSetKey(task), "0", new ScanParams().match(request.getUrl()));
-			return scanResult.getResult().size() != 0;
-		}
-	}
+	// @Override
+	// public boolean isDuplicate(Request request, Task task) {
+	// try (Jedis jedis = pool.getResource()) {
+	// ScanResult<String> scanResult = jedis.sscan(getSetKey(task), "0", new
+	// ScanParams().match(request.getUrl()));
+	// return scanResult.getResult().size() != 0;
+	// }
+	// }
 
 }
