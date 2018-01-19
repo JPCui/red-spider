@@ -1,5 +1,7 @@
 package cn.cjp.spider;
 
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +52,9 @@ public class RedisTest {
 			if ((num++) % 1000 == 0) {
 				System.out.println("moved: " + num);
 			}
+			if (num >= 10_000_000) {
+				break;
+			}
 		}
 
 		Long setLength = jedis.scard(setName);
@@ -76,6 +81,23 @@ public class RedisTest {
 
 		System.out.println("list length: " + listLength);
 		System.out.println("set length: " + setLength);
+	}
+
+	@Test
+	public void diffSet() {
+		String set1 = "set_99lib.net";
+		String set2 = "set_autual_99lib.net";
+		String queue = "queue_99lib.net";
+
+		// 取出差集
+		Set<String> diffSet = jedis.sdiff(set1, set2);
+		System.out.println("diff : " + diffSet);
+		// 从全集合去除这些集合
+		String[] diffs = diffSet.toArray(new String[0]);
+		jedis.srem(set1, diffs);
+		// 然后放入队列
+		jedis.lpush(queue, diffs);
+
 	}
 
 }
