@@ -16,13 +16,13 @@
       "parserType": 0
     },
     {
-      "field": "section_id",
+      "field": "chaptor_id",
       "parserPath": "http://www.99lib.net/book/.*/(.*).htm",
       "parserType": 50,
       "uniqueFlag": true
     },
     {
-      "field": "chaptor_id",
+      "field": "book_id",
       "parserPath": "http://www.99lib.net/book/(.*)/.*.htm",
       "parserType": 50
     },
