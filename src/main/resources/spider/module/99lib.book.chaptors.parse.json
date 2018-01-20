@@ -23,17 +23,6 @@
       "parserType": 50
     },
     {
-      "field": "chaptor_id",
-      "parserPath": "dd a",
-      "parserPathAttr": "href",
-      "hasMultiValue" : true,
-      "parserType": 20,
-      "nested": {
-        "parserType": 30,
-        "parserPath": "/book/.*/(.*).htm"
-      }
-    },
-    {
       "field": "chaptors",
       "hasEmbeddedAttr" : true,
       "hasMultiValue" : true,
