@@ -84,6 +84,9 @@ public class SimpleProcessorTest {
 		SimpleProcessorTest test = new SimpleProcessorTest();
 		test.scheduler = new MyRedisScheduler(new JedisPool());
 		test.run();
+
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		countDownLatch.await();
 	}
 
 	@Test
