@@ -16,11 +16,13 @@ import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.spider.core.discovery.CommonDiscovery;
 import cn.cjp.spider.core.discovery.Discovery;
+import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
 import cn.cjp.spider.core.model.PageModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
+import cn.cjp.spider.util._99libUtil;
 import cn.cjp.utils.Assert;
 import cn.cjp.utils.StringUtil;
 import us.codecraft.webmagic.Page;
@@ -144,11 +146,21 @@ public class SimpleProcessor implements PageProcessor {
 		attrs.forEach(attr -> {
 			try {
 				Selectable selectable = this.parse(page, dom, attr);
-				if (attr.isHasEmbeddedAttr()) {
-					json.put(attr.getField(), parseNodeWithEmbeddedAttr(page, selectable, attr));
-				} else {
-					json.put(attr.getField(), parseNodeWithoutEmbeddedAttr(selectable, attr));
+				if (attr.getField().equals("tags")) {
+					LOGGER.info("");
 				}
+
+				Object result = null;
+				if (attr.isHasEmbeddedAttr()) {
+					result = parseNodeWithEmbeddedAttr(page, selectable, attr);
+				} else {
+					result = parseNodeWithoutEmbeddedAttr(selectable, attr);
+				}
+
+				// 去噪
+				result = denosing(page, attr, result);
+
+				json.put(attr.getField(), result);
 
 				if (attr.isUniqueFlag()) {
 					// 设置唯一键
@@ -162,6 +174,30 @@ public class SimpleProcessor implements PageProcessor {
 			}
 		});
 		return json;
+	}
+
+	/**
+	 * 去噪
+	 * 
+	 * @param attr
+	 * @param result
+	 * @return
+	 */
+	private Object denosing(Page page, Attr attr, Object result) {
+		DenoisingType denoisingType = DenoisingType.fromValue(attr.getDenoisingType());
+		if (denoisingType != null) {
+			switch (denoisingType) {
+			case _99LIB_SECTIONS: {
+				if (result instanceof List) {
+					result = _99libUtil.extractValidSections((List<?>) result, page.getHtml().css("meta[name=client]", "content").get());
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -191,7 +227,7 @@ public class SimpleProcessor implements PageProcessor {
 		if (attr.isHasMultiValue()) {
 			if (attr.getFilterRepeat() == 1) {
 				// 去重（还要保证顺序不变）
-				List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s)).distinct()
+				List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s))
 						.collect(Collectors.toList());
 				// json.put(attr.getField(), values);
 				result = values;

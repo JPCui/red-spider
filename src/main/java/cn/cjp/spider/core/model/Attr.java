@@ -72,5 +72,7 @@ public class Attr {
 	 * 内嵌Attr集合, if hasMultiValue = true
 	 */
 	private List<Attr> embeddedAttrs;
+	
+	private int denoisingType = 0;
 
 }

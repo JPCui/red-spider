@@ -69,11 +69,17 @@ public class _99libUtil {
 	 * @return
 	 */
 	public static <T> List<T> extractValidSections(List<T> doms, String metaContent) {
+		int size = doms.size();
 		List<Integer> indexes = extractValidSectionIndexs(metaContent);
-		List<T> selectedDoms = new ArrayList<>();
+		List<T> selectedDoms = new ArrayList<>();doms.get(523);
 		indexes.forEach(index -> {
-			selectedDoms.add(doms.get(index));
+			if (index < size) {
+				selectedDoms.add(doms.get(index));
+			}
 		});
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(selectedDoms.toString());
+		}
 		return selectedDoms;
 	}
 

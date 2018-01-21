@@ -32,7 +32,7 @@
       "field": "content",
       "parserType": 20,
       "hasMultiValue": true,
-      "filterRepeat": 1
+      "denoisingType" : 10
     }
   ],
   // 是否是列表页
