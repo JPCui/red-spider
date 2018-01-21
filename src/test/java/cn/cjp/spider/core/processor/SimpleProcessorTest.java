@@ -42,7 +42,7 @@ public class SimpleProcessorTest {
 			site.addHeader("User-Agent", UserAgents.get());
 			site.setDomain(siteModel.getSiteName());
 			site.setSleepTime(3000);
-			site.setRetrySleepTime(30_000); // 重试休息时间：10s
+			site.setRetrySleepTime(30_000); // 重试休息时间：30s
 			site.setRetryTimes(5); // 重试 10次
 			site.setTimeOut(30_000); // 超时时间 30s
 			simpleProcessor.setSite(site);
