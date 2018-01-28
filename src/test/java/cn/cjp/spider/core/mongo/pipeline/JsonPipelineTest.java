@@ -10,13 +10,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.alibaba.fastjson.JSONObject;
 
-import cn.cjp.Application;
+import cn.cjp.SpiderAppApplication;
 import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import us.codecraft.webmagic.ResultItems;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
+@SpringApplicationConfiguration(classes = SpiderAppApplication.class)
 @WebAppConfiguration
 public class JsonPipelineTest {
 

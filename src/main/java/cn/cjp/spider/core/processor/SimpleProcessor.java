@@ -189,7 +189,8 @@ public class SimpleProcessor implements PageProcessor {
 			switch (denoisingType) {
 			case _99LIB_SECTIONS: {
 				if (result instanceof List) {
-					result = _99libUtil.extractValidSections((List<?>) result, page.getHtml().css("meta[name=client]", "content").get());
+					result = _99libUtil.extractValidSections((List<?>) result,
+							page.getHtml().css("meta[name=client]", "content").get());
 				}
 				break;
 			}
@@ -238,7 +239,10 @@ public class SimpleProcessor implements PageProcessor {
 				result = values;
 			}
 		} else {
-			String value = selectable.get().trim();
+			String value = selectable.get();
+			if (value != null) {
+				value = value.trim();
+			}
 			// json.put(attr.getField(), value);
 			result = value;
 		}

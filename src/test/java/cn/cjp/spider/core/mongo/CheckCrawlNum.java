@@ -3,7 +3,6 @@ package cn.cjp.spider.core.mongo;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ import com.mongodb.DBObject;
 import com.mongodb.GroupCommand;
 import com.mongodb.MongoClientURI;
 
-import cn.cjp.app.model.doc.Sections;
+import cn.cjp.app.model.doc.Chaptors;
 import redis.clients.jedis.Jedis;
 
 public class CheckCrawlNum {
@@ -53,21 +52,25 @@ public class CheckCrawlNum {
 
 	}
 
+	/**
+	 * 哪些文檔需要重新爬
+	 */
 	@Test
-	public void testBefore0121() {
+	public void testRecrawl() {
 		int page = 0;
 		int pageSize = 1000;
 
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, 15);
+		// Calendar cal = Calendar.getInstance();
+		// cal.set(Calendar.HOUR_OF_DAY, 15);
 
 		Jedis jedis = new Jedis();
 
-		List<Sections> list = null;
+		List<Chaptors> list = null;
 		while (true) {
-			Criteria criteria = Criteria.where("_updateDate").lt(cal.getTime());
+			Criteria criteria = new Criteria();
+			// criteria.and("_updateDate").lt(cal.getTime());
 			Query query = Query.query(criteria).skip(((page++) - 1) * pageSize).limit(pageSize);
-			list = mongoTemplate.find(query, Sections.class);
+			list = mongoTemplate.find(query, Chaptors.class);
 			if (list.size() == 0) {
 				break;
 			}

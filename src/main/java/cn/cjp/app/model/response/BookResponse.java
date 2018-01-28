@@ -10,9 +10,11 @@ public class BookResponse {
 	private String name;
 
 	private String author;
+	
+	private String type;
+	
+	private String[] tags;
 
 	private String summary;
-
-	private String[] tags;
 
 }

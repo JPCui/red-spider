@@ -4,15 +4,13 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <link rel="stylesheet" href="${staticServerPath}/css/style.css" />
-  <title></title>
+  <title>藏書</title>
   
 <style>
     * {
         list-style-type: none;
     }
     div.box {
-        height: 500px;
-        overflow-y: scroll;
     }
     ul {
         display: table;
@@ -20,10 +18,6 @@
     ul li {
         display: table-row;
         border-bottom: 1px solid silver;
-    }
-    ul li c {
-        display: table-cell;
-        padding: 10px 15px;
     }
 </style>
   
@@ -33,14 +27,32 @@
   <script src="${staticServerPath}/js/canvas-nest.js" count="200" zindex="-2" opacity="0.8" color="47,135,193" type="text/javascript"></script>
 </header>
 
-	
-<h1>IP统计</h1>
 <div class="box">
+	<#list data as d>
     <ul>
-    	<#list datas?keys as key>
-        <li><c>${key}</c><c>${datas[key]}</c></li>
-        </#list>
-    </ul>
+    	<li>
+    		<h2><a href="/book/${d._id}">${d.name}</a></h2>
+    	</li>
+    	<li>
+    		作者：<a href="/book/author/${d.author}">${d.author}</a>
+    	</li>
+    	<li>
+	    	<#if d.type??>
+    		分類：
+    		<a href="/book/type/${d.type}">${d.type}</a>
+	    	</#if>
+    	</li>
+    	<li>
+	    	<#if d.tags??>
+    		標簽：
+	    	<#list d.tags as tag>
+	    		<a href="/book/tags/${tag}">${tag}</a> &nbsp;
+	    	</#list>
+	    	</#if>
+    	</li>
+    	<li>${d.summary}</li>
+	</ul>
+    </#list>
 </div>
 
 

@@ -22,6 +22,7 @@ import cn.cjp.app.model.request.PageRequest;
 import cn.cjp.app.model.response.BookResponse;
 import cn.cjp.app.model.response.ChaptorsResponse.ChaptorResponse;
 import cn.cjp.app.model.response.SectionResponse;
+import cn.cjp.app.model.response.SectionResponse.PageIndexResponse;
 import cn.cjp.app.repository.BookRepository;
 import cn.cjp.app.repository.ChaptorsRepository;
 import cn.cjp.app.repository.SectionsRepository;
@@ -93,11 +94,12 @@ public class BookService {
 	/**
 	 * 根据bookDocId获取chaptor，再跟进 index 获取 section_id
 	 * 
-	 * @param bookId
+	 * @param bookDocId
 	 * @param index
+	 *            下标，base: 1
 	 * @return
 	 */
-	public SectionResponse getSectionByDocIdAndIndex(String bookDocId, int index) {
+	public SectionResponse getSectionByBookDocIdAndIndex(String bookDocId, int index) {
 		Book book = bookRepository.findById(bookDocId);
 
 		Query query = new Query(Criteria.where("book_id").is(book.getBookId()));
@@ -105,18 +107,37 @@ public class BookService {
 		ServiceAssert.assert404(chaptors);
 
 		Chaptor[] chaptorArray = chaptors.getChaptors();
-		Chaptor selectedChaptor = chaptorArray[index];
-		String chaptorId = selectedChaptor.getChaptorId();
+		int size = chaptorArray.length;
+		if (index <= size) {
+			Chaptor selectedChaptor = chaptorArray[index - 1];
+			String chaptorId = selectedChaptor.getChaptorId();
 
-		Criteria criteria = new Criteria();
-		criteria.and("chaptor_id").is(chaptorId);
-		query = new Query(criteria);
-		Sections sections = sectionsRepository.findOne(query);
-		ServiceAssert.assert404(sections);
+			Criteria criteria = new Criteria();
+			criteria.and("chaptor_id").is(chaptorId);
+			query = new Query(criteria);
+			Sections sections = sectionsRepository.findOne(query);
+			ServiceAssert.assert404(sections);
 
-		SectionResponse sectionResponse = new SectionResponse();
-		BeanUtils.copyProperties(sections, sectionResponse);
-		return sectionResponse;
+			SectionResponse sectionResponse = new SectionResponse();
+			BeanUtils.copyProperties(sections, sectionResponse);
+			if (index > 1) {
+				// prev
+				sectionResponse.setPrev(PageIndexResponse.build(index - 1, chaptorArray[index - 1].getChaptorName()));
+			}
+			if (index < size) {
+				// next
+				sectionResponse.setNext(PageIndexResponse.build(index + 1, chaptorArray[index + 1].getChaptorName()));
+			}
+			return sectionResponse;
+		}
+		return null;
+	}
+
+	public BookResponse findOne(String bookId) {
+		Book book = bookRepository.findById(bookId);
+		BookResponse bookResponse = new BookResponse();
+		BeanUtils.copyProperties(book, bookResponse);
+		return bookResponse;
 	}
 
 }
