@@ -10,7 +10,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @SpringBootApplication
 @ServletComponentScan
-public class Application extends SpringBootServletInitializer {
+public class SpiderAppApplication extends SpringBootServletInitializer {
 
 	/**
 	 * 创建异步任务执行器
@@ -28,11 +28,11 @@ public class Application extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(Application.class);
+		return application.sources(SpiderAppApplication.class);
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(SpiderAppApplication.class, args);
 	}
 
 }
