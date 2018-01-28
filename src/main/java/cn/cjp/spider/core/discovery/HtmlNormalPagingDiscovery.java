@@ -1,6 +1,7 @@
 package cn.cjp.spider.core.discovery;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,7 +50,17 @@ public class HtmlNormalPagingDiscovery implements Discovery {
 				}
 			}
 			if (currUrl.matches(findSeedPattern)) {
-				foundUrlList.add(currUrl);
+				try {
+					URI.create(currUrl);
+					if (currUrl.matches(".*九.九.藏.书.*")) {
+						LOGGER.error(String.format("illigle argument url : , from : ", url, page.getUrl().get()));
+						LOGGER.error(page.toString());
+					}
+					foundUrlList.add(currUrl);
+				} catch (Exception e) {
+					LOGGER.error(String.format("illigle argument url : , from : ", url, page.getUrl().get()));
+					LOGGER.error(page.toString());
+				}
 			}
 		});
 

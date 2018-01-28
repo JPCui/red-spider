@@ -1,0 +1,3 @@
+function Reduce(doc, out) {
+	out.count +=1;
+}
