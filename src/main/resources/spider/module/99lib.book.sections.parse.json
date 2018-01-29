@@ -8,6 +8,7 @@
     "parserType": 20,
     "parserPath": "#content"
   },
+  "denoisingTypes" : [20],
   // 属性列表
   "attrs": [
     {
@@ -27,6 +28,7 @@
       "parserType": 50
     },
     {
+      // <d>((?=[\\s\\S])[^<]*)</d>
       "parserPath": "#content div",
       "parserPathAttr": "allText",
       "field": "content",

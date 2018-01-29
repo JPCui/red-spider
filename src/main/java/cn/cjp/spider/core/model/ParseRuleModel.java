@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import cn.cjp.spider.core.enums.DenoisingType;
 import lombok.Data;
 
 /**
@@ -14,30 +15,34 @@ import lombok.Data;
 @Data
 public class ParseRuleModel {
 
-    private String type = "PARSE_RULE";
+	private String type = "PARSE_RULE";
 
-    /**
-     * 唯一
-     */
-    @NotEmpty
-    private String ruleName;
+	/**
+	 * 唯一
+	 */
+	@NotEmpty
+	private String ruleName;
 
-    /**
-     * URL规则，符合该规则的文档，由当前解析规则解析
-     */
-    @NotEmpty
-    private String urlPattern;
+	/**
+	 * URL规则，符合该规则的文档，由当前解析规则解析
+	 */
+	@NotEmpty
+	private String urlPattern;
 
-    @NotNull
-    private List<Attr> attrs;
+	/**
+	 * @see DenoisingType
+	 */
+	private int[] denoisingTypes;
 
-    @NotNull
-    private Attr parentAttr;
+	@NotNull
+	private List<Attr> attrs;
 
-    /**
-     * 是否是列表页
-     */
-    private int isList;
+	@NotNull
+	private Attr parentAttr;
 
+	/**
+	 * 是否是列表页
+	 */
+	private int isList;
 
 }

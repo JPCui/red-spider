@@ -14,6 +14,13 @@ public enum DenoisingType {
 
 	_99LIB_SECTIONS(10, "_99LIB_SECTIONS"),
 
+	/**
+	 * 利用正则表达式 移除无关内容
+	 * 
+	 * 内容里出现类似 99lib 的文字
+	 */
+	_99LIB_TEXT_REGEX_REMOVE(20, "_99LIB_TEXT_REGEX_REMOVE"),
+
 	;
 
 	private final int code;

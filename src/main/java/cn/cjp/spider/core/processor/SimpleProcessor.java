@@ -21,6 +21,7 @@ import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
 import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.spider.util._99libUtil;
 import cn.cjp.utils.Assert;
@@ -28,6 +29,7 @@ import cn.cjp.utils.StringUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.selector.Selectable;
 
@@ -78,6 +80,7 @@ public class SimpleProcessor implements PageProcessor {
 			Assert.assertNotNull(attrs);
 
 			Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
+			root = denosingBefore(root, parseRule);
 			if (isList == 1) {
 				List<Selectable> domList = this.parse(page, root, parentAttr).nodes();
 				List<JSONObject> jsons = this.parseNodes(page, domList, attrs);
@@ -145,6 +148,7 @@ public class SimpleProcessor implements PageProcessor {
 		JSONObject json = new JSONObject();
 		attrs.forEach(attr -> {
 			try {
+
 				Selectable selectable = this.parse(page, dom, attr);
 				if (attr.getField().equals("tags")) {
 					LOGGER.info("");
@@ -174,6 +178,40 @@ public class SimpleProcessor implements PageProcessor {
 			}
 		});
 		return json;
+	}
+
+	private Selectable denosingBefore(Selectable selectable, ParseRuleModel parseRuleModel) {
+
+		int[] denoisingTypes = parseRuleModel.getDenoisingTypes();
+		if (denoisingTypes != null) {
+			for (int denoisingBeforeType : denoisingTypes) {
+				DenoisingType denoisingType = DenoisingType.fromValue(denoisingBeforeType);
+				switch (denoisingType) {
+				case _99LIB_TEXT_REGEX_REMOVE:
+					String txt = selectable.get();
+					txt = txt.replaceAll("<acronym>((?=[\\s\\S])[^<]*)</acronym>", "");
+					txt = txt.replaceAll("<bdo>((?=[\\s\\S])[^<]*)</bdo>", "");
+					txt = txt.replaceAll("<big>((?=[\\s\\S])[^<]*)</big>", "");
+					txt = txt.replaceAll("<cite>((?=[\\s\\S])[^<]*)</cite>", "");
+					txt = txt.replaceAll("<code>((?=[\\s\\S])[^<]*)</code>", "");
+					txt = txt.replaceAll("<dfn>((?=[\\s\\S])[^<]*)</dfn>", "");
+					txt = txt.replaceAll("<kbd>((?=[\\s\\S])[^<]*)</kbd>", "");
+					txt = txt.replaceAll("<q>((?=[\\s\\S])[^<]*)</q>", "");
+					txt = txt.replaceAll("<s>((?=[\\s\\S])[^<]*)</s>", "");
+					txt = txt.replaceAll("<samp>((?=[\\s\\S])[^<]*)</samp>", "");
+					txt = txt.replaceAll("<strike>((?=[\\s\\S])[^<]*)</strike>", "");
+					txt = txt.replaceAll("<tt>((?=[\\s\\S])[^<]*)</tt>", "");
+					txt = txt.replaceAll("<u>((?=[\\s\\S])[^<]*)</u>", "");
+					txt = txt.replaceAll("<var>((?=[\\s\\S])[^<]*)</var>", "");
+					selectable = new Html(txt);
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+		return selectable;
 	}
 
 	/**
@@ -315,6 +353,8 @@ public class SimpleProcessor implements PageProcessor {
 					break;
 				}
 				case DOM: {
+					// TODO JacksonUtil.toJson(dom.css("#content div",
+					// "allText").all());
 					value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
 					break;
 				}
