@@ -1,4 +1,4 @@
-package cn.cjp.spider.web;
+package cn.cjp.spider.manage.web;
 
 import java.util.ArrayList;
 import java.util.HashMap;
