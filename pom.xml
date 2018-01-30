@@ -5,7 +5,7 @@
 	<groupId>cn.cjp</groupId>
 	<artifactId>red-spider</artifactId>
 	<version>1.0.0.Snapshot</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>red-spider</name>
 	<url>http://maven.apache.org</url>
@@ -61,7 +61,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.10</version>
 		</dependency>
 		<!-- 微信SDK JAVA (公众平台、开放平台、 商户平台、 服务商平台) -->
 		<dependency>
@@ -219,35 +218,22 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<profiles>
-		<!-- 线上环境 -->
-		<profile>
-			<id>online</id>
-			<properties>
-				<deploy.server>ONLINE</deploy.server>
-				<deploy.url>http://online.host:8888/manager/text</deploy.url>
-				<plugin.compile.skip>true</plugin.compile.skip>
-			</properties>
-		</profile>
-		<!-- 测试环境 -->
-		<profile>
-			<id>onTest</id>
-			<properties>
-				<deploy.server>Test</deploy.server>
-				<deploy.url>http://test.host:8888/manager/text</deploy.url>
-				<plugin.compile.skip>true</plugin.compile.skip>
-			</properties>
-		</profile>
-	</profiles>
-
 	<build>
 		<finalName>${project.artifactId}</finalName>
 
 		<plugins>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>cn.cjp.SpiderAppApplication</mainClass>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -256,22 +242,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<!-- maven打包的时候告诉maven不需要web.xml,否刚会报找不到web.xml错误 -->
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<attachClasses>true</attachClasses>
 				</configuration>
 			</plugin>
 
