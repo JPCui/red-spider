@@ -1,21 +1,23 @@
-package cn.cjp.spider;
+package cn.cjp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @SpringBootApplication
 @ServletComponentScan
-public class Application extends SpringBootServletInitializer {
+public class SpiderAppApplication extends SpringBootServletInitializer {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpiderAppApplication.class, args);
+    }
 
     /**
      * 创建异步任务执行器
-     * 
-     * @return
      */
     @Bean
     public SimpleAsyncTaskExecutor simpleAsyncTaskExecutor() {
@@ -28,11 +30,7 @@ public class Application extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(Application.class);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        return application.sources(SpiderAppApplication.class);
     }
 
 }

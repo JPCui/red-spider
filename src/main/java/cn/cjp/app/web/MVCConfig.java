@@ -1,4 +1,4 @@
-package cn.cjp.spider.manage.web;
+package cn.cjp.app.web;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,9 +45,8 @@ import cn.cjp.web.Symphony;
  * MVC代码配置方法
  * <p>
  * 用于替代springMVC的配置文件
- * 
- * @author Jinpeng Cui
  *
+ * @author Jinpeng Cui
  */
 @Configuration
 @EnableWebMvc
@@ -55,13 +54,14 @@ import cn.cjp.web.Symphony;
 public class MVCConfig extends WebMvcConfigurationSupport {
 
     private static final Logger logger = Logger.getLogger(MVCConfig.class);
+    @Autowired
+    FreeMarkerProperties properties;
 
     /**
      * 如果你只使用 freemarker 做视图，需要设置 @Bean(name = "freeMarkerViewResolver") <br>
      * 如果你使用了多个 视图解析，参考：{@link #viewResolver()}
-     * 
-     * @return
-     * @see {@link http://docs.spring.io/spring-boot/docs/1.5.1.RELEASE/reference/htmlsingle/#howto-customize-view-resolvers}
+     *
+     * @see <a href="http://docs.spring.io/spring-boot/docs/1.5.1.RELEASE/reference/htmlsingle/#howto-customize-view-resolvers">howto-customize-view-resolvers</a>
      */
     // @Bean(name = "freeMarkerViewResolver")
     public FreeMarkerViewResolver freeMarkerViewResolver() {
@@ -75,14 +75,9 @@ public class MVCConfig extends WebMvcConfigurationSupport {
         return viewResolver;
     }
 
-    @Autowired
-    FreeMarkerProperties properties;
-
     /**
      * override {@link FreeMarkerConfigurer
      * org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration.FreeMarkerWebConfiguration.freeMarkerConfigurer()}
-     * 
-     * @return
      */
     @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
@@ -103,8 +98,7 @@ public class MVCConfig extends WebMvcConfigurationSupport {
 
     /**
      * 使用多个视图解析
-     * 
-     * @return
+     *
      * @see {@link http://docs.spring.io/spring-boot/docs/1.5.1.RELEASE/reference/htmlsingle/#howto-customize-view-resolvers}
      */
     @Bean(name = "viewResolver")
@@ -121,8 +115,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
 
     /**
      * 默认视图
-     * 
-     * @return
      */
     private List<View> defaultView() {
         List<View> defaultViews = new ArrayList<>();
@@ -137,7 +129,7 @@ public class MVCConfig extends WebMvcConfigurationSupport {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private List<ViewResolver> viewResolvers() {
@@ -174,8 +166,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <使用方法说明>
      * </p>
-     * 
-     * @return
      */
     @Bean
     public MessageSource messageSource() {
@@ -191,8 +181,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <只需要在自定义的servlet上用@Controller("映射路径")标注即可>
      * </p>
-     * 
-     * @return
      */
     @Bean
     public HandlerAdapter servletHandlerAdapter() {
@@ -205,8 +193,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <使用方法说明>
      * </p>
-     * 
-     * @return
      */
     public LocaleChangeInterceptor localeChangeInterceptor() {
         logger.info("LocaleChangeInterceptor");
@@ -218,8 +204,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <使用方法说明>
      * </p>
-     * 
-     * @return
      */
     @Bean(name = "localeResolver")
     public CookieLocaleResolver cookieLocaleResolver() {
@@ -232,8 +216,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <这个比较奇怪,理论上应该是不需要的>
      * </p>
-     * 
-     * @return
      */
     @Bean
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
@@ -247,8 +229,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <使用方法说明>
      * </p>
-     * 
-     * @param registry
      */
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
@@ -263,8 +243,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <这个比较奇怪,理论上应该是不需要的>
      * </p>
-     * 
-     * @return
      */
     @Bean
     public HandlerMapping resourceHandlerMapping() {
@@ -277,8 +255,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <可以在jsp中使用/static/**的方式访问/WEB-INF/static/下的内容>
      * </p>
-     * 
-     * @param registry
      */
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -291,8 +267,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <这个比较奇怪,理论上应该是不需要的>
      * </p>
-     * 
-     * @return
      */
     @Bean
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
@@ -305,8 +279,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
      * <p>
      * <这里只增加了字符串转日期和字符串两边去空格的处理>
      * </p>
-     * 
-     * @return
      */
     @Override
     protected ConfigurableWebBindingInitializer getConfigurableWebBindingInitializer() {

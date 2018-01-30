@@ -23,26 +23,15 @@
       "parserType": 50
     },
     {
-      "field": "chaptor_id",
-      "parserPath": "dd a",
-      "parserPathAttr": "href",
-      "hasMultiValue" : true,
-      "parserType": 20,
-      "nested": {
-        "parserType": 30,
-        "parserPath": "/book/.*/(.*).htm"
-      }
-    },
-    {
       "field": "chaptors",
       "hasEmbeddedAttr" : true,
       "hasMultiValue" : true,
       "parserType": 20,
-      "parserPath" : "dd",
+      "parserPath" : "dt,dd",
       "embeddedAttrs" : [
 	    {
 	      "field": "chaptor_id",
-	      "parserPath": "dd a",
+	      "parserPath": "dt a,dd a",
 	      "parserPathAttr": "href",
 	      "parserType": 20,
 	      "nested": {
@@ -51,17 +40,11 @@
 	      }
 	    }, {
 	      "field": "chaptor_name",
-	      "parserPath": "dd a",
-	      "parserPathAttr": "text",
+	      "parserPath": "dt,dd",
+	      "parserPathAttr": "allText",
 	      "parserType": 20
 	    }
     ]
-    },
-    {
-      "parserPath": "dt,dd a",
-      "parserPathAttr": "text",
-      "field": "titleName",
-      "parserType": 20
     }
   ],
   // 是否是列表页

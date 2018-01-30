@@ -8,6 +8,7 @@
     "parserType": 20,
     "parserPath": "#content"
   },
+  "denoisingTypes" : [20],
   // 属性列表
   "attrs": [
     {
@@ -16,23 +17,24 @@
       "parserType": 0
     },
     {
-      "field": "section_id",
+      "field": "chaptor_id",
       "parserPath": "http://www.99lib.net/book/.*/(.*).htm",
       "parserType": 50,
       "uniqueFlag": true
     },
     {
-      "field": "chaptor_id",
+      "field": "book_id",
       "parserPath": "http://www.99lib.net/book/(.*)/.*.htm",
       "parserType": 50
     },
     {
+      // <d>((?=[\\s\\S])[^<]*)</d>
       "parserPath": "#content div",
       "parserPathAttr": "allText",
       "field": "content",
       "parserType": 20,
       "hasMultiValue": true,
-      "filterRepeat": 1
+      "denoisingType" : 10
     }
   ],
   // 是否是列表页

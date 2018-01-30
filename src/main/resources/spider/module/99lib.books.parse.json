@@ -34,6 +34,13 @@
       "parserType": 20
     },
     {
+      "parserPath": "h4:eq(4) a",
+      "parserPathAttr": "allText",
+      "field": "tags",
+      "parserType": 20,
+      "hasMultiValue" : true
+    },
+    {
       "parserPath": "h2 a",
       "parserPathAttr": "text",
       "field": "name",

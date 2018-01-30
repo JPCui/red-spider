@@ -16,16 +16,20 @@ import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.spider.core.discovery.CommonDiscovery;
 import cn.cjp.spider.core.discovery.Discovery;
+import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
 import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
+import cn.cjp.spider.util._99libUtil;
 import cn.cjp.utils.Assert;
 import cn.cjp.utils.StringUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.selector.Selectable;
 
@@ -59,9 +63,10 @@ public class SimpleProcessor implements PageProcessor {
 	@Override
 	public void process(Page page) {
 		try {
+			LOGGER.info(String.format("parse url: %s", page.getUrl().get()));
 			this.processInner(page);
 		} catch (Exception e) {
-			LOGGER.error(String.format("page parser fail, page=%s", page.getUrl().get()), e);
+			LOGGER.error(String.format("parse fail, url=%s", page.getUrl().get()), e);
 		}
 	}
 
@@ -75,6 +80,7 @@ public class SimpleProcessor implements PageProcessor {
 			Assert.assertNotNull(attrs);
 
 			Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
+			root = denosingBefore(root, parseRule);
 			if (isList == 1) {
 				List<Selectable> domList = this.parse(page, root, parentAttr).nodes();
 				List<JSONObject> jsons = this.parseNodes(page, domList, attrs);
@@ -142,12 +148,23 @@ public class SimpleProcessor implements PageProcessor {
 		JSONObject json = new JSONObject();
 		attrs.forEach(attr -> {
 			try {
+
 				Selectable selectable = this.parse(page, dom, attr);
-				if (attr.isHasEmbeddedAttr()) {
-					json.put(attr.getField(), parseNodeWithEmbeddedAttr(page, selectable, attr));
-				} else {
-					json.put(attr.getField(), parseNodeWithoutEmbeddedAttr(selectable, attr));
+				if (attr.getField().equals("tags")) {
+					LOGGER.info("");
 				}
+
+				Object result = null;
+				if (attr.isHasEmbeddedAttr()) {
+					result = parseNodeWithEmbeddedAttr(page, selectable, attr);
+				} else {
+					result = parseNodeWithoutEmbeddedAttr(selectable, attr);
+				}
+
+				// 去噪
+				result = denosing(page, attr, result);
+
+				json.put(attr.getField(), result);
 
 				if (attr.isUniqueFlag()) {
 					// 设置唯一键
@@ -161,6 +178,65 @@ public class SimpleProcessor implements PageProcessor {
 			}
 		});
 		return json;
+	}
+
+	private Selectable denosingBefore(Selectable selectable, ParseRuleModel parseRuleModel) {
+
+		int[] denoisingTypes = parseRuleModel.getDenoisingTypes();
+		if (denoisingTypes != null) {
+			for (int denoisingBeforeType : denoisingTypes) {
+				DenoisingType denoisingType = DenoisingType.fromValue(denoisingBeforeType);
+				switch (denoisingType) {
+				case _99LIB_TEXT_REGEX_REMOVE:
+					String txt = selectable.get();
+					txt = txt.replaceAll("<acronym>((?=[\\s\\S])[^<]*)</acronym>", "");
+					txt = txt.replaceAll("<bdo>((?=[\\s\\S])[^<]*)</bdo>", "");
+					txt = txt.replaceAll("<big>((?=[\\s\\S])[^<]*)</big>", "");
+					txt = txt.replaceAll("<cite>((?=[\\s\\S])[^<]*)</cite>", "");
+					txt = txt.replaceAll("<code>((?=[\\s\\S])[^<]*)</code>", "");
+					txt = txt.replaceAll("<dfn>((?=[\\s\\S])[^<]*)</dfn>", "");
+					txt = txt.replaceAll("<kbd>((?=[\\s\\S])[^<]*)</kbd>", "");
+					txt = txt.replaceAll("<q>((?=[\\s\\S])[^<]*)</q>", "");
+					txt = txt.replaceAll("<s>((?=[\\s\\S])[^<]*)</s>", "");
+					txt = txt.replaceAll("<samp>((?=[\\s\\S])[^<]*)</samp>", "");
+					txt = txt.replaceAll("<strike>((?=[\\s\\S])[^<]*)</strike>", "");
+					txt = txt.replaceAll("<tt>((?=[\\s\\S])[^<]*)</tt>", "");
+					txt = txt.replaceAll("<u>((?=[\\s\\S])[^<]*)</u>", "");
+					txt = txt.replaceAll("<var>((?=[\\s\\S])[^<]*)</var>", "");
+					selectable = new Html(txt);
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+		return selectable;
+	}
+
+	/**
+	 * 去噪
+	 * 
+	 * @param attr
+	 * @param result
+	 * @return
+	 */
+	private Object denosing(Page page, Attr attr, Object result) {
+		DenoisingType denoisingType = DenoisingType.fromValue(attr.getDenoisingType());
+		if (denoisingType != null) {
+			switch (denoisingType) {
+			case _99LIB_SECTIONS: {
+				if (result instanceof List) {
+					result = _99libUtil.extractValidSections((List<?>) result,
+							page.getHtml().css("meta[name=client]", "content").get());
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -190,7 +266,7 @@ public class SimpleProcessor implements PageProcessor {
 		if (attr.isHasMultiValue()) {
 			if (attr.getFilterRepeat() == 1) {
 				// 去重（还要保证顺序不变）
-				List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s)).distinct()
+				List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s))
 						.collect(Collectors.toList());
 				// json.put(attr.getField(), values);
 				result = values;
@@ -201,7 +277,10 @@ public class SimpleProcessor implements PageProcessor {
 				result = values;
 			}
 		} else {
-			String value = selectable.get().trim();
+			String value = selectable.get();
+			if (value != null) {
+				value = value.trim();
+			}
 			// json.put(attr.getField(), value);
 			result = value;
 		}
@@ -274,6 +353,8 @@ public class SimpleProcessor implements PageProcessor {
 					break;
 				}
 				case DOM: {
+					// TODO JacksonUtil.toJson(dom.css("#content div",
+					// "allText").all());
 					value = dom.css(attr.getParserPath(), attr.getParserPathAttr());
 					break;
 				}

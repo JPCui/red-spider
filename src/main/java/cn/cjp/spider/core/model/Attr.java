@@ -73,4 +73,6 @@ public class Attr {
 	 */
 	private List<Attr> embeddedAttrs;
 
+	private int denoisingType = 0;
+
 }

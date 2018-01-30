@@ -4,15 +4,13 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <link rel="stylesheet" href="${staticServerPath}/css/style.css" />
-  <title>API统计</title>
+  <title>${data.book.name}</title>
   
 <style>
     * {
         list-style-type: none;
     }
     div.box {
-        height: 500px;
-        overflow-y: scroll;
     }
     ul {
         display: table;
@@ -21,23 +19,22 @@
         display: table-row;
         border-bottom: 1px solid silver;
     }
-    ul li c {
-        display: table-cell;
-        padding: 10px 15px;
-    }
 </style>
   
 </head>
 <body id="body">
+<header>
+  <script src="${staticServerPath}/js/canvas-nest.js" count="200" zindex="-2" opacity="0.8" color="47,135,193" type="text/javascript"></script>
+</header>
 
-	
-<h1>API统计</h1>
 <div class="box">
     <ul>
-    	<#list datas?keys as key>
-        <li><c>${key}</c><c>${datas[key]}</c></li>
-        </#list>
-    </ul>
+	<#list data.chaptors as cha>
+    	<li>
+    		<a href="/book/${data.book._id}/${item_index?if_exists+1}">${cha.chaptorName}</a>
+    	</li>
+    </#list>
+	</ul>
 </div>
 
 

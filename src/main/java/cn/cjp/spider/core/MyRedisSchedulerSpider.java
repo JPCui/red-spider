@@ -21,10 +21,11 @@ public class MyRedisSchedulerSpider extends us.codecraft.webmagic.Spider {
 	}
 
 	public Spider setScheduler(Scheduler scheduler) {
-		if (!(scheduler instanceof MyRedisScheduler)) {
-			throw new UnsupportedOperationException(
-					String.format("scheduler should implements %s", MyRedisScheduler.class));
-		}
+		// if (!(scheduler instanceof MyRedisScheduler)) {
+		// throw new UnsupportedOperationException(
+		// String.format("scheduler should implements %s",
+		// MyRedisScheduler.class));
+		// }
 		return super.setScheduler(scheduler);
 	}
 
