@@ -1,30 +1,20 @@
 package cn.cjp.spider.core;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.tomcat.util.security.MD5Encoder;
+
+
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
 public class Demo {
 
-	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 
+        System.out.println(RandomStringUtils.random(11, true, true));
 
-		System.out.println();
+        System.out.println(MD5Encoder.encode(("tfHETu1mENh" + System.currentTimeMillis() % 6).getBytes()));
 
-		String s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^";
-		for (int i = 0; i < s.length(); i++) {
-			System.out.print('\'');
-			System.out.print(s.charAt(i));
-			System.out.print('\'');
-			System.out.print(',');
-		}
-		System.out.println();
-
-		for (int i = 0; i < 68; i++) {
-			System.out.print(i+1);
-			System.out.print(',');
-		}
-		System.out.println();
-
-	}
+    }
 
 }

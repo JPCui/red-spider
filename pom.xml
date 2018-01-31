@@ -5,7 +5,7 @@
     <groupId>cn.cjp</groupId>
     <artifactId>red-spider</artifactId>
     <version>1.0.0.Snapshot</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>red-spider</name>
     <url>http://maven.apache.org</url>
@@ -21,7 +21,7 @@
         <junit.version>4.11</junit.version>
         <spring.version>4.3.7.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson.version>1.9.12</jackson.version>
+        <codehua.jackson.version>1.9.12</codehua.jackson.version>
         <jsoup.version>1.10.1</jsoup.version>
         <mongodb.version>3.4.0</mongodb.version>
     </properties>
@@ -114,12 +114,12 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>${jackson.version}</version>
+            <version>${codehua.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson.version}</version>
+            <version>${codehua.jackson.version}</version>
         </dependency>
         <!-- Jackson Configuration END -->
         <!-- for xml viewresolver -->
@@ -212,7 +212,8 @@
             <properties>
                 <deploy.server>ONLINE</deploy.server>
                 <deploy.url>http://online.host:8888/manager/text</deploy.url>
-                <plugin.compile.skip>${project.artifactId}</plugin.compile.skip>
+                <plugin.compile.skip>false</plugin.compile.skip>
+                <profile.build.finalName>${project.artifactId}</profile.build.finalName>
             </properties>
         </profile>
         <!-- 测试环境 -->
@@ -222,15 +223,20 @@
                 <deploy.server>Test</deploy.server>
                 <deploy.url>http://test.host:8888/manager/text</deploy.url>
                 <plugin.compile.skip>true</plugin.compile.skip>
-                <build.finalName>${project.artifactId}-${project.version}</build.finalName>
+                <profile.build.finalName>${project.artifactId}-${project.version}</profile.build.finalName>
             </properties>
         </profile>
     </profiles>
 
     <build>
-        <finalName>${}</finalName>
+        <finalName>${profile.build.finalName}</finalName>
 
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -248,17 +254,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <!-- maven打包的时候告诉maven不需要web.xml,否刚会报找不到web.xml错误 -->
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
 
