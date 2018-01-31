@@ -1,11 +1,5 @@
 package cn.cjp.app.web;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerProperties;
@@ -15,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.accept.ContentNegotiationManagerFactoryBean;
 import org.springframework.web.bind.support.ConfigurableWebBindingInitializer;
@@ -32,11 +25,18 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
-import org.springframework.web.servlet.view.xml.MarshallingView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import cn.cjp.freemarker.template.ext.StringIgnoreNullMethod;
 import cn.cjp.web.Symphony;
@@ -99,7 +99,7 @@ public class MVCConfig extends WebMvcConfigurationSupport {
     /**
      * 使用多个视图解析
      *
-     * @see {@link http://docs.spring.io/spring-boot/docs/1.5.1.RELEASE/reference/htmlsingle/#howto-customize-view-resolvers}
+     * @see <a href="http://docs.spring.io/spring-boot/docs/1.5.1.RELEASE/reference/htmlsingle/#howto-customize-view-resolvers">howto-customize-view-resolvers</a>
      */
     @Bean(name = "viewResolver")
     public ContentNegotiatingViewResolver viewResolver() {
@@ -121,10 +121,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
         // 默认视图
         // json视图解析
         defaultViews.add(new MappingJackson2JsonView());
-        // xml视图解析
-        MarshallingView marshallingView = new MarshallingView();
-        marshallingView.setMarshaller(new XStreamMarshaller());
-        defaultViews.add(marshallingView);
         return defaultViews;
     }
 
@@ -139,14 +135,14 @@ public class MVCConfig extends WebMvcConfigurationSupport {
         viewResolvers.add(freeMarkerViewResolver());
 
         // bean name
-        // viewResolvers.add(new BeanNameViewResolver());
+        viewResolvers.add(new BeanNameViewResolver());
 
-        // InternalResourceViewResolver viewResolver = new
-        // InternalResourceViewResolver();
-        // viewResolver.setPrefix("/WEB-INF/pages/");
-        // viewResolver.setSuffix(".jsp");
-        // viewResolver.setContentType("text/html;charset=UTF-8");
-        // viewResolvers.add(viewResolver);
+        InternalResourceViewResolver viewResolver = new
+                InternalResourceViewResolver();
+        viewResolver.setPrefix("/WEB-INF/pages/");
+        viewResolver.setSuffix(".jsp");
+        viewResolver.setContentType("text/html;charset=UTF-8");
+        viewResolvers.add(viewResolver);
 
         return viewResolvers;
     }
