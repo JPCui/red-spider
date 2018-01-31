@@ -101,14 +101,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-        </dependency>
 
         <!-- Jackson Configuration BEGIN -->
         <dependency>
@@ -128,18 +120,6 @@
             <artifactId>xstream</artifactId>
             <version>1.4.3</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-oxm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-        </dependency>
         <!-- Redis Start -->
         <dependency>
             <groupId>redis.clients</groupId>
@@ -156,6 +136,34 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <!-- spring boot begin -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-freemarker</artifactId>
@@ -176,39 +184,26 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
         <!-- spring boot end -->
-        <!-- mongodb begin -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>${mongodb.version}</version>
-        </dependency>
-        <!-- mongodb end -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!-- aspect -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
+            <version>1.6.12</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
+            <version>1.8.9</version>
         </dependency>
     </dependencies>
 
     <profiles>
         <!-- 线上环境 -->
         <profile>
-            <id>online</id>
+            <id>prod</id>
             <properties>
                 <deploy.server>ONLINE</deploy.server>
                 <deploy.url>http://online.host:8888/manager/text</deploy.url>
@@ -218,7 +213,7 @@
         </profile>
         <!-- 测试环境 -->
         <profile>
-            <id>onTest</id>
+            <id>test</id>
             <properties>
                 <deploy.server>Test</deploy.server>
                 <deploy.url>http://test.host:8888/manager/text</deploy.url>
