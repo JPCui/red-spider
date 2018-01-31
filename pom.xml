@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.6.RELEASE</version>
+        <version>1.5.9.RELEASE</version>
     </parent>
 
     <properties>
@@ -22,7 +22,6 @@
         <spring.version>4.3.7.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>1.9.12</jackson.version>
-        <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
         <jsoup.version>1.10.1</jsoup.version>
         <mongodb.version>3.4.0</mongodb.version>
     </properties>
@@ -37,7 +36,7 @@
 
     <repositories>
         <repository>
-            <id>ali-repos</id>
+            <id>ali-repo</id>
             <name>Ali Repository</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public</url>
         </repository>
@@ -206,19 +205,6 @@
         </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <profiles>
         <!-- 线上环境 -->
         <profile>
@@ -226,7 +212,7 @@
             <properties>
                 <deploy.server>ONLINE</deploy.server>
                 <deploy.url>http://online.host:8888/manager/text</deploy.url>
-                <plugin.compile.skip>true</plugin.compile.skip>
+                <plugin.compile.skip>${project.artifactId}</plugin.compile.skip>
             </properties>
         </profile>
         <!-- 测试环境 -->
@@ -236,12 +222,13 @@
                 <deploy.server>Test</deploy.server>
                 <deploy.url>http://test.host:8888/manager/text</deploy.url>
                 <plugin.compile.skip>true</plugin.compile.skip>
+                <build.finalName>${project.artifactId}-${project.version}</build.finalName>
             </properties>
         </profile>
     </profiles>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>${}</finalName>
 
         <plugins>
             <plugin>
