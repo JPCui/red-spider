@@ -100,4 +100,16 @@ public class RedisTest {
 
 	}
 
+	@Test
+	public void queue2Queue() {
+		String q1 = "queue_99lib.net2";
+		String q2 = "queue_99lib.net";
+
+		String s = null;
+		while ((s = jedis.lpop(q1)) != null) {
+			jedis.lpush(q2, s);
+			System.out.println("push: " + s);
+		}
+	}
+
 }

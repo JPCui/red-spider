@@ -1,5 +1,20 @@
 <div id="d">
-    <div>aaaaaa</div>
-    <div>bbbbbb</div>
-    <div>ccc</div>
+    <div>
+    	<d>-X-</d>
+    </div>
+    <div>
+    	aaa
+    	<d>X</d>
+    	aaa
+    </div>
+    <div>
+    	bbb
+    	<a>XX</a>
+    	bbb
+    </div>
+    <div>
+    	ccc
+    	<s>XXX</s>
+    	<span>必须有的内容</span>
+    </div>
 </div>

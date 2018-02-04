@@ -1,4 +1,4 @@
-package cn.cjp.app.web.service;
+package cn.cjp.app.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +56,7 @@ public class BookService {
 		Criteria criteria = new Criteria();
 		requestJson.keySet().forEach(key -> {
 			if (requestJson.get(key) != null && !StringUtil.isEmpty(requestJson.get(key).toString())) {
-				criteria.and(key).is(requestJson.get(key));
+				criteria.orOperator(Criteria.where(key).is(requestJson.get(key)));
 			}
 		});
 
