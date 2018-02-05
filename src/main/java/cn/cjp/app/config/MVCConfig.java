@@ -1,4 +1,4 @@
-package cn.cjp.app.web;
+package cn.cjp.app.config;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

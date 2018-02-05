@@ -18,7 +18,6 @@
 
     <properties>
         <jp-base.version>v2017.1030</jp-base.version>
-        <junit.version>4.11</junit.version>
         <spring.version>4.3.7.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codehua.jackson.version>1.9.12</codehua.jackson.version>
@@ -208,7 +207,6 @@
                 <deploy.server>ONLINE</deploy.server>
                 <deploy.url>http://online.host:8888/manager/text</deploy.url>
                 <plugin.compile.skip>false</plugin.compile.skip>
-                <profile.build.finalName>${project.artifactId}</profile.build.finalName>
             </properties>
         </profile>
         <!-- 测试环境 -->
@@ -218,14 +216,11 @@
                 <deploy.server>Test</deploy.server>
                 <deploy.url>http://test.host:8888/manager/text</deploy.url>
                 <plugin.compile.skip>true</plugin.compile.skip>
-                <profile.build.finalName>${project.artifactId}-${project.version}</profile.build.finalName>
             </properties>
         </profile>
     </profiles>
 
     <build>
-        <finalName>${profile.build.finalName}</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
