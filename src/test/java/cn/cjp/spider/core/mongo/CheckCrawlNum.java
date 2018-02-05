@@ -21,6 +21,7 @@ import com.mongodb.GroupCommand;
 import com.mongodb.MongoClientURI;
 
 import cn.cjp.app.model.doc.Chaptors;
+import cn.cjp.app.model.doc.Sections;
 import redis.clients.jedis.Jedis;
 
 public class CheckCrawlNum {
@@ -65,12 +66,12 @@ public class CheckCrawlNum {
 
 		Jedis jedis = new Jedis();
 
-		List<Chaptors> list = null;
+		List<Sections> list = null;
 		while (true) {
 			Criteria criteria = new Criteria();
 			// criteria.and("_updateDate").lt(cal.getTime());
 			Query query = Query.query(criteria).skip(((page++) - 1) * pageSize).limit(pageSize);
-			list = mongoTemplate.find(query, Chaptors.class);
+			list = mongoTemplate.find(query, Sections.class);
 			if (list.size() == 0) {
 				break;
 			}

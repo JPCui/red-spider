@@ -199,27 +199,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <!-- 线上环境 -->
-        <profile>
-            <id>prod</id>
-            <properties>
-                <deploy.server>ONLINE</deploy.server>
-                <deploy.url>http://online.host:8888/manager/text</deploy.url>
-                <plugin.compile.skip>false</plugin.compile.skip>
-            </properties>
-        </profile>
-        <!-- 测试环境 -->
-        <profile>
-            <id>test</id>
-            <properties>
-                <deploy.server>Test</deploy.server>
-                <deploy.url>http://test.host:8888/manager/text</deploy.url>
-                <plugin.compile.skip>true</plugin.compile.skip>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
