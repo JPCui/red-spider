@@ -38,11 +38,11 @@ public class WxMpController {
 	@PostMapping
 	public String index(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String requestMessage = StreamUtils.copyToString(request.getInputStream(), Charset.defaultCharset());
-		LOGGER.info(requestMessage);
+		LOGGER.info(String.format("rec wechat msg: %s", requestMessage));
+		LOGGER.info(String.format("rec params: %s", request.getParameterMap()));
 		OutputStream os = response.getOutputStream();
 
 		String responseMessage = "嘤嘤嘤~";
-
 		wechatComponent.textMessage(os, requestMessage, responseMessage);
 		os.flush();
 		return "";

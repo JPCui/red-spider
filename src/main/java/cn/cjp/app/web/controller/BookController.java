@@ -31,7 +31,7 @@ public class BookController {
 	@Autowired
 	BookService bookService;
 
-	@RequestMapping("books")
+	@RequestMapping("/books")
 	public ModelAndView books(BookPageRequest bookRequest) {
 		Response<?> response = Response.success(bookService.findAll(bookRequest));
 

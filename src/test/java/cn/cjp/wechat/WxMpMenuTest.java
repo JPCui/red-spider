@@ -3,6 +3,7 @@ package cn.cjp.wechat;
 import org.junit.Test;
 import org.springframework.util.StringUtils;
 
+import cn.cjp.Server;
 import weixin.popular.api.MenuAPI;
 import weixin.popular.api.TokenAPI;
 import weixin.popular.bean.menu.Button;
@@ -10,9 +11,6 @@ import weixin.popular.bean.menu.MenuButtons;
 import weixin.popular.bean.token.Token;
 
 public class WxMpMenuTest {
-
-    String appid = "wx46b87cd60d921ad1";
-    String secret = "310318fe04525556d42ed82ef84ee607";
 
     @Test
     public void testAdd() {
@@ -38,7 +36,7 @@ public class WxMpMenuTest {
         String accessToken = "6_6i2BjEpQ3mXkX6U8z-92dfA3cNBm1oQWIdZNqDckSHyl0EtR5QbNXYfH8oIH7paBMLzGCXs-ug0wQ-sQp" +
                 "-s4hjNQPRGWEgKhOZOYcrgRjQajTce0nXy4nkM5IvhtQldDsYwROF7XPsmUwQAxLOXaACAGJS";
         if (StringUtils.isEmpty(accessToken)) {
-            Token token = TokenAPI.token(appid, secret);
+            Token token = TokenAPI.token(Server.Wechat.appid, Server.Wechat.secret);
             System.out.println(token.getAccess_token());
             accessToken = token.getAccess_token();
         }
