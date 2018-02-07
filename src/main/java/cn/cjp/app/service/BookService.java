@@ -1,8 +1,9 @@
 package cn.cjp.app.service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,11 +84,17 @@ public class BookService {
 		Chaptors chaptors = chaptorsRepository.findOne(query);
 		Chaptor[] chaptorArray = chaptors.getChaptors();
 
-		return Arrays.asList(chaptorArray).stream().map(cha -> {
+		List<ChaptorResponse> chaptorResponses = new ArrayList<>();
+		IntStream.range(0, chaptorArray.length).forEach(i -> {
+			Chaptor cha = chaptorArray[i];
 			ChaptorResponse chaptorResponse = new ChaptorResponse();
 			BeanUtils.copyProperties(cha, chaptorResponse);
-			return chaptorResponse;
-		}).collect(Collectors.toList());
+			if (!StringUtil.isEmpty(cha.getChaptorId())) {
+				chaptorResponse.setViewId(Integer.valueOf(i + 1).toString());
+			}
+			chaptorResponses.add(chaptorResponse);
+		});
+		return chaptorResponses;
 
 	}
 
@@ -109,6 +116,7 @@ public class BookService {
 		Chaptor[] chaptorArray = chaptors.getChaptors();
 		int size = chaptorArray.length;
 		if (index <= size) {
+			// 当前章节
 			Chaptor selectedChaptor = chaptorArray[index - 1];
 			String chaptorId = selectedChaptor.getChaptorId();
 
@@ -120,13 +128,22 @@ public class BookService {
 
 			SectionResponse sectionResponse = new SectionResponse();
 			BeanUtils.copyProperties(sections, sectionResponse);
+			sectionResponse.setTitle(selectedChaptor.getChaptorName());
 			if (index > 1) {
 				// prev
-				sectionResponse.setPrev(PageIndexResponse.build(index - 1, chaptorArray[index - 1].getChaptorName()));
+				int t = index - 2;
+				while (StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
+					t -= 1;
+				}
+				sectionResponse.setPrev(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
 			}
 			if (index < size) {
 				// next
-				sectionResponse.setNext(PageIndexResponse.build(index + 1, chaptorArray[index + 1].getChaptorName()));
+				int t = index;
+				while (StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
+					t += 1;
+				}
+				sectionResponse.setNext(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
 			}
 			return sectionResponse;
 		}

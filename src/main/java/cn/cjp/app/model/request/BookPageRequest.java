@@ -13,6 +13,6 @@ public class BookPageRequest extends PageRequest {
 
 	private String author;
 
-	private String[] tags;
+	private String tags;
 
 }

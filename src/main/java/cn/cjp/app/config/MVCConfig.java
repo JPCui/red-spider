@@ -137,13 +137,6 @@ public class MVCConfig extends WebMvcConfigurationSupport {
         // bean name
         viewResolvers.add(new BeanNameViewResolver());
 
-        InternalResourceViewResolver viewResolver = new
-                InternalResourceViewResolver();
-        viewResolver.setPrefix("/WEB-INF/pages/");
-        viewResolver.setSuffix(".jsp");
-        viewResolver.setContentType("text/html;charset=UTF-8");
-        viewResolvers.add(viewResolver);
-
         return viewResolvers;
     }
 

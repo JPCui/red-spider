@@ -2,8 +2,6 @@ package cn.cjp.app.model.response;
 
 import java.util.List;
 
-import org.springframework.data.mongodb.core.mapping.Field;
-
 import lombok.Data;
 
 @Data
@@ -21,7 +19,8 @@ public class ChaptorsResponse {
 	@Data
 	public static class ChaptorResponse {
 
-		@Field("chaptor_name")
 		private String chaptorName;
+
+		private String viewId;
 	}
 }

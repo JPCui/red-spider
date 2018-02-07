@@ -6,6 +6,8 @@ import lombok.Data;
 public class SectionResponse {
 
 	private String _id;
+	
+	private String title;
 
 	private String[] content;
 

@@ -6,23 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="${staticServerPath}/css/style.css"/>
     <title>${data.book.name}</title>
-
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            list-style-type: none;
-        }
-
-        div.box {
-        }
-
-        ul {
-            display: table;
-        }
-
-        ul li {
-            display: table-row;
-            border-bottom: 1px solid silver;
-        }
     </style>
 
 </head>
@@ -32,10 +17,14 @@
 </header>
 
 <div class="box">
-    <ul>
+    <ul class="list-group">
 	<#list data.chaptors as cha>
-        <li>
-            <a href="/book/${data.book._id}/${item_index?if_exists+1}">${cha.chaptorName}</a>
+        <li class="list-group-item">
+        	<#if cha.viewId??>
+            <a href="${serverPath}/book/${data.book._id}/${cha.viewId}">${cha.chaptorName}</a>
+        	<#else>
+            ${cha.chaptorName}
+        	</#if>
         </li>
     </#list>
     </ul>
