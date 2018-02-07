@@ -18,7 +18,10 @@
 
 <div class="box">
     <ul class="list-group">
-	<#list data.chaptors as cha>
+        <li class="list-group-item">
+            <a href="../books">首页</a>
+        </li>
+		<#list data.chaptors as cha>
         <li class="list-group-item">
         	<#if cha.viewId??>
             <a href="${serverPath}/book/${data.book._id}/${cha.viewId}">${cha.chaptorName}</a>
@@ -26,7 +29,7 @@
             ${cha.chaptorName}
         	</#if>
         </li>
-    </#list>
+    	</#list>
     </ul>
 </div>
 
