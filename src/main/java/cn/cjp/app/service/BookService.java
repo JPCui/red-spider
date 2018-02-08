@@ -27,6 +27,7 @@ import cn.cjp.app.model.response.SectionResponse.PageIndexResponse;
 import cn.cjp.app.repository.BookRepository;
 import cn.cjp.app.repository.ChaptorsRepository;
 import cn.cjp.app.repository.SectionsRepository;
+import cn.cjp.core.cache.Cacheable;
 import cn.cjp.utils.StringUtil;
 
 @Service
@@ -38,6 +39,8 @@ public class BookService {
 
 	public static final String COLLECTION_BOOK_SECTIONS = "99lib-book-sections";
 
+	public static final String FIELD_BOOK_ID = "book_id";
+
 	@Autowired
 	BookRepository bookRepository;
 
@@ -47,6 +50,7 @@ public class BookService {
 	@Autowired
 	SectionsRepository sectionsRepository;
 
+	@Cacheable(key = "bks:%s:%s:%s:%s", args = { "#bookRequest.getName()", "#bookRequest.getAuthor()", "#bookRequest.getType()", "#bookRequest.getTags()" })
 	public List<BookResponse> findAll(BookPageRequest bookRequest) {
 
 		JSONObject requestJson = (JSONObject) JSONObject.toJSON(bookRequest);
@@ -71,8 +75,7 @@ public class BookService {
 		}).collect(Collectors.toList());
 	}
 
-	public static final String FIELD_BOOK_ID = "book_id";
-
+	@Cacheable(key = "bks:cha:%s", args = { "#docId" })
 	public List<ChaptorResponse> findAllChaptors(String docId) {
 		Book book = bookRepository.findById(docId);
 		String bookId = book.getBookId();
@@ -106,6 +109,7 @@ public class BookService {
 	 *            下标，base: 1
 	 * @return
 	 */
+	@Cacheable(key = "bks:sec:%s:%s", args = { "#bookDocId", "#index" })
 	public SectionResponse getSectionByBookDocIdAndIndex(String bookDocId, int index) {
 		Book book = bookRepository.findById(bookDocId);
 
@@ -150,6 +154,7 @@ public class BookService {
 		return null;
 	}
 
+	@Cacheable(key = "bk:%s", args = { "#bookId" })
 	public BookResponse findOne(String bookId) {
 		Book book = bookRepository.findById(bookId);
 		BookResponse bookResponse = new BookResponse();

@@ -12,10 +12,10 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import cn.cjp.app.config.Symphony;
 
-@ComponentScan("cn.cjp")
+@ComponentScan({ "cn.cjp" })
 @SpringBootApplication
 @ServletComponentScan
-@EnableConfigurationProperties({Symphony.class})
+@EnableConfigurationProperties({ Symphony.class })
 public class SpiderAppApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
