@@ -9,7 +9,6 @@ import lombok.Data;
 
 @Data
 @Configuration
-@PropertySource("classpath:symphony.properties")
 @ConfigurationProperties(prefix = "symphony", ignoreUnknownFields = true)
 @ConditionalOnProperty("symphony.enable")
 public class Symphony {
