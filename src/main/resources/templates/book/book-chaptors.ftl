@@ -19,7 +19,7 @@
 <div class="box">
     <ul class="list-group">
         <li class="list-group-item">
-            <a href="../books">首页</a>
+            <a href="${serverPath}/books">首页</a>
         </li>
 		<#list data.chaptors as cha>
         <li class="list-group-item">

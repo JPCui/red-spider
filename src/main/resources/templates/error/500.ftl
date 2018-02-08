@@ -9,7 +9,7 @@
 
 <body>
 <@common_body>
-    ${msg}
+    ${msg!}
 </@common_body>
 </body>
 </html>

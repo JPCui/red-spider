@@ -50,7 +50,8 @@ public class BookService {
 	@Autowired
 	SectionsRepository sectionsRepository;
 
-	@Cacheable(key = "bks:%s:%s:%s:%s", args = { "#bookRequest.getName()", "#bookRequest.getAuthor()", "#bookRequest.getType()", "#bookRequest.getTags()" })
+	@Cacheable(key = "bks:%s:%s:%s:%s", args = { "#bookRequest.getName()", "#bookRequest.getAuthor()",
+			"#bookRequest.getType()", "#bookRequest.getTags()" })
 	public List<BookResponse> findAll(BookPageRequest bookRequest) {
 
 		JSONObject requestJson = (JSONObject) JSONObject.toJSON(bookRequest);
@@ -136,10 +137,12 @@ public class BookService {
 			if (index > 1) {
 				// prev
 				int t = index - 2;
-				while (StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
+				while (t >= 0 && StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
 					t -= 1;
 				}
-				sectionResponse.setPrev(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
+				if (t >= 0) {
+					sectionResponse.setPrev(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
+				}
 			}
 			if (index < size) {
 				// next
