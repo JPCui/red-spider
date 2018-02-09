@@ -11,32 +11,33 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import cn.cjp.app.config.Symphony;
+import cn.cjp.wechat.WechatProperties;
 
-@ComponentScan({ "cn.cjp" })
+@ComponentScan({"cn.cjp"})
 @SpringBootApplication
 @ServletComponentScan
-@EnableConfigurationProperties({ Symphony.class })
+@EnableConfigurationProperties({Symphony.class, WechatProperties.class})
 public class SpiderAppApplication extends SpringBootServletInitializer {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpiderAppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SpiderAppApplication.class, args);
+    }
 
-	/**
-	 * 创建异步任务执行器
-	 */
-	@Bean
-	public SimpleAsyncTaskExecutor simpleAsyncTaskExecutor() {
-		SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
-		simpleAsyncTaskExecutor.setThreadNamePrefix("Async-Task-");
-		simpleAsyncTaskExecutor.setDaemon(true);
-		simpleAsyncTaskExecutor.setConcurrencyLimit(10);
-		return simpleAsyncTaskExecutor;
-	}
+    /**
+     * 创建异步任务执行器
+     */
+    @Bean
+    public SimpleAsyncTaskExecutor simpleAsyncTaskExecutor() {
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+        simpleAsyncTaskExecutor.setThreadNamePrefix("Async-Task-");
+        simpleAsyncTaskExecutor.setDaemon(true);
+        simpleAsyncTaskExecutor.setConcurrencyLimit(10);
+        return simpleAsyncTaskExecutor;
+    }
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(SpiderAppApplication.class);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(SpiderAppApplication.class);
+    }
 
 }

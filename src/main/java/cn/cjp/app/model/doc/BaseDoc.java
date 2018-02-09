@@ -9,8 +9,6 @@ public class BaseDoc {
 	
 	private String _id;
 	
-	private String _refer;
-	
 	private Date _updateDate;
 
 }
