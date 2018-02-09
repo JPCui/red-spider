@@ -1,14 +1,18 @@
 package cn.cjp.app.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.WriteResult;
+
 import cn.cjp.app.model.doc.ReaderRecord;
-import cn.cjp.app.repository.ReaderRecordRepository;
+import cn.cjp.utils.JacksonUtil;
 
 /**
  * reader service
@@ -16,32 +20,29 @@ import cn.cjp.app.repository.ReaderRecordRepository;
 @Service
 public class ReaderRecordService {
 
-    @Autowired
-    ReaderRecordRepository readerRecordRepository;
+	@Autowired
+	MongoTemplate mongoTemplate;
 
-    public void save(String userId, String bookDocId, int index) {
-        ReaderRecord reader = new ReaderRecord();
-        reader.setBookDocId(bookDocId);
-        reader.setIndex(index);
-        reader.setUserId(userId);
-        readerRecordRepository.save(reader);
-    }
+	public void save(String userId, String bookDocId, int index) {
+		ReaderRecord record = new ReaderRecord();
+		record.setBookDocId(bookDocId);
+		record.setIndex(index);
+		record.setUserId(userId);
 
-    public ReaderRecord findOne(String userId) {
-        ReaderRecord readerRecord = new ReaderRecord();
-        readerRecord.setUserId(userId);
+		WriteResult writeResult = mongoTemplate.upsert(
+				Query.query(Criteria.where("userId").is(userId).and("bookDocId").is(bookDocId)),
+				Update.fromDBObject(BasicDBObject.parse(JacksonUtil.toJson(record))), ReaderRecord.class);
+		System.out.println(writeResult);
+	}
 
-        Example<ReaderRecord> example = Example.of(readerRecord);
+	public ReaderRecord findOne(String userId) {
+		ReaderRecord readerRecord = new ReaderRecord();
+		readerRecord.setUserId(userId);
 
-        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "_updateDate");
-        Sort sort = new Sort(order);
-        PageRequest pageRequest = new PageRequest(1, 1, sort);
-        Page<ReaderRecord> records = readerRecordRepository.findAll(example, pageRequest);
-        if (records.hasContent()) {
-            return records.getContent().get(0);
-        }
-        return null;
-    }
-
+		Sort sort = new Sort(Sort.Direction.DESC, "_updateDate");
+		Query query = Query.query(Criteria.where("userId").is(userId)).with(sort);
+		ReaderRecord record = mongoTemplate.findOne(query, ReaderRecord.class);
+		return record;
+	}
 
 }

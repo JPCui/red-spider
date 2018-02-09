@@ -38,7 +38,7 @@
     <div class="row">
         <div class="col-sm-1"></div>
         <div class="panel panel-default">
-			<div class="panel-heading">${data.section.title}</div>
+			<div class="panel-heading">${data.section.curr.message}</div>
 			<#list data.section.content as c>
 			<div class="panel-body">
 			${c}

@@ -1,8 +1,6 @@
 package cn.cjp.app;
 
 
-import com.alibaba.fastjson.JSON;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
