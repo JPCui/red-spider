@@ -18,7 +18,7 @@ public class TextService {
 
 	/**
 	 * @param txt
-	 * @return 
+	 * @return
 	 */
 	public String chat(String txt) {
 
