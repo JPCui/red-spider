@@ -8,11 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Document(collection = "reader")
+@Document(collection = "reader_record")
 @CompoundIndexes({@CompoundIndex(name = "uk_userId_bookDocId", def = "{'userId': 1, 'bookDocId': 1}", unique = true)})
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Reader extends BaseDoc {
+public class ReaderRecord extends BaseDoc {
 
     private String userId;
 
