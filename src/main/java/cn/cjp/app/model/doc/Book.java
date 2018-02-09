@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @Document(collection = "99lib-book")
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Book extends BaseDoc {
+public class Book extends BaseSpiderDoc {
 
 	@Field("book_id")
 	private String bookId;

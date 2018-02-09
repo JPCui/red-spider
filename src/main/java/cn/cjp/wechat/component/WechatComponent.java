@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.OutputStream;
 
+import cn.cjp.app.model.doc.WxUserDoc;
 import cn.cjp.app.service.WxUserService;
 import cn.cjp.utils.Logger;
 import cn.cjp.wechat.UserUtil;
@@ -121,7 +122,9 @@ public class WechatComponent {
 
         User user = this.getUserInfo(requestMessage.getFromUserName());
 
-        wxUserService.save(UserUtil.toWxUserDoc(user));
+        WxUserDoc wxUserDoc = UserUtil.toWxUserDoc(user);
+        wxUserDoc.setAppid(wechatProperties.getAppId());
+        wxUserService.save(wxUserDoc);
 
         EventMessage responseMessage = new EventMessage();
         responseMessage.setFromUserName(requestMessage.getToUserName());

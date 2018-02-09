@@ -9,6 +9,6 @@ public class BaseDoc {
 	
 	private String _id;
 	
-	private Date _updateDate;
+	private Date _updateDate = new Date();
 
 }

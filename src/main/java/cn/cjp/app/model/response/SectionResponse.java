@@ -7,9 +7,9 @@ public class SectionResponse {
 
 	private String _id;
 	
-	private String title;
-
 	private String[] content;
+
+	private PageIndexResponse curr;
 
 	private PageIndexResponse prev;
 

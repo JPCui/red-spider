@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @Document(collection = "99lib-book-chaptors")
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Chaptors extends BaseDoc {
+public class Chaptors extends BaseSpiderDoc {
 
 	private String titleName;
 

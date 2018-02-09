@@ -16,62 +16,83 @@ import cn.cjp.app.model.response.SectionResponse;
 import cn.cjp.app.model.vo.BookChaptorVO;
 import cn.cjp.app.model.vo.BookSectionVO;
 import cn.cjp.app.service.BookService;
+import cn.cjp.app.service.ReaderService;
 import cn.cjp.app.util.ResponseUtil;
 
 /**
  * books
- * 
- * @author sucre
  *
+ * @author sucre
  */
 @RequestMapping
 @Controller
 public class BookController {
 
-	@Autowired
-	BookService bookService;
+    @Autowired
+    BookService bookService;
 
-	@RequestMapping("/books")
-	public ModelAndView books(BookPageRequest bookRequest) {
-		Response<?> response = Response.success(bookService.findAll(bookRequest));
+    @RequestMapping("/books")
+    public ModelAndView books(BookPageRequest bookRequest) {
+        Response<?> response = Response.success(bookService.findAll(bookRequest));
 
-		return ResponseUtil.get(response, "/book/books");
-	}
+        return ResponseUtil.get(response, "/book/books");
+    }
 
-	@RequestMapping("/book/{bookDocId}")
-	public ModelAndView chaptors(@PathVariable String bookDocId) {
-		BookResponse book = bookService.findOne(bookDocId);
-		List<ChaptorResponse> chaptors = bookService.findAllChaptors(bookDocId);
+    @RequestMapping("/book/{bookDocId}")
+    public ModelAndView chaptors(@PathVariable String bookDocId) {
+        BookResponse book = bookService.findOne(bookDocId);
+        List<ChaptorResponse> chaptors = bookService.findAllChaptors(bookDocId);
 
-		BookChaptorVO vo = new BookChaptorVO();
-		vo.setBook(book);
-		vo.setChaptors(chaptors);
+        BookChaptorVO vo = new BookChaptorVO();
+        vo.setBook(book);
+        vo.setChaptors(chaptors);
 
-		Response<?> response = Response.success(vo);
+        Response<?> response = Response.success(vo);
 
-		return ResponseUtil.get(response, "/book/book-chaptors");
-	}
+        return ResponseUtil.get(response, "/book/book-chaptors");
+    }
 
-	/**
-	 * 
-	 * @param bookDocId
-	 * @param index
-	 *            下标，base：1
-	 * @return
-	 */
-	@RequestMapping("/book/{bookDocId}/{index}")
-	public ModelAndView chaptors(@PathVariable String bookDocId, @PathVariable int index) {
+    @Autowired
+    private ReaderService readerService;
 
-		BookResponse book = bookService.findOne(bookDocId);
+    /**
+     * @param index 下标，base：1
+     */
+    @RequestMapping("/book/{bookDocId}/{index}")
+    public ModelAndView chaptors(@PathVariable String bookDocId, @PathVariable int index) {
 
-		SectionResponse section = bookService.getSectionByBookDocIdAndIndex(bookDocId, index);
+        BookResponse book = bookService.findOne(bookDocId);
 
-		BookSectionVO vo = new BookSectionVO();
-		vo.setBook(book);
-		vo.setSection(section);
+        SectionResponse section = bookService.getSectionByBookDocIdAndIndex(bookDocId, index);
 
-		Response<?> response = Response.success(vo);
-		return ResponseUtil.get(response, "/book/book-sections");
-	}
+        {
+            String userId = "";
+            readerService.save(userId, bookDocId, section.getCurr().getIndex());
+        }
+
+        BookSectionVO vo = new BookSectionVO();
+        vo.setBook(book);
+        vo.setSection(section);
+
+        Response<?> response = Response.success(vo);
+        return ResponseUtil.get(response, "/book/book-sections");
+    }
+
+    public ModelAndView getLastRead() {
+
+        String bookDocId = "";
+        int index = 0;
+
+        BookResponse book = bookService.findOne(bookDocId);
+
+        SectionResponse section = bookService.getSectionByBookDocIdAndIndex(bookDocId, index);
+
+        BookSectionVO vo = new BookSectionVO();
+        vo.setBook(book);
+        vo.setSection(section);
+
+        Response<?> response = Response.success(vo);
+        return ResponseUtil.get(response, "/book/book-sections");
+    }
 
 }
