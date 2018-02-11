@@ -9,7 +9,11 @@
 
 <body>
 <@common_body>
-${message!}
+<#if message??>
+    message
+<#else>
+    <img src="https://static.hacpai.com/images/404/${.now?long % 10}.gif" />
+</#if>
 </@common_body>
 </body>
 </html>
