@@ -137,13 +137,13 @@ public class WechatComponent {
         MenuKey menuKey = MenuKey.fromDescription(menuKeyStr);
 
         if (menuKey != null) {
-            String msg = null;
             switch (menuKey) {
                 case BOOK_READ: {
-                    ReaderRecord readerRecord = readerRecordService.findOneByOpenid(requestMessage.getFromUserName());
+                    ReaderRecord readerRecord = readerRecordService.findLatestByOpenid(requestMessage.getFromUserName());
                     SectionResponse sectionResponse = bookService.getSectionByBookDocIdAndIndex(readerRecord.getBookDocId(), readerRecord.getIndex());
                     String[] contents = sectionResponse.getContent();
-                    msg = contents[readerRecord.getSecIndex()].substring(0, 600);
+                    // 不能超过 600字
+                    responseMsg = contents[readerRecord.getSecIndex()].substring(0, 600);
 
                     break;
                 }
@@ -155,15 +155,15 @@ public class WechatComponent {
                 }
             }
 
-            if (!StringUtil.isEmpty(msg)) {
-                EventMessage responseMessage = new EventMessage();
-                responseMessage.setFromUserName(requestMessage.getToUserName());
-                responseMessage.setToUserName(requestMessage.getFromUserName());
-                responseMessage.setMsg(msg);
-                return responseMessage;
-            }
         }
 
+        if (!StringUtil.isEmpty(responseMsg)) {
+            EventMessage responseMessage = new EventMessage();
+            responseMessage.setFromUserName(requestMessage.getToUserName());
+            responseMessage.setToUserName(requestMessage.getFromUserName());
+            responseMessage.setMsg(responseMsg);
+            return responseMessage;
+        }
         return null;
     }
 

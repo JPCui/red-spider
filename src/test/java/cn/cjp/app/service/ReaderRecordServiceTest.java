@@ -22,12 +22,12 @@ public class ReaderRecordServiceTest {
 	String userId = "";
 
 	@Test
-	public void test() {
+	public void test() throws IllegalAccessException {
 		String bookDocId = "bookDocId";
 		int index = 1;
 		readerRecordService.save(userId, bookDocId, index);
 
-		ReaderRecord readerRecord = readerRecordService.findOne(userId);
+		ReaderRecord readerRecord = readerRecordService.findLatestByUserId(userId);
 
 		Assert.assertNotNull(readerRecord);
 		Assert.assertEquals(bookDocId, readerRecord.getBookDocId());

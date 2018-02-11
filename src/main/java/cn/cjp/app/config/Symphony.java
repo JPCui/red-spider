@@ -14,4 +14,13 @@ public class Symphony {
 
     private String serverPath;
 
+    private Login login;
+
+    @Data
+    public static class Login {
+
+        private String secret;
+
+    }
+
 }
