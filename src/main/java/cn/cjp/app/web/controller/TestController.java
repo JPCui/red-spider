@@ -10,7 +10,7 @@ import cn.cjp.app.exception.ServiceException;
 
 @Controller
 @RequestMapping
-public class ErrorController {
+public class TestController {
 
     @RequestMapping("404")
     public ModelAndView _404() throws ClassNotFoundException, FileNotFoundException {
