@@ -49,6 +49,7 @@ public class WxMpMenuTest {
 
 		Button m1 = new Button();
 		m1.setKey("m1");
+		m1.setName("书友会");
 		m1.setSub_button(Lists.newArrayList(sub1, sub2, sub3));
 
 		MenuButtons btn1 = new MenuButtons();
