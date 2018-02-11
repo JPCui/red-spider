@@ -12,11 +12,13 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import cn.cjp.app.config.Symphony;
 import cn.cjp.wechat.WechatProperties;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @ComponentScan({"cn.cjp"})
 @SpringBootApplication
 @ServletComponentScan
 @EnableConfigurationProperties({Symphony.class, WechatProperties.class})
+@EnableSwagger2
 public class SpiderAppApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

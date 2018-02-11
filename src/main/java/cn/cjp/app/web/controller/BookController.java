@@ -18,6 +18,7 @@ import cn.cjp.app.model.vo.BookSectionVO;
 import cn.cjp.app.service.BookService;
 import cn.cjp.app.service.ReaderRecordService;
 import cn.cjp.app.util.ResponseUtil;
+import io.swagger.annotations.Api;
 
 /**
  * books
@@ -26,6 +27,7 @@ import cn.cjp.app.util.ResponseUtil;
  */
 @RequestMapping
 @Controller
+@Api
 public class BookController {
 
 	@Autowired

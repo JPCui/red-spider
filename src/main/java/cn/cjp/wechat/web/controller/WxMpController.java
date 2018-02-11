@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cn.cjp.utils.Logger;
 import cn.cjp.wechat.component.WechatComponent;
+import io.swagger.annotations.Api;
 import weixin.popular.bean.message.EventMessage;
 import weixin.popular.bean.xmlmessage.XMLMessage;
 import weixin.popular.bean.xmlmessage.XMLTextMessage;
@@ -25,6 +26,7 @@ import weixin.popular.util.XMLConverUtil;
 
 @RestController
 @RequestMapping("/wx/mp")
+@Api
 public class WxMpController {
 
     private static final Logger LOGGER = Logger.getLogger(WxMpController.class);
