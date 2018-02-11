@@ -12,6 +12,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.WriteResult;
 
 import cn.cjp.app.model.doc.ReaderRecord;
+import cn.cjp.app.model.doc.WxUserDoc;
 import cn.cjp.utils.JacksonUtil;
 
 /**
@@ -22,6 +23,9 @@ public class ReaderRecordService {
 
 	@Autowired
 	MongoTemplate mongoTemplate;
+
+	@Autowired
+	WxUserService wxUserService;
 
 	public void save(String userId, String bookDocId, int index) {
 		ReaderRecord record = new ReaderRecord();
@@ -43,6 +47,12 @@ public class ReaderRecordService {
 		Query query = Query.query(Criteria.where("userId").is(userId)).with(sort);
 		ReaderRecord record = mongoTemplate.findOne(query, ReaderRecord.class);
 		return record;
+	}
+
+	public ReaderRecord findOneByOpenid(String openid) {
+		WxUserDoc wxUserDoc = wxUserService.findOneByOpenid(openid);
+		ReaderRecord readerRecord = this.findOne(wxUserDoc.get_id());
+		return readerRecord;
 	}
 
 }

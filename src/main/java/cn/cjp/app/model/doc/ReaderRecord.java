@@ -18,6 +18,14 @@ public class ReaderRecord extends BaseDoc {
 
     private String bookDocId;
 
+    /**
+     * 章节序号，base 1
+     */
     private int index;
+
+    /**
+     * 段落下表，base 0
+     */
+    private int secIndex;
 
 }

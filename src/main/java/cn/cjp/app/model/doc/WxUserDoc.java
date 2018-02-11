@@ -9,7 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Document(collection = "wx_user")
-@CompoundIndexes({@CompoundIndex(name = "uk_appid_unionid", def = "{'appid': 1, 'unionid': 1}", unique = true)})
+@CompoundIndexes({@CompoundIndex(name = "uk_appid_openid", def = "{'appid': 1, 'openid': 1}", unique = true), @CompoundIndex(name =
+        "uk_unionid", def = "{'unionid': 1}", unique = true)})
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class WxUserDoc extends BaseDoc {
