@@ -34,9 +34,11 @@ public class WechatProperties {
         /**
          * 默认回答
          */
-        private String dft;
+        private String dft = "On my way ~";
 
-        private String onSubscribe;
+        private String onSubscribe = "谢谢关注 ~";
+
+        private String unsupport = "暂不支持哦 ~";
 
     }
 
