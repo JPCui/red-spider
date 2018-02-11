@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="SERVICE_NAME" value="red-spider"/>
+    <property name="MAX_HISTORY" value="30"/>
+    <property name="HOME_PATH" value="/home/logs"/>
+    <property name="PATTERN_CONSOLE"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{50}) - %yellow([%file:%line]) - %msg%n"/>
+    <property name="PATTERN_ELK"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS}$$${HOSTNAME}$$%thread{}$$%level{}$$%logger{}$$%file{}$$%line{}$$${SERVICE_NAME}$$%X{traceId}$$%X{feTraceId}$$%n{}%msg{}%n{}$$%ex{}$$%n"/>
+
+    <!-- 本地日志通过控制台输出 -->
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="stdOutAppender">
+        <encoder>
+            <pattern>${PATTERN_CONSOLE}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 非本地日志写到文件里,通过ELK收集和展现 -->
+    <springProfile name="!dev">
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="rollingFileAppender">
+            <file>${HOME_PATH}/${SERVICE_NAME}/${HOSTNAME}_application.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${HOME_PATH}/${SERVICE_NAME}/${HOSTNAME}_application.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>${MAX_HISTORY}</maxHistory>
+            </rollingPolicy>
+            <!-- 添加的logstash encoder  -->
+            <encoder>
+                <pattern>${PATTERN_ELK}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <!-- sql执行log输出 -->
+    <logger level="info" name="org.springframework.web.servlet.view"/>
+
+    <!-- 分环境日志配置 -->
+    <springProfile name="dev">
+        <root level="debug">
+            <appender-ref ref="stdOutAppender"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="production">
+        <root level="debug">
+            <appender-ref ref="rollingFileAppender"/>
+        </root>
+    </springProfile>
+</configuration>
