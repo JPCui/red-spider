@@ -1,46 +1,47 @@
 package cn.cjp.app.model.response;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class SectionResponse {
+public class SectionResponse implements Serializable {
 
-	private String _id;
-	
-	private String[] content;
+    private String _id;
 
-	private PageIndexResponse curr;
+    private String[] content;
 
-	private PageIndexResponse prev;
+    private PageIndexResponse curr;
 
-	private PageIndexResponse next;
+    private PageIndexResponse prev;
 
-	/**
-	 * 用來跳轉，上一章、下一章
-	 * 
-	 * @author sucre
-	 *
-	 */
-	@Data
-	public static class PageIndexResponse {
+    private PageIndexResponse next;
 
-		public static PageIndexResponse build(int index, String message) {
-			PageIndexResponse response = new PageIndexResponse();
-			response.setIndex(index);
-			response.setMessage(message);
-			return response;
-		}
+    /**
+     * 用來跳轉，上一章、下一章
+     *
+     * @author sucre
+     */
+    @Data
+    public static class PageIndexResponse {
 
-		/**
-		 * 下標/頁碼
-		 */
-		private int index = 0;
+        public static PageIndexResponse build(int index, String message) {
+            PageIndexResponse response = new PageIndexResponse();
+            response.setIndex(index);
+            response.setMessage(message);
+            return response;
+        }
 
-		/**
-		 * 信息
-		 */
-		private String message = "";
+        /**
+         * 下標/頁碼
+         */
+        private int index = 0;
 
-	}
+        /**
+         * 信息
+         */
+        private String message = "";
+
+    }
 
 }

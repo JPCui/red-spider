@@ -14,12 +14,15 @@ import cn.cjp.app.model.doc.DocUtil;
 import cn.cjp.app.model.doc.ReaderRecord;
 import cn.cjp.app.model.doc.WxUserDoc;
 import cn.cjp.app.repository.ReaderRecordRepository;
+import cn.cjp.utils.Logger;
 
 /**
  * reader service
  */
 @Service
 public class ReaderRecordService {
+
+    private static final Logger LOGGER = Logger.getLogger(ReaderRecordService.class);
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -39,7 +42,7 @@ public class ReaderRecordService {
         WriteResult writeResult = mongoTemplate.upsert(
             Query.query(Criteria.where("userId").is(userId).and("bookDocId").is(bookDocId)),
             Update.fromDBObject(DocUtil.bean2DBObject(record), "_id"), ReaderRecord.class);
-        System.out.println(writeResult);
+        LOGGER.info(writeResult.toString());
     }
 
     /**

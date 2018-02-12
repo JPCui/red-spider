@@ -1,7 +1,5 @@
 package cn.cjp.app.service;
 
-import com.alibaba.fastjson.JSONObject;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -51,21 +49,25 @@ public class BookService {
     private SectionsRepository sectionsRepository;
 
     @Cacheable(key = "bks:%s:%s:%s:%s", args = {"#bookRequest.getName()", "#bookRequest.getAuthor()",
-            "#bookRequest.getType()", "#bookRequest.getTags()"})
+        "#bookRequest.getType()", "#bookRequest.getTags()"})
     public List<BookResponse> findAll(BookPageRequest bookRequest) {
 
-        JSONObject requestJson = (JSONObject) JSONObject.toJSON(bookRequest);
-
-        int page = (int) requestJson.remove("page");
-        int pageSize = PageRequest.DEFAULT_PAGE_SIZE;
-
         Criteria criteria = new Criteria();
-        requestJson.keySet().forEach(key -> {
-            if (requestJson.get(key) != null && !StringUtil.isEmpty(requestJson.get(key).toString())) {
-                criteria.orOperator(Criteria.where(key).is(requestJson.get(key)));
-            }
-        });
+        if (!StringUtil.isEmpty(bookRequest.getName())) {
+            criteria.orOperator(Criteria.where("name").is(bookRequest.getName()));
+        }
+        if (!StringUtil.isEmpty(bookRequest.getAuthor())) {
+            criteria.orOperator(Criteria.where("author").is(bookRequest.getAuthor()));
+        }
+        if (!StringUtil.isEmpty(bookRequest.getType())) {
+            criteria.orOperator(Criteria.where("type").is(bookRequest.getType()));
+        }
+        if (!StringUtil.isEmpty(bookRequest.getTags())) {
+            criteria.orOperator(Criteria.where("tags").is(bookRequest.getTags()));
+        }
 
+        int page = bookRequest.getPage();
+        int pageSize = PageRequest.DEFAULT_PAGE_SIZE;
         Query query = new Query(criteria).skip((page - 1) * pageSize).limit(pageSize);
 
         List<Book> books = bookRepository.find(query);
@@ -162,9 +164,14 @@ public class BookService {
         return null;
     }
 
+    /**
+     * find by doc id
+     * @param bookDocId
+     * @return doc
+     */
     @Cacheable(key = "bk:%s", args = {"#bookId"})
-    public BookResponse findOne(String bookId) {
-        Book book = bookRepository.findById(bookId);
+    public BookResponse findOne(String bookDocId) {
+        Book book = bookRepository.findById(bookDocId);
         BookResponse bookResponse = new BookResponse();
         BeanUtils.copyProperties(book, bookResponse);
         return bookResponse;
