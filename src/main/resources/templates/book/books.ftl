@@ -1,3 +1,4 @@
+<#include "../macro/pager.ftl">
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,8 +47,13 @@
     </div>
 	<br/>
     <div class="row">
+		<@pager prevPage="${data.prevPage}" prevMsg="上一页" nextPage="${data.nextPage}" nextMsg="下一页" lastPage="./" lastMsg="目录">
+		</@pager>
+    </div>
+	<br/>
+    <div class="row">
         <div class="col-md-12">
-	    <#list data as d>
+	    <#list data.resultList as d>
             <ul class="list-group">
                 <li class="list-group-item">
                     <h2><a href="${serverPath}/book/${d._id}">${d.name}</a></h2>

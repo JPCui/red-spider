@@ -20,7 +20,7 @@ import com.mongodb.DBObject;
 import com.mongodb.GroupCommand;
 import com.mongodb.MongoClientURI;
 
-import cn.cjp.app.model.doc.Chaptors;
+import cn.cjp.app.model.doc.Book;
 import cn.cjp.app.model.doc.Sections;
 import redis.clients.jedis.Jedis;
 
@@ -31,6 +31,13 @@ public class CheckCrawlNum {
 	public CheckCrawlNum() throws UnknownHostException {
 		SimpleMongoDbFactory factory = new SimpleMongoDbFactory(new MongoClientURI("mongodb://localhost:27017/test"));
 		mongoTemplate = new MongoTemplate(factory);
+	}
+
+	@Test
+	public void testInsert() {
+		Book book = new Book();
+		book.setBookId("0");
+		mongoTemplate.insert(book);
 	}
 
 	@Test

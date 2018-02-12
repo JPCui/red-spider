@@ -1,15 +1,15 @@
 package cn.cjp.app.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import cn.cjp.app.exception.ServiceAssert;
 import cn.cjp.app.model.doc.Book;
@@ -26,155 +26,162 @@ import cn.cjp.app.repository.BookRepository;
 import cn.cjp.app.repository.ChaptorsRepository;
 import cn.cjp.app.repository.SectionsRepository;
 import cn.cjp.core.cache.Cacheable;
+import cn.cjp.utils.Page;
 import cn.cjp.utils.StringUtil;
 
 @Service
 public class BookService {
 
-    public static final String COLLECTION_BOOK = "99lib-book";
+	public static final String COLLECTION_BOOK = "99lib-book";
 
-    public static final String COLLECTION_BOOK_CHAPTORS = "99lib-book-chaptors";
+	public static final String COLLECTION_BOOK_CHAPTORS = "99lib-book-chaptors";
 
-    public static final String COLLECTION_BOOK_SECTIONS = "99lib-book-sections";
+	public static final String COLLECTION_BOOK_SECTIONS = "99lib-book-sections";
 
-    public static final String FIELD_BOOK_ID = "book_id";
+	public static final String FIELD_BOOK_ID = "book_id";
 
-    @Autowired
-    private BookRepository bookRepository;
+	@Autowired
+	private BookRepository bookRepository;
 
-    @Autowired
-    private ChaptorsRepository chaptorsRepository;
+	@Autowired
+	private ChaptorsRepository chaptorsRepository;
 
-    @Autowired
-    private SectionsRepository sectionsRepository;
+	@Autowired
+	private SectionsRepository sectionsRepository;
 
-    @Cacheable(key = "bks:%s:%s:%s:%s", args = {"#bookRequest.getName()", "#bookRequest.getAuthor()",
-        "#bookRequest.getType()", "#bookRequest.getTags()"})
-    public List<BookResponse> findAll(BookPageRequest bookRequest) {
+	@Cacheable(key = "bks:%s:%s:%s:%s:%s", args = { "#bookRequest.getName()", "#bookRequest.getAuthor()",
+			"#bookRequest.getType()", "#bookRequest.getTags()", "#bookRequest.getPage()" })
+	public Page<BookResponse> findAll(BookPageRequest bookRequest) {
 
-        Criteria criteria = new Criteria();
-        if (!StringUtil.isEmpty(bookRequest.getName())) {
-            criteria.orOperator(Criteria.where("name").is(bookRequest.getName()));
-        }
-        if (!StringUtil.isEmpty(bookRequest.getAuthor())) {
-            criteria.orOperator(Criteria.where("author").is(bookRequest.getAuthor()));
-        }
-        if (!StringUtil.isEmpty(bookRequest.getType())) {
-            criteria.orOperator(Criteria.where("type").is(bookRequest.getType()));
-        }
-        if (!StringUtil.isEmpty(bookRequest.getTags())) {
-            criteria.orOperator(Criteria.where("tags").is(bookRequest.getTags()));
-        }
+		Criteria criteria = new Criteria();
+		if (!StringUtil.isEmpty(bookRequest.getName())) {
+			criteria.orOperator(Criteria.where("name").is(bookRequest.getName()));
+		}
+		if (!StringUtil.isEmpty(bookRequest.getAuthor())) {
+			criteria.orOperator(Criteria.where("author").is(bookRequest.getAuthor()));
+		}
+		if (!StringUtil.isEmpty(bookRequest.getType())) {
+			criteria.orOperator(Criteria.where("type").is(bookRequest.getType()));
+		}
+		if (!StringUtil.isEmpty(bookRequest.getTags())) {
+			criteria.orOperator(Criteria.where("tags").is(bookRequest.getTags()));
+		}
 
-        int page = bookRequest.getPage();
-        int pageSize = PageRequest.DEFAULT_PAGE_SIZE;
-        Query query = new Query(criteria).skip((page - 1) * pageSize).limit(pageSize);
+		int page = bookRequest.getPage();
+		int pageSize = PageRequest.DEFAULT_PAGE_SIZE;
+		Query query = new Query(criteria).skip((page - 1) * pageSize).limit(pageSize);
+		Page<Book> bookPage = bookRepository.findPage(query);
+		List<BookResponse> bookResponses = bookPage.getResultList().stream().map(book -> {
+			BookResponse bookResponse = new BookResponse();
+			BeanUtils.copyProperties(book, bookResponse);
+			return bookResponse;
+		}).collect(Collectors.toList());
+		Page<BookResponse> pageResponsePage = new Page<>(bookPage.getCurrPage(), bookPage.getSizeOfPage(),
+				bookPage.getCountOfData(), bookResponses);
+		return pageResponsePage;
+	}
 
-        List<Book> books = bookRepository.find(query);
-        return books.stream().map(book -> {
-            BookResponse bookResponse = new BookResponse();
-            BeanUtils.copyProperties(book, bookResponse);
-            return bookResponse;
-        }).collect(Collectors.toList());
-    }
+	@Cacheable(key = "bks:cha:%s", args = { "#docId" })
+	public List<ChaptorResponse> findAllChaptors(String docId) {
+		Book book = bookRepository.findById(docId);
+		String bookId = book.getBookId();
 
-    @Cacheable(key = "bks:cha:%s", args = {"#docId"})
-    public List<ChaptorResponse> findAllChaptors(String docId) {
-        Book book = bookRepository.findById(docId);
-        String bookId = book.getBookId();
+		Criteria criteria = new Criteria();
+		criteria.and("book_id").is(bookId);
+		Query query = new Query(criteria);
 
-        Criteria criteria = new Criteria();
-        criteria.and("book_id").is(bookId);
-        Query query = new Query(criteria);
+		Chaptors chaptors = chaptorsRepository.findOne(query);
+		ServiceAssert.assert404(chaptors);
+		Chaptor[] chaptorArray = chaptors.getChaptors();
 
-        Chaptors chaptors = chaptorsRepository.findOne(query);
-        Chaptor[] chaptorArray = chaptors.getChaptors();
+		List<ChaptorResponse> chaptorResponses = new ArrayList<>();
+		IntStream.range(0, chaptorArray.length).forEach(i -> {
+			Chaptor cha = chaptorArray[i];
+			ChaptorResponse chaptorResponse = new ChaptorResponse();
+			BeanUtils.copyProperties(cha, chaptorResponse);
+			if (!StringUtil.isEmpty(cha.getChaptorId())) {
+				chaptorResponse.setViewId(Integer.valueOf(i + 1).toString());
+			}
+			chaptorResponses.add(chaptorResponse);
+		});
+		return chaptorResponses;
 
-        List<ChaptorResponse> chaptorResponses = new ArrayList<>();
-        IntStream.range(0, chaptorArray.length).forEach(i -> {
-            Chaptor cha = chaptorArray[i];
-            ChaptorResponse chaptorResponse = new ChaptorResponse();
-            BeanUtils.copyProperties(cha, chaptorResponse);
-            if (!StringUtil.isEmpty(cha.getChaptorId())) {
-                chaptorResponse.setViewId(Integer.valueOf(i + 1).toString());
-            }
-            chaptorResponses.add(chaptorResponse);
-        });
-        return chaptorResponses;
+	}
 
-    }
+	/**
+	 * 根据bookDocId获取chaptor，再跟进 index 获取 section_id
+	 *
+	 * @param bookDocId
+	 *            doc id
+	 * @param index
+	 *            下标，base: 1
+	 * @return the index-ed in all chaptors
+	 */
+	@Cacheable(key = "bks:sec:%s:%s", args = { "#bookDocId", "#index" })
+	public SectionResponse getSectionByBookDocIdAndIndex(String bookDocId, int index) {
+		Book book = bookRepository.findById(bookDocId);
 
-    /**
-     * 根据bookDocId获取chaptor，再跟进 index 获取 section_id
-     *
-     * @param bookDocId doc id
-     * @param index     下标，base: 1
-     * @return the index-ed in all chaptors
-     */
-    @Cacheable(key = "bks:sec:%s:%s", args = {"#bookDocId", "#index"})
-    public SectionResponse getSectionByBookDocIdAndIndex(String bookDocId, int index) {
-        Book book = bookRepository.findById(bookDocId);
+		Query query = new Query(Criteria.where("book_id").is(book.getBookId()));
+		Chaptors chaptors = chaptorsRepository.findOne(query);
+		ServiceAssert.assert404(chaptors);
 
-        Query query = new Query(Criteria.where("book_id").is(book.getBookId()));
-        Chaptors chaptors = chaptorsRepository.findOne(query);
-        ServiceAssert.assert404(chaptors);
+		Chaptor[] chaptorArray = chaptors.getChaptors();
+		int size = chaptorArray.length;
+		if (index <= size) {
+			// 当前章节
+			Chaptor selectedChaptor = chaptorArray[index - 1];
+			if (StringUtil.isEmpty(selectedChaptor.getChaptorId())) {
+				return this.getSectionByBookDocIdAndIndex(bookDocId, index + 1);
+			}
+			String chaptorId = selectedChaptor.getChaptorId();
 
-        Chaptor[] chaptorArray = chaptors.getChaptors();
-        int size = chaptorArray.length;
-        if (index <= size) {
-            // 当前章节
-            Chaptor selectedChaptor = chaptorArray[index - 1];
-            if (StringUtil.isEmpty(selectedChaptor.getChaptorId())) {
-                return this.getSectionByBookDocIdAndIndex(bookDocId, index + 1);
-            }
-            String chaptorId = selectedChaptor.getChaptorId();
+			Criteria criteria = new Criteria();
+			criteria.and("chaptor_id").is(chaptorId);
+			query = new Query(criteria);
+			Sections sections = sectionsRepository.findOne(query);
+			ServiceAssert.assert404(sections);
 
-            Criteria criteria = new Criteria();
-            criteria.and("chaptor_id").is(chaptorId);
-            query = new Query(criteria);
-            Sections sections = sectionsRepository.findOne(query);
-            ServiceAssert.assert404(sections);
+			SectionResponse sectionResponse = new SectionResponse();
+			BeanUtils.copyProperties(sections, sectionResponse);
 
-            SectionResponse sectionResponse = new SectionResponse();
-            BeanUtils.copyProperties(sections, sectionResponse);
+			sectionResponse.setCurr(PageIndexResponse.build(index, selectedChaptor.getChaptorName()));
 
-            sectionResponse.setCurr(PageIndexResponse.build(index, selectedChaptor.getChaptorName()));
+			if (index > 1) {
+				// prev
+				int t = index - 2;
+				while (t >= 0 && StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
+					t -= 1;
+				}
+				if (t >= 0) {
+					sectionResponse.setPrev(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
+				}
+			}
+			if (index < size) {
+				// next
+				int t = index;
+				while (StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
+					t += 1;
+				}
+				sectionResponse.setNext(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
+			}
 
-            if (index > 1) {
-                // prev
-                int t = index - 2;
-                while (t >= 0 && StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
-                    t -= 1;
-                }
-                if (t >= 0) {
-                    sectionResponse.setPrev(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
-                }
-            }
-            if (index < size) {
-                // next
-                int t = index;
-                while (StringUtil.isEmpty(chaptorArray[t].getChaptorId())) {
-                    t += 1;
-                }
-                sectionResponse.setNext(PageIndexResponse.build(t + 1, chaptorArray[t].getChaptorName()));
-            }
+			return sectionResponse;
+		}
+		return null;
+	}
 
-            return sectionResponse;
-        }
-        return null;
-    }
-
-    /**
-     * find by doc id
-     * @param bookDocId
-     * @return doc
-     */
-    @Cacheable(key = "bk:%s", args = {"#bookId"})
-    public BookResponse findOne(String bookDocId) {
-        Book book = bookRepository.findById(bookDocId);
-        BookResponse bookResponse = new BookResponse();
-        BeanUtils.copyProperties(book, bookResponse);
-        return bookResponse;
-    }
+	/**
+	 * find by doc id
+	 * 
+	 * @param bookDocId
+	 * @return doc
+	 */
+	@Cacheable(key = "bk:%s", args = { "#bookDocId" })
+	public BookResponse findOne(String bookDocId) {
+		Book book = bookRepository.findById(bookDocId);
+		BookResponse bookResponse = new BookResponse();
+		BeanUtils.copyProperties(book, bookResponse);
+		return bookResponse;
+	}
 
 }
