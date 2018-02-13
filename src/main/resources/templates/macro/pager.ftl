@@ -2,7 +2,7 @@
 	<ul class="pager">
 		<#if data.prevPage??>
 			<li class="previous">
-			<a href="${prevPage}" aria-label="${prevPage}">
+			<a href="?page=${prevPage}" aria-label="${prevPage}">
 			<span aria-hidden="true">${prevMsg}</span>
 			</a>
 			</li>

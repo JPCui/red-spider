@@ -47,7 +47,7 @@
     </div>
 	<br/>
     <div class="row">
-		<@pager prevPage="${data.prevPage}" prevMsg="上一页" nextPage="${data.nextPage}" nextMsg="下一页" lastPage="./" lastMsg="目录">
+		<@pager prevPage="${data.prevPage}" prevMsg="上一页" nextPage="${data.nextPage}" nextMsg="下一页" lastPage="${serverPath}/books" lastMsg="目录">
 		</@pager>
     </div>
 	<br/>
