@@ -5,67 +5,67 @@ import java.util.List;
 
 public enum Event {
 
-    VIEW(100, "VIEW"),
+	VIEW(100, "VIEW"),
 
-    CLICK(200, "CLICK"),
+	CLICK(200, "CLICK"),
 
-    LOCATION(300, "LOCATION"),
+	LOCATION(300, "LOCATION"),
 
-    SCAN(400, "SCAN"),
+	SCAN(400, "SCAN"),
 
-    subscribe(500, "subscribe"),
+	SUBSCRIBE(500, "SUBSCRIBE"),
 
-    unsubscribe(600, "unsubscribe"),;
+	UNSUBSCRIBE(600, "UNSUBSCRIBE"),;
 
-    private final int code;
-    private final String message;
+	private final int code;
+	private final String message;
 
-    public static Event fromValue(final int code) {
-        for (Event t : Event.values()) {
-            if (code == t.getValue()) {
-                return t;
-            }
-        }
+	public static Event fromValue(final int code) {
+		for (Event t : Event.values()) {
+			if (code == t.getValue()) {
+				return t;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    public static Event fromDescription(String message) {
-        for (Event t : Event.values()) {
-            if (message == t.getDescription()) {
-                return t;
-            }
-        }
+	public static Event fromDescription(String message) {
+		for (Event t : Event.values()) {
+			if (message == t.getDescription()) {
+				return t;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    public static List<Event> fromValues(final Iterable<Integer> codes) {
+	public static List<Event> fromValues(final Iterable<Integer> codes) {
 
-        List<Event> ts = new ArrayList<>();
+		List<Event> ts = new ArrayList<>();
 
-        for (Integer code : codes) {
+		for (Integer code : codes) {
 
-            final Event t = fromValue(code);
+			final Event t = fromValue(code);
 
-            if (t != null) {
-                ts.add(t);
-            }
-        }
+			if (t != null) {
+				ts.add(t);
+			}
+		}
 
-        return ts;
-    }
+		return ts;
+	}
 
-    Event(int code, String message) {
-        this.code = code;
-        this.message = message;
-    }
+	Event(int code, String message) {
+		this.code = code;
+		this.message = message;
+	}
 
-    public int getValue() {
-        return code;
-    }
+	public int getValue() {
+		return code;
+	}
 
-    public String getDescription() {
-        return message;
-    }
+	public String getDescription() {
+		return message;
+	}
 }

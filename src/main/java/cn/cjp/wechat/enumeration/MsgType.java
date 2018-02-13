@@ -3,73 +3,78 @@ package cn.cjp.wechat.enumeration;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public enum MsgType {
 
-    text(100, "text"),
+	TEXT(100, "text"),
 
-    image(200, "image"),
+	IMAGE(200, "image"),
 
-    voice(300, "voice"),
+	VOICE(300, "voice"),
 
-    video(400, "video"),
+	VIDEO(400, "video"),
 
-    shortvideo(500, "shortvideo"),
+	SHORTVIDEO(500, "shortvideo"),
 
-    location(600, "location"),
+	LOCATION(600, "location"),
 
-    event(700, "event"),;
+	EVENT(700, "event"),
 
-    private final int code;
-    private final String message;
+	NEWS(800, "news"),
 
-    public static MsgType fromValue(final int code) {
-        for (MsgType t : MsgType.values()) {
-            if (code == t.getValue()) {
-                return t;
-            }
-        }
+	MUSIC(900, "music"),
 
-        return null;
-    }
+	;
 
-    public static MsgType fromDescription(String message) {
-        for (MsgType t : MsgType.values()) {
-            if (message == t.getDescription()) {
-                return t;
-            }
-        }
+	private final int code;
+	private final String message;
 
-        return null;
-    }
+	public static MsgType fromValue(final int code) {
+		for (MsgType t : MsgType.values()) {
+			if (code == t.getValue()) {
+				return t;
+			}
+		}
 
-    public static List<MsgType> fromValues(final Iterable<Integer> codes) {
+		return null;
+	}
 
-        List<MsgType> ts = new ArrayList<>();
+	public static MsgType fromDescription(String message) {
+		for (MsgType t : MsgType.values()) {
+			if (t.getDescription().equalsIgnoreCase(message)) {
+				return t;
+			}
+		}
 
-        for (Integer code : codes) {
+		return null;
+	}
 
-            final MsgType t = fromValue(code);
+	public static List<MsgType> fromValues(final Iterable<Integer> codes) {
 
-            if (t != null) {
-                ts.add(t);
-            }
-        }
+		List<MsgType> ts = new ArrayList<>();
 
-        return ts;
-    }
+		for (Integer code : codes) {
 
-    MsgType(int code, String message) {
-        this.code = code;
-        this.message = message;
-    }
+			final MsgType t = fromValue(code);
 
-    public int getValue() {
-        return code;
-    }
+			if (t != null) {
+				ts.add(t);
+			}
+		}
 
-    public String getDescription() {
-        return message;
-    }
+		return ts;
+	}
+
+	MsgType(int code, String message) {
+		this.code = code;
+		this.message = message;
+	}
+
+	public int getValue() {
+		return code;
+	}
+
+	public String getDescription() {
+		return message;
+	}
 
 }

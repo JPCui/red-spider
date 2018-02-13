@@ -8,19 +8,28 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "symphony", ignoreUnknownFields = true)
 public class Symphony {
 
-    private boolean enable;
+	private boolean enable;
 
-    private String staticServerPath;
+	private String staticServerPath;
 
-    private String serverPath;
+	private String serverPath;
 
-    private Login login;
+	private Login login;
 
-    @Data
-    public static class Login {
+	private Tuling tuling;
 
-        private String secret;
+	@Data
+	public static class Tuling {
+		private String api;
+		private String apikey;
+		private String secret;
+	}
 
-    }
+	@Data
+	public static class Login {
+
+		private String secret;
+
+	}
 
 }

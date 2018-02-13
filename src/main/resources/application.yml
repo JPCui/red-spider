@@ -1,0 +1,52 @@
+spring:
+  profiles: 
+    active: dev
+  data:
+    mongodb:
+      database: test
+      host: localhost
+      port: 27017
+  freemarker:
+    enabled: true
+    template-loader-path: classpath:/templates/
+    allow-request-override: false
+    cache: true
+    check-template-location: true
+    charset: UTF-8
+    expose-request-attributes: true
+    expose-session-attributes: false
+    expose-spring-macro-helpers: false
+    suffix: .ftl
+    settings:
+      datetime_format: yyyy-MM-dd HH:mm:ss
+
+server:
+  port: 8800
+  contextPath: /rs
+
+endpoints:
+  enabled: true
+  health:
+    enabled: true
+    time-to-live: 5000
+
+wechat:
+  appId: wx46b87cd60d921ad1
+  appsecret: 310318fe04525556d42ed82ef84ee607
+  valid:
+    token: 96c7f65aa25b497ba5a0f236881ba657
+    encodingAESKey: no6wFXmgT7gE8q2sEJwODIlScaZIO2W9PowWKZ67DuI
+  msg:
+    dft: 嘤嘤嘤 ~
+    on_subscribe: Hello ~
+
+symphony:
+  enable: true
+  staticServerPath: /rs
+  serverPath: /rs
+  login:
+    secret: ssssss
+  tuling:
+    api: http://www.tuling123.com/openapi/api
+    apikey: 96c7f65aa25b497ba5a0f236881ba657
+    secret: ae16601956ef4d8c

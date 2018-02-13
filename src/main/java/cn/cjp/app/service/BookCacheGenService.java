@@ -1,11 +1,15 @@
 package cn.cjp.app.service;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cn.cjp.app.exception.ServiceException;
 import cn.cjp.app.model.request.BookPageRequest;
 import cn.cjp.app.model.response.BookResponse;
+import cn.cjp.app.model.response.ChaptorsResponse.ChaptorResponse;
 import cn.cjp.utils.FileUtil;
 import cn.cjp.utils.Logger;
 import cn.cjp.utils.Page;
@@ -37,8 +41,11 @@ public class BookCacheGenService {
 			}
 			bookPage.getResultList().forEach(book -> {
 				try {
-					bookService.findAllChaptors(book.get_id());
 					bookService.findOne(book.get_id());
+					List<ChaptorResponse> chaptorResponses = bookService.findAllChaptors(book.get_id());
+					IntStream.range(1, chaptorResponses.size() + 1).forEach(index -> {
+						bookService.getSectionByBookDocIdAndIndex(book.get_id(), index);
+					});
 				} catch (ServiceException e) {
 					LOGGER.error(e.getMessage(), e);
 				}

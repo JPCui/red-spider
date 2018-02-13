@@ -8,7 +8,7 @@
 			</li>
     	</#if>
 		
-		<li><a href="lastPage">${lastMsg}</a></li>
+		<li><a href="${lastPage}">${lastMsg}</a></li>
 		
 		<#if data.nextPage??>
 			<li class="next">
