@@ -16,7 +16,7 @@ public class _99libUtilTest {
 	Html html = null;
 
 	public _99libUtilTest() throws IOException {
-		File file = ResourceUtils.getFile("classpath:sections-in-chaptor.txt");
+		File file = ResourceUtils.getFile("classpath:sections-in-chaptor2.html");
 		String domStr = FileUtils.readFileToString(file);
 		html = new Html(domStr);
 	}

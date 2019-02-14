@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 public class ExecutorsTest {
 
     public static void main(String[] args) throws InterruptedException {
-        ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 3,
+        ThreadPoolExecutor executorService = new ThreadPoolExecutor(2, 4,
                 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>());
 
@@ -23,12 +23,9 @@ public class ExecutorsTest {
     }
 
     public static Thread newThread() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                sleep();
-                System.out.println(Thread.currentThread().getName() + ".. over");
-            }
+        Thread thread = new Thread(() -> {
+            sleep();
+            System.out.println(Thread.currentThread().getName() + ".. over");
         });
         return thread;
     }

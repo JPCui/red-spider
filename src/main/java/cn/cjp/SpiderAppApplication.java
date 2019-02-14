@@ -14,8 +14,7 @@ import cn.cjp.app.config.Symphony;
 import cn.cjp.wechat.WechatProperties;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@ComponentScan({"cn.cjp"})
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.cjp")
 @ServletComponentScan
 @EnableConfigurationProperties({Symphony.class, WechatProperties.class})
 @EnableSwagger2
@@ -33,7 +32,7 @@ public class SpiderAppApplication extends SpringBootServletInitializer {
         SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
         simpleAsyncTaskExecutor.setThreadNamePrefix("Async-Task-");
         simpleAsyncTaskExecutor.setDaemon(true);
-        simpleAsyncTaskExecutor.setConcurrencyLimit(10);
+        simpleAsyncTaskExecutor.setConcurrencyLimit(Runtime.getRuntime().availableProcessors() * 2);
         return simpleAsyncTaskExecutor;
     }
 
