@@ -1,15 +1,11 @@
 package cn.cjp.spider.util;
 
+import com.alibaba.fastjson.util.Base64;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import com.alibaba.fastjson.util.Base64;
-
-import cn.cjp.utils.Logger;
-import cn.cjp.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class _99libUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(_99libUtil.class);
-
     /**
      * 用来去噪，解析出哪些 index 是最终获取的 target index <br>
      *
@@ -27,30 +21,29 @@ public class _99libUtil {
      *
      * @param metaContent 经过base64编码的content，被隐藏在 meta[4] 里
      */
-    public static final List<Integer> extractValidSectionIndexs(String metaContent) {
+    private static List<Integer> extractValidSectionIndexs(String metaContent) {
 
-        byte[]    bts = Base64.decodeFast(metaContent);
-        String    s   = new String(bts);
-        Integer[] e   = StringUtil.split(s, "[A-Z]+%");
+        byte[]        bts = Base64.decodeFast(metaContent);
+        String        s   = new String(bts);
+        List<Integer> e   = IntSplitter.split(s, "[A-Z]+%");
 
         Map<Integer, Integer> validSectionIndexMap = new TreeMap<>();
 
         int j    = 0;
         int star = 0;
-        for (int i = 0; i < e.length; i++) {
-            if (e[i] < 3) {
-                validSectionIndexMap.put(e[i], i + star);
+        for (int i = 0; i < e.size(); i++) {
+            if (e.get(i) < 3) {
+                validSectionIndexMap.put(e.get(i), i + star);
                 j++;
             } else {
-                validSectionIndexMap.put(e[i] - j, i + star);
+                validSectionIndexMap.put(e.get(i) - j, i + star);
                 j += 2;
             }
         }
         // 這裏竟然有重複的，去一下重
-        ArrayList<Integer> validSectionIndexs = new ArrayList<>(
-            validSectionIndexMap.values().stream().distinct().collect(Collectors.toList()));
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(validSectionIndexMap.toString());
+        ArrayList<Integer> validSectionIndexs = validSectionIndexMap.values().stream().distinct().collect(Collectors.toCollection(ArrayList::new));
+        if (log.isDebugEnabled()) {
+            log.debug(validSectionIndexMap.toString());
         }
         return validSectionIndexs;
     }
@@ -70,9 +63,6 @@ public class _99libUtil {
                 selectedDoms.add(doms.get(index));
             }
         });
-        if (LOGGER.isDebugEnabled()) {
-//            LOGGER.debug(selectedDoms.toString());
-        }
         return selectedDoms;
     }
 

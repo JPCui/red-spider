@@ -1,0 +1,91 @@
+{
+  "version": "2019-03-30",
+  // 图书列表
+  "type": "parser",
+  "ruleName": "douban.movie",
+  "urlPattern": "https://movie.douban.com/subject/(.*)/.*",
+  // 列表页中，用于定位列表DOM，非必须
+  "parentAttr": {
+    "parserPath": "#content",
+    "field": "",
+    "parserType": 20
+  },
+  "attrs": [
+    {
+      "field": "_tableName",
+      "defaultValue": "movie",
+      "parserType": 0
+    },
+    {
+      "field": "_source",
+      "defaultValue": "douban",
+      "parserType": 0
+    },
+    {
+      "field": "movie_id",
+      "parserPath": "https://movie.douban.com/subject/(.*)/.*",
+      "parserType": 50,
+      "unique": true
+    },
+    {
+      "parserPath": "h1 span:eq(0)",
+      "parserPathAttr": "text",
+      "field": "title",
+      "parserType": 20
+    },
+    {
+      "parserPath": ".article .subject #mainpic img",
+      "parserPathAttr": "src",
+      "field": "cover_url",
+      "parserType": 20
+    },
+    {
+      "description": "导演",
+      "parserPath": "#info a[rel=v:directedBy]",
+      "parserPathAttr": "text",
+      "field": "director",
+      "parserType": 20
+    },
+    {
+      "description": "演员",
+      "parserPath": "#info .actor .attrs a",
+      "parserPathAttr": "text",
+      "field": "actor",
+      "parserType": 20
+    },
+    {
+      "description": "编剧",
+      "parserPath": "#info",
+      "field": "celebrity",
+      "parserType": 20,
+      "nested": {
+        "parserPath": "<a href=\"/celebrity/(\\d+)/\">(.*)</a>",
+        "parserPathAttr": "text",
+        "parserType": 30
+      }
+    },
+    {
+      "description": "类型",
+      "parserPath": "#info span[property=v:genre]",
+      "field": "type",
+      "parserPathAttr": "text",
+      "parserType": 20
+    },
+    {
+      "description": "时长",
+      "parserPath": "#info span[property=v:runtime]",
+      "field": "type",
+      "parserPathAttr": "text",
+      "parserType": 20
+    },
+    {
+      "description": "时长",
+      "parserPath": "#interest_sectl strong[property=v:average]",
+      "field": "type",
+      "parserPathAttr": "text",
+      "parserType": 20
+    }
+  ],
+  "isList": 0,
+  "skip": 0
+}

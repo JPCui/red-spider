@@ -17,10 +17,15 @@
       "parserType": 0
     },
     {
+      "field": "_source",
+      "defaultValue": "99lib",
+      "parserType": 0
+    },
+    {
       "field": "chaptor_id",
       "parserPath": "http://www.99lib.net/book/.*/(.*).htm",
       "parserType": 50,
-      "uniqueFlag": true
+      "unique": true
     },
     {
       "field": "book_id",

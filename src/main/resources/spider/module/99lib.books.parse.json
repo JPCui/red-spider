@@ -17,11 +17,16 @@
       "parserType": 0
     },
     {
+      "field": "_source",
+      "defaultValue": "99lib",
+      "parserType": 0
+    },
+    {
     	"field" : "book_id",
     	"parserPath" : "h2 a",
         "parserPathAttr": "href",
     	"parserType" : 20,
-    	"uniqueFlag" : true,
+    	"unique" : true,
     	"nested" : {
     		"parserType" : 30,
     		"parserPath" : "/book/(.*)/index.htm"

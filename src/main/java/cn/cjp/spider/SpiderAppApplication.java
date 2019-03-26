@@ -1,24 +1,12 @@
-package cn.cjp;
+package cn.cjp.spider;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-import cn.cjp.app.config.Symphony;
-import cn.cjp.wechat.WechatProperties;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
 @SpringBootApplication(scanBasePackages = "cn.cjp")
-@ServletComponentScan
-@EnableConfigurationProperties({Symphony.class, WechatProperties.class})
-@EnableSwagger2
-public class SpiderAppApplication extends SpringBootServletInitializer {
+public class SpiderAppApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SpiderAppApplication.class, args);
@@ -34,11 +22,6 @@ public class SpiderAppApplication extends SpringBootServletInitializer {
         simpleAsyncTaskExecutor.setDaemon(true);
         simpleAsyncTaskExecutor.setConcurrencyLimit(Runtime.getRuntime().availableProcessors() * 2);
         return simpleAsyncTaskExecutor;
-    }
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SpiderAppApplication.class);
     }
 
 }

@@ -1,18 +1,5 @@
 package cn.cjp.spider.core.processor;
 
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.junit.Test;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-
-import com.mongodb.MongoClientURI;
-
 import cn.cjp.spider.core.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
@@ -21,6 +8,15 @@ import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.utils.Logger;
+import com.mongodb.MongoClientURI;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.junit.Test;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
@@ -36,7 +32,7 @@ public class SimpleProcessorTest {
 
     private Scheduler scheduler;
 
-    public void run() throws Exception {
+    public void run() {
         final Map<String, PageModel> map = SpiderConfig.PAGE_RULES;
 
         map.forEach((siteName, siteModel) -> {
@@ -59,11 +55,11 @@ public class SimpleProcessorTest {
 
         try {
             MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor);
-            spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("/tmp/spider/"))
+            spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("~/tmp/spider/"))
                 .addUrl(siteModel.getUrl()).thread(executorService, threadNum);
             // 结束不自动关闭，默认 true
             spider.setExitWhenComplete(false);
-            spider.start();
+            spider.run();
 
             LOGGER.error(spider.getSite().getDomain() + " running.");
         } catch (UnknownHostException e) {
@@ -80,27 +76,21 @@ public class SimpleProcessorTest {
     }
 
     @Test
-    public void runTest() throws Exception {
+    public void runTest() {
         SimpleProcessorTest test = new SimpleProcessorTest();
         test.scheduler = new MyRedisScheduler(new JedisPool());
-        test.run();
-
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        countDownLatch.await();
+        test.runSpider(SpiderConfig.PAGE_RULES.get("douban.movie"));
     }
 
     @Test
-    public void runTmp() throws InterruptedException {
+    public void runOneUrl() {
 
-        PageModel pageModel = SpiderConfig.PAGE_RULES.get("99lib.net");
+        PageModel pageModel = SpiderConfig.PAGE_RULES.get("douban.movie");
         pageModel.setSeedDiscoveries(Collections.emptyList());
-        pageModel.setUrl("http://www.99lib.net/book/8559/303275.htm");
+        pageModel.setUrl("https://movie.douban.com/subject/27624661/");
         SimpleProcessorTest test = new SimpleProcessorTest();
         test.scheduler = new QueueScheduler();
         test.runSpider(pageModel);
-
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        countDownLatch.await();
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.cjp.mongo;
 
+import cn.cjp.Server.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -11,20 +12,20 @@ import cn.cjp.Server;
 
 public class MongoTest {
 
-	@Test
-	public void test() {
+    @Test
+    public void test() {
 
-		MongoClient client = new MongoClient(Server.Mongo.host);
-		MongoDatabase db = client.getDatabase("test");
-		MongoIterable<String> it = db.listCollectionNames();
-		MongoCursor<String> i = it.iterator();
+        MongoClient           client = new MongoClient(Server.Mongo.host, Mongo.port);
+        MongoDatabase         db     = client.getDatabase("test");
+        MongoIterable<String> it     = db.listCollectionNames();
+        MongoCursor<String>   i      = it.iterator();
 
-		while (i.hasNext()) {
-			System.out.println(i.next());
-		}
+        while (i.hasNext()) {
+            System.out.println(i.next());
+        }
 
-		client.close();
+        client.close();
 
-	}
+    }
 
 }

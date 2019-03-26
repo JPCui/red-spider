@@ -9,7 +9,7 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
 /**
- * scheduler should implements {@link SimpleRedisScheduler}
+ * scheduler should implements {@link MyRedisScheduler}
  * 
  * @author sucre
  *

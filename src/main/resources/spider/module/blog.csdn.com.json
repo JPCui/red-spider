@@ -1,4 +1,5 @@
 {
+    "version": "2019-01-01",
 	"siteName": "blog.csdn.com",
     "db" : "blog_csdn_com",
 	"url": "http://blog.csdn.net/dQCFKyQDXYm3F8rB0",

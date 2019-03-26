@@ -6,39 +6,20 @@ spring:
       database: test
       host: localhost
       port: 27017
-  freemarker:
-    enabled: true
-    template-loader-path: classpath:/templates/
-    allow-request-override: false
-    cache: true
-    check-template-location: true
-    charset: UTF-8
-    expose-request-attributes: true
-    expose-session-attributes: false
-    expose-spring-macro-helpers: false
-    suffix: .ftl
-    settings:
-      datetime_format: yyyy-MM-dd HH:mm:ss
 
 server:
   port: 8800
-  contextPath: /rs
+  servlet:
+    contextPath: /rs
 
-endpoints:
-  enabled: true
-  health:
-    enabled: true
-    time-to-live: 5000
-
-wechat:
-  appId: wx46b87cd60d921ad1
-  appsecret: 310318fe04525556d42ed82ef84ee607
-  valid:
-    token: 96c7f65aa25b497ba5a0f236881ba657
-    encodingAESKey: no6wFXmgT7gE8q2sEJwODIlScaZIO2W9PowWKZ67DuI
-  msg:
-    dft: 嘤嘤嘤 ~
-    on_subscribe: Hello ~
+management:
+  endpoint:
+    conditions:
+      enabled: true
+    health:
+      enabled: true
+      cache:
+        time-to-live: 5000
 
 symphony:
   enable: true

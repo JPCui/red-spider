@@ -10,7 +10,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.alibaba.fastjson.JSONObject;
 
-import cn.cjp.SpiderAppApplication;
+import cn.cjp.spider.SpiderAppApplication;
 import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import us.codecraft.webmagic.ResultItems;

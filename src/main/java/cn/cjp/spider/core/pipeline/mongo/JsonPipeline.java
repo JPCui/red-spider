@@ -1,89 +1,84 @@
 package cn.cjp.spider.core.pipeline.mongo;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.data.mongodb.core.MongoTemplate;
-
-import com.alibaba.fastjson.JSONObject;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
-
 import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.utils.Logger;
 import cn.cjp.utils.StringUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.result.UpdateResult;
+import java.util.Date;
+import java.util.List;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
 /**
  * json -> mongodb
- * 
- * @author sucre
  *
+ * @author sucre
  */
 public class JsonPipeline implements Pipeline {
 
-	private static final Logger LOGGER = Logger.getLogger(JsonPipeline.class);
+    private static final Logger LOGGER = Logger.getLogger(JsonPipeline.class);
 
-	private MongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
 
-	/**
-	 * by SpringDataMongoDB
-	 * 
-	 * @param mongoTemplate
-	 */
-	public JsonPipeline(MongoTemplate mongoTemplate) {
-		this.mongoTemplate = mongoTemplate;
-	}
+    /**
+     * by SpringDataMongoDB
+     */
+    public JsonPipeline(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
-	@Override
-	public void process(ResultItems resultItems, Task task) {
-		JSONObject json = resultItems.get("json");
-		if (json != null) {
-			this.insert(json);
-		}
+    @Override
+    public void process(ResultItems resultItems, Task task) {
+        JSONObject json = resultItems.get("json");
+        if (json != null) {
+            this.insert(json);
+        }
 
-		List<JSONObject> jsons = resultItems.get("jsons");
-		if (jsons != null) {
-			this.insert(jsons);
-		}
+        List<JSONObject> jsons = resultItems.get("jsons");
+        if (jsons != null) {
+            this.insert(jsons);
+        }
 
-	}
+    }
 
-	private void insert(JSONObject json) {
-		DBCollection dbc = getCollection(json);
+    private void insert(JSONObject json) {
+        MongoCollection dbc = getCollection(json);
 
-		// TODO 唯一鍵應該在外面設置
-		// TODO 對於索引，可優化為結構化
-		// 獲取唯一鍵
-		String uniqueKey = json.getString(SpiderConst.KEY_UNIQUE);
-		if (!StringUtil.isEmpty(uniqueKey)) {
-			DBObject keyDbo = new BasicDBObject();
-			keyDbo.put(uniqueKey, 1);
-			dbc.createIndex(keyDbo, "uk_".concat(uniqueKey), true);
-		}
+        // TODO 唯一鍵應該在外面設置
+        // TODO 對於索引，可優化為結構化
+        // 獲取唯一鍵
+        String uniqueKey = json.getString(SpiderConst.KEY_UNIQUE);
+        if (!StringUtil.isEmpty(uniqueKey)) {
+            Document keyDbo = new Document();
+            keyDbo.put(uniqueKey, 1);
+            dbc.createIndex(keyDbo, new IndexOptions().name("uk_".concat(uniqueKey)).unique(true));
+        }
 
-		DBObject queryDBO = new BasicDBObject(uniqueKey, json.get(uniqueKey));
-		DBObject updateDBO = toDBObject(json);
-		WriteResult r = dbc.update(queryDBO, updateDBO, true, false);
-		LOGGER.info(String.format("insert status %s", r.getN()));
-	}
+        Document     queryDBO     = new Document(uniqueKey, json.get(uniqueKey));
+        Document     updateDBO    = toDBObject(json);
+        UpdateResult updateResult = dbc.updateOne(queryDBO, updateDBO, new UpdateOptions().upsert(true));
+        LOGGER.info(String.format("insert status %s", updateResult.getModifiedCount()));
+    }
 
-	private void insert(List<JSONObject> jsons) {
-		jsons.forEach(json -> insert(json));
-	}
+    private void insert(List<JSONObject> jsons) {
+        jsons.forEach(json -> insert(json));
+    }
 
-	private DBCollection getCollection(JSONObject json) {
-		return this.mongoTemplate.getCollection(json.getString(SpiderConst.KEY_TABLE_NAME));
-	}
+    private MongoCollection<Document> getCollection(JSONObject json) {
+        return this.mongoTemplate.getCollection(json.getString(SpiderConst.KEY_TABLE_NAME));
+    }
 
-	private DBObject toDBObject(JSONObject json) {
-		DBObject dbo = new BasicDBObject(json);
-		dbo.put("_updateDate", new Date());
-		return dbo;
-	}
+    private Document toDBObject(JSONObject json) {
+        Document dbo = new Document(json);
+        dbo.put("_updateDate", new Date());
+        return dbo;
+    }
 
 }

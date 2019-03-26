@@ -61,7 +61,7 @@ public class Attr {
 	/**
 	 * 是否具有唯一性
 	 */
-	private boolean uniqueFlag = false;
+	private boolean unique = false;
 
 	/**
 	 * 是否内嵌Attr

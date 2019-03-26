@@ -1,18 +1,5 @@
 package cn.cjp.spider.core.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
 import cn.cjp.spider.core.discovery.CommonDiscovery;
@@ -27,6 +14,16 @@ import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.spider.util._99libUtil;
 import cn.cjp.utils.Assert;
 import cn.cjp.utils.StringUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -162,7 +159,7 @@ public class SimpleProcessor implements PageProcessor {
 
                 json.put(attr.getField(), result);
 
-                if (attr.isUniqueFlag()) {
+                if (attr.isUnique()) {
                     // 设置唯一键
                     // TODO 应优化
                     json.put(SpiderConst.KEY_UNIQUE, attr.getField());
@@ -351,7 +348,12 @@ public class SimpleProcessor implements PageProcessor {
             }
 
             // 嵌套
-            return attr.getNested() == null ? value : this.parse(page, value, attr.getNested());
+            if (attr.getNested() == null) {
+                log.debug(String.format("found attr %s : %s", attr.getField(), value));
+                return value;
+            } else {
+                return this.parse(page, value, attr.getNested());
+            }
         } catch (Throwable t) {
             log.error(String.format("parser fail, page=%s, dom=%s, attr=%s", page.getUrl().get(), dom.toString(),
                                     JSON.toJSONString(attr)));
