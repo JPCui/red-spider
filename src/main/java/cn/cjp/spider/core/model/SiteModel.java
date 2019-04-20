@@ -12,10 +12,12 @@ import javax.validation.constraints.NotNull;
  * @author sucre
  */
 @Data
-public class PageModel {
+public class SiteModel {
 
     @NotNull
     private String siteName;
+
+    private String domain;
 
     private String description;
 

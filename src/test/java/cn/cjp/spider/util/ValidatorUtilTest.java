@@ -1,6 +1,6 @@
 package cn.cjp.spider.util;
 
-import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.spider.core.model.SiteModel;
 import org.junit.Test;
 
 import javax.validation.ConstraintViolation;
@@ -10,8 +10,8 @@ public class ValidatorUtilTest {
 
     @Test
     public void test() {
-        PageModel pageModel = new PageModel();
-        Set<ConstraintViolation<PageModel>> vs = ValidatorUtil.validate(pageModel);
+        SiteModel                           siteModel = new SiteModel();
+        Set<ConstraintViolation<SiteModel>> vs        = ValidatorUtil.validate(siteModel);
         vs.forEach(v->{
             System.out.println(v);
             System.out.println(v.getMessage());
@@ -19,7 +19,7 @@ public class ValidatorUtilTest {
             System.out.println(v.getPropertyPath());
         });
 
-        System.out.println(ValidatorUtil.validateWithTemplateByParam(pageModel));
+        System.out.println(ValidatorUtil.validateWithTemplateByParam(siteModel));
     }
 
 

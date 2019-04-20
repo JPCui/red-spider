@@ -6,6 +6,7 @@ import cn.cjp.utils.StringUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import java.util.Date;
@@ -20,19 +21,17 @@ import us.codecraft.webmagic.pipeline.Pipeline;
  * json -> mongodb
  *
  * @author sucre
- * @deprecated use MongoPipeline instead
- * @see MongoPipeline
  */
-public class JsonPipeline implements Pipeline {
+public class MongoPipeline implements Pipeline {
 
-    private static final Logger LOGGER = Logger.getLogger(JsonPipeline.class);
+    private static final Logger LOGGER = Logger.getLogger(MongoPipeline.class);
 
     private MongoTemplate mongoTemplate;
 
     /**
      * by SpringDataMongoDB
      */
-    public JsonPipeline(MongoTemplate mongoTemplate) {
+    public MongoPipeline(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -65,7 +64,7 @@ public class JsonPipeline implements Pipeline {
 
         Document     queryDBO     = new Document(uniqueKey, json.get(uniqueKey));
         Document     updateDBO    = toDBObject(json);
-        UpdateResult updateResult = dbc.updateOne(queryDBO, updateDBO, new UpdateOptions().upsert(true));
+        UpdateResult updateResult = dbc.replaceOne(queryDBO, updateDBO, new ReplaceOptions().upsert(true));
         LOGGER.info(String.format("insert status %s", updateResult.getModifiedCount()));
     }
 

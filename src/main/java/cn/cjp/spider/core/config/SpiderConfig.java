@@ -1,6 +1,6 @@
 package cn.cjp.spider.core.config;
 
-import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.util.ValidatorUtil;
 import cn.cjp.utils.Logger;
@@ -26,7 +26,7 @@ public class SpiderConfig {
      */
     public static final String PARSE_RULE_FILE_SUFFIX = ".parse.json";
 
-    public static final Map<String, PageModel> PAGE_RULES = new HashMap<>();
+    public static final Map<String, SiteModel> PAGE_RULES = new HashMap<>();
 
     public static final Map<String, ParseRuleModel> PARSE_RULES = new HashMap<>();
 
@@ -42,9 +42,9 @@ public class SpiderConfig {
      * @param url 当前URL
      */
     public static Optional<ParseRuleModel> getParseRule(String site, String url) {
-        final Map<String, PageModel> pageModels      = PAGE_RULES;
-        final PageModel              pageModel       = pageModels.get(site);
-        final List<ParseRuleModel>   parseRuleModels = pageModel.getParseRuleModels();
+        final Map<String, SiteModel> pageModels      = PAGE_RULES;
+        final SiteModel              siteModel       = pageModels.get(site);
+        final List<ParseRuleModel>   parseRuleModels = siteModel.getParseRuleModels();
         return parseRuleModels.stream().filter(parseRuleModel -> {
             return url.matches(parseRuleModel.getUrlPattern());
         }).distinct().findAny();
@@ -54,16 +54,16 @@ public class SpiderConfig {
      * 整理每一个站点的parse rule
      */
     private static void combineParseRule() {
-        final Map<String, PageModel> pageModels = PAGE_RULES;
+        final Map<String, SiteModel> pageModels = PAGE_RULES;
         pageModels.keySet().forEach(site -> {
-            PageModel            pageModel       = PAGE_RULES.get(site);
-            List<String>         parseRules      = pageModel.getParseRules();
+            SiteModel            siteModel       = PAGE_RULES.get(site);
+            List<String>         parseRules      = siteModel.getParseRules();
             List<ParseRuleModel> parseRuleModels = new ArrayList<>();
             parseRules.forEach(parseRule -> {
                 ParseRuleModel parseRuleModel = PARSE_RULES.get(parseRule);
                 parseRuleModels.add(parseRuleModel);
             });
-            pageModel.setParseRuleModels(parseRuleModels);
+            siteModel.setParseRuleModels(parseRuleModels);
         });
     }
 
@@ -94,13 +94,13 @@ public class SpiderConfig {
                     }
                     PARSE_RULES.put(parseRuleModel.getRuleName(), parseRuleModel);
                 } else if (configFile.getName().endsWith(SPIDER_RULE_FILE_SUFFIX)) {
-                    PageModel pageModel = JSON.parseObject(jsonStr, PageModel.class);
-                    ValidatorUtil.validateWithTemplateByParam(pageModel);
+                    SiteModel siteModel = JSON.parseObject(jsonStr, SiteModel.class);
+                    ValidatorUtil.validateWithTemplateByParam(siteModel);
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(String.format("read parse rule[%s]: %s", pageModel.getSiteName(),
-                                                   JSON.toJSONString(pageModel)));
+                        LOGGER.debug(String.format("read parse rule[%s]: %s", siteModel.getSiteName(),
+                                                   JSON.toJSONString(siteModel)));
                     }
-                    PAGE_RULES.put(pageModel.getSiteName(), pageModel);
+                    PAGE_RULES.put(siteModel.getSiteName(), siteModel);
                 }
             }
         } catch (IOException e) {

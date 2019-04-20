@@ -3,7 +3,7 @@ package cn.cjp.spider.core.processor;
 import cn.cjp.spider.core.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
-import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
@@ -33,16 +33,16 @@ public class SimpleProcessorTest {
     private Scheduler scheduler;
 
     public void run() {
-        final Map<String, PageModel> map = SpiderConfig.PAGE_RULES;
+        final Map<String, SiteModel> map = SpiderConfig.PAGE_RULES;
 
         map.forEach((siteName, siteModel) -> {
             runSpider(siteModel);
         });
     }
 
-    private void runSpider(PageModel siteModel) {
+    private void runSpider(SiteModel siteModel) {
         SimpleProcessor simpleProcessor = new SimpleProcessor();
-        simpleProcessor.setPageModel(siteModel);
+        simpleProcessor.setSiteModel(siteModel);
 
         Site site = new Site();
         site.addHeader("User-Agent", UserAgents.get());
@@ -85,12 +85,12 @@ public class SimpleProcessorTest {
     @Test
     public void runOneUrl() {
 
-        PageModel pageModel = SpiderConfig.PAGE_RULES.get("douban.movie");
-        pageModel.setSeedDiscoveries(Collections.emptyList());
-        pageModel.setUrl("https://movie.douban.com/subject/27624661/");
+        SiteModel siteModel = SpiderConfig.PAGE_RULES.get("douban.movie");
+        siteModel.setSeedDiscoveries(Collections.emptyList());
+        siteModel.setUrl("https://movie.douban.com/subject/27624661/");
         SimpleProcessorTest test = new SimpleProcessorTest();
         test.scheduler = new QueueScheduler();
-        test.runSpider(pageModel);
+        test.runSpider(siteModel);
     }
 
 }

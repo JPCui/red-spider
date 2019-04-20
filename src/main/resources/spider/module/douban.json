@@ -2,6 +2,7 @@
   "version": "2019-03-30",
   "siteName": "douban.movie",
   "url": "https://movie.douban.com/subject/27624661",
+  "domain": "douban.com",
   "seedDiscoveries": [
     {
       "pattern": "https://movie.douban.com/subject/(.*)",

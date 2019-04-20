@@ -41,7 +41,7 @@ public class MyRedisScheduler extends RedisScheduler {
 		try (Jedis jedis = pool.getResource()) {
 			// Long r = jedis.sadd(getSetKey(task), request.getUrl());
 			Long r = jedis.sadd(getActualSetKey(task), request.getUrl());
-			if (Long.valueOf(1L) == r) {
+			if (Long.valueOf(1L).equals(r)) {
 				LOGGER.info(String.format("download url success : %s", request.getUrl()));
 			} else {
 				LOGGER.warn(String.format("download url duplicate : %s", request.getUrl()));

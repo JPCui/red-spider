@@ -8,7 +8,7 @@ import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
-import cn.cjp.spider.core.model.PageModel;
+import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.spider.util._99libUtil;
@@ -50,7 +50,7 @@ public class SimpleProcessor implements PageProcessor {
 
     Site site = Site.me().setUserAgent(UserAgents.get()).setRetryTimes(3).setSleepTime(3000);
 
-    PageModel pageModel;
+    SiteModel siteModel;
 
     Discovery discovery;
 
@@ -70,7 +70,7 @@ public class SimpleProcessor implements PageProcessor {
 
     private void _process(Page page) {
         // 按照URL对应的解析器进行解析
-        SpiderConfig.getParseRule(pageModel.getSiteName(), page.getUrl().get()).ifPresent(parseRule -> {
+        SpiderConfig.getParseRule(siteModel.getSiteName(), page.getUrl().get()).ifPresent(parseRule -> {
             final List<Attr> attrs      = parseRule.getAttrs();
             final Attr       parentAttr = parseRule.getParentAttr();
             final int        isList     = parseRule.getIsList();
@@ -83,19 +83,19 @@ public class SimpleProcessor implements PageProcessor {
                 List<Selectable> domList = this.parse(page, root, parentAttr).nodes();
                 List<JSONObject> jsons   = this.parseNodes(page, domList, attrs);
                 jsons.forEach(json -> {
-                    setDefaultValue(page, pageModel, json);
+                    setDefaultValue(page, siteModel, json);
                 });
 
                 page.putField("jsons", jsons);
             } else {
                 Selectable dom  = this.parse(page, root, parentAttr);
                 JSONObject json = this.parseNode(page, dom, attrs);
-                setDefaultValue(page, pageModel, json);
+                setDefaultValue(page, siteModel, json);
 
                 page.putField("json", json);
             }
 
-            if (pageModel.getSkip() == 1) {
+            if (siteModel.getSkip() == 1) {
                 page.setSkip(true);
             }
         });
@@ -103,12 +103,12 @@ public class SimpleProcessor implements PageProcessor {
         this.findSeeds(page);
     }
 
-    private void setDefaultValue(Page page, PageModel pageModel, JSONObject json) {
+    private void setDefaultValue(Page page, SiteModel siteModel, JSONObject json) {
         json.put(SpiderConst.KEY_REFER_URL, page.getUrl().get());
-        if (StringUtil.isEmpty(pageModel.getDb())) {
-            json.put(SpiderConst.KEY_DB_NAME, pageModel.getSiteName());
+        if (StringUtil.isEmpty(siteModel.getDb())) {
+            json.put(SpiderConst.KEY_DB_NAME, siteModel.getSiteName());
         } else {
-            json.put(SpiderConst.KEY_DB_NAME, pageModel.getDb());
+            json.put(SpiderConst.KEY_DB_NAME, siteModel.getDb());
         }
     }
 
@@ -116,7 +116,7 @@ public class SimpleProcessor implements PageProcessor {
      * 发现新URL
      */
     private void findSeeds(Page page) {
-        final List<SeedDiscoveryRule> seedDiscoveries = pageModel.getSeedDiscoveries();
+        final List<SeedDiscoveryRule> seedDiscoveries = siteModel.getSeedDiscoveries();
         if (seedDiscoveries != null) {
             seedDiscoveries.forEach(seedDiscovery -> {
                 discovery.discover(page, seedDiscovery);
@@ -348,12 +348,11 @@ public class SimpleProcessor implements PageProcessor {
             }
 
             // 嵌套
-            if (attr.getNested() == null) {
-                log.debug(String.format("found attr %s : %s", attr.getField(), value));
-                return value;
-            } else {
-                return this.parse(page, value, attr.getNested());
+            if (attr.getNested() != null) {
+                value = this.parse(page, value, attr.getNested());
             }
+            log.debug(String.format("found attr %s : %s", attr.getField(), value));
+            return value;
         } catch (Throwable t) {
             log.error(String.format("parser fail, page=%s, dom=%s, attr=%s", page.getUrl().get(), dom.toString(),
                                     JSON.toJSONString(attr)));
@@ -370,12 +369,12 @@ public class SimpleProcessor implements PageProcessor {
         this.site = site;
     }
 
-    public PageModel getPageModel() {
-        return pageModel;
+    public SiteModel getSiteModel() {
+        return siteModel;
     }
 
-    public void setPageModel(PageModel pageModel) {
-        this.pageModel = pageModel;
+    public void setSiteModel(SiteModel siteModel) {
+        this.siteModel = siteModel;
     }
 
 }

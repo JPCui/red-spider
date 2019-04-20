@@ -9,8 +9,6 @@ spring:
 
 server:
   port: 8800
-  servlet:
-    contextPath: /rs
 
 management:
   endpoint:
