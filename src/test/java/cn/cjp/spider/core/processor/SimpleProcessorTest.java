@@ -1,6 +1,6 @@
 package cn.cjp.spider.core.processor;
 
-import cn.cjp.spider.core.MyRedisSchedulerSpider;
+import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
@@ -54,7 +54,7 @@ public class SimpleProcessorTest {
         simpleProcessor.setSite(site);
 
         try {
-            MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor);
+            MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
             spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("~/tmp/spider/"))
                 .addUrl(siteModel.getUrl()).thread(executorService, threadNum);
             // 结束不自动关闭，默认 true

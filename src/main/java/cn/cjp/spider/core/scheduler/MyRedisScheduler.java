@@ -23,10 +23,6 @@ public class MyRedisScheduler extends RedisScheduler {
 		return SET_AUTUAL_PREFIX + task.getUUID();
 	}
 
-	public MyRedisScheduler(String host) {
-		super(host);
-	}
-
 	public MyRedisScheduler(JedisPool pool) {
 		super(pool);
 	}

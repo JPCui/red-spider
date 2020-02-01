@@ -18,20 +18,18 @@ public class SpiderConfig {
      * @param mongoTemplate
      * @return
      */
-    @Bean
+    @Bean("mongoPipeline")
     Pipeline pipeline(@Autowired MongoTemplate mongoTemplate) {
-        Pipeline pipeline = new MongoPipeline(mongoTemplate);
-        return pipeline;
+        return new MongoPipeline(mongoTemplate);
     }
 
     /**
      * 调度器（种子队列）
      * @return
      */
-    @Bean
+    @Bean("myRedisScheduler")
     Scheduler scheduler() {
-        Scheduler scheduler = new MyRedisScheduler(new JedisPool());
-        return scheduler;
+        return new MyRedisScheduler(new JedisPool());
     }
 
 }

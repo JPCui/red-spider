@@ -8,9 +8,9 @@ import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
-import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
+import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.util._99libUtil;
 import cn.cjp.utils.Assert;
 import cn.cjp.utils.StringUtil;
@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.Page;
@@ -50,9 +51,15 @@ public class SimpleProcessor implements PageProcessor {
 
     Site site = Site.me().setUserAgent(UserAgents.get()).setRetryTimes(3).setSleepTime(3000);
 
-    SiteModel siteModel;
+    private SiteModel siteModel;
 
-    Discovery discovery;
+    private Discovery discovery;
+
+    /**
+     * 声明该处理器是一次性的，不会进行URL发现
+     */
+    @Setter
+    private boolean onceOnly;
 
     public SimpleProcessor() {
         discovery = new CommonDiscovery();
@@ -116,6 +123,9 @@ public class SimpleProcessor implements PageProcessor {
      * 发现新URL
      */
     private void findSeeds(Page page) {
+        if(onceOnly) {
+            return;
+        }
         final List<SeedDiscoveryRule> seedDiscoveries = siteModel.getSeedDiscoveries();
         if (seedDiscoveries != null) {
             seedDiscoveries.forEach(seedDiscovery -> {
@@ -351,10 +361,29 @@ public class SimpleProcessor implements PageProcessor {
             if (attr.getNested() != null) {
                 value = this.parse(page, value, attr.getNested());
             }
-            log.debug(String.format("found attr %s : %s", attr.getField(), value));
+            if (log.isDebugEnabled()) {
+                String t = attr.getField();
+                if (t.length() > 30) {
+                    t = t.substring(0, 30);
+                }
+                if (log.isDebugEnabled()) {
+                    String _1 = t;
+                    if (_1.length() > 30) {
+                        _1 = _1.substring(0, 30);
+                    }
+                    String _2 = null;
+                    if (value != null) {
+                        _2 = value.toString();
+                        if (_2.length() > 30) {
+                            _2 = _2.substring(0, 30);
+                        }
+                    }
+                    log.debug(String.format("found attr %s : %s", _1, _2));
+                }
+            }
             return value;
         } catch (Throwable t) {
-            log.error(String.format("parser fail, page=%s, dom=%s, attr=%s", page.getUrl().get(), dom.toString(),
+            log.error(String.format("parser fail, page=%s, dom=%s, attr=%s", page.getRequest().getUrl(), dom.toString(),
                                     JSON.toJSONString(attr)));
             throw t;
         }

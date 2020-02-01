@@ -3,7 +3,7 @@
   // 图书列表
   "type": "parser",
   "ruleName": "douban.movie",
-  "urlPattern": "https://movie.douban.com/subject/(.*)/.*",
+  "urlPattern": "https://movie.douban.com/subject/(\\d*)(/)+((\\?)?|\\?.*)",
   // 列表页中，用于定位列表DOM，非必须
   "parentAttr": {
     "parserPath": "#content",
