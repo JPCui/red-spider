@@ -14,7 +14,7 @@ public class BilibiliMoDaTaskTest {
         StringRedisTemplate redisTemplate = new StringRedisTemplate(factory);
         redisTemplate.afterPropertiesSet();
 
-        new BilibiliMoDaTask(redisTemplate).execute();
+        new BilibiliMoDaTask(redisTemplate, null).execute();
 
     }
 

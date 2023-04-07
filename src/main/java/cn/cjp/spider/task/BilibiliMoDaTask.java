@@ -1,9 +1,7 @@
 package cn.cjp.spider.task;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.cjp.spider.msg.AbstractMsgNotifyService;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.extra.mail.MailAccount;
-import cn.hutool.extra.mail.MailUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -17,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -39,6 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BilibiliMoDaTask {
 
     /**
@@ -57,7 +57,6 @@ public class BilibiliMoDaTask {
     private static final String HK_SMTH_KEY           = "UTMPKEY";
     private static final String HK_SMTH_NUM           = "UTMPNUM";
 
-    private static boolean forTest       = false;
     private static boolean isLoginFailed = false;
 
     private Map<String, String> cookies = new HashMap<>();
@@ -68,15 +67,8 @@ public class BilibiliMoDaTask {
 
     static int retry = 0;
 
-    final StringRedisTemplate redisTemplate;
-
-    public BilibiliMoDaTask(StringRedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-        String forTestStr = redisTemplate.opsForValue().get(K_SMTH_STOCK_TEST);
-        if (forTestStr != null) {
-            forTest = Boolean.valueOf(forTestStr);
-        }
-    }
+    final StringRedisTemplate            redisTemplate;
+    final List<AbstractMsgNotifyService> msgNotifyServices;
 
     private String escape(String s) {
         // 去掉不可见字符
@@ -92,10 +84,6 @@ public class BilibiliMoDaTask {
             String[] arr = s.split("=");
             cookies.put(arr[0], arr[1]);
         }
-    }
-
-    public static void main(String[] args) {
-        new BilibiliMoDaTask(new StringRedisTemplate());
     }
 
     private void setTitle(String rpId, String title) {
@@ -179,7 +167,7 @@ public class BilibiliMoDaTask {
             log.info("\nsend a post: {}\n", titles.toString());
             String timeStr = DateFormatUtils.format(postTimeStr, PATTERN_YMD_HMS);
             try {
-                sendMail("[" + timeStr + "] " + title, titles.toString());
+                sendMsg("[" + timeStr + "] " + title, titles.toString());
             } catch (Exception e) {
                 redisTemplate.opsForSet().remove("bilibili:moda:replies:read", rpid + "");
             }
@@ -205,7 +193,7 @@ public class BilibiliMoDaTask {
             return true;
         }
         // 傻狍子X
-        if(uid.equals("691652013")) {
+        if (uid.equals("691652013")) {
             return true;
         }
         // 超过60个字也关注一下
@@ -310,27 +298,10 @@ public class BilibiliMoDaTask {
         return members.toArray(new String[]{});
     }
 
-    public void sendMail(String title, String content) {
-        MailAccount account = new MailAccount();
-        account.setHost("smtp.qq.com");
-        account.setPort(587);
-        account.setAuth(true);
-        account.setFrom("624498030@qq.com");
-        account.setUser("624498030@qq.com");
-        account.setPass("cogqsnusvkgebbbc"); //密码
-        account.setSslEnable(false);
-
+    public void sendMsg(String title, String content) {
         List<String> listeners = Lists.newArrayList(initNotifyEmail());
-//        List<String> listeners = Lists.newArrayList("624498030@qq.com", "18238819901@163.com", "416557132@qq.com");
-        for (String e : listeners) {
-            try {
-                MailUtil.send(
-                    account,
-                    CollUtil.newArrayList(e),
-                    title, content, false);
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
+        for (AbstractMsgNotifyService service : msgNotifyServices) {
+            service.send(listeners, title, content);
         }
 
     }
