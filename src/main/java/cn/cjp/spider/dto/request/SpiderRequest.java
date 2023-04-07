@@ -1,6 +1,5 @@
 package cn.cjp.spider.dto.request;
 
-import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,7 +24,7 @@ public class SpiderRequest {
         int threadCoreNum = Runtime.getRuntime().availableProcessors();
         // 最大线程数
         int threadMaxNum  = Runtime.getRuntime().availableProcessors() * 2;
-        @ApiModelProperty(value = "超时时间，ms")
+        // 超时时间，ms
         int timeout = 30_000;
     }
 

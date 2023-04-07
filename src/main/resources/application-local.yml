@@ -1,0 +1,11 @@
+spring:
+  mongodb:
+    uri: mongodb://localhost:27017/test
+  redis:
+    host: 127.0.0.1
+    hostName: 127.0.0.1
+    port: 6379
+    password: 123456
+
+server:
+  port: 8800

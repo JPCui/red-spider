@@ -36,13 +36,13 @@
     <logger level="info" name="org.springframework.web.servlet.view"/>
     <logger level="info" name="org.springframework.data.redis"/>
     <logger level="info" name="io.lettuce.core.protocol"/>
+    <logger level="info" name="cn.cjp"/>
 
     <!-- 分环境日志配置 -->
-    <springProfile name="default">
-        <root level="INFO">
-            <appender-ref ref="stdOutAppender"/>
-        </root>
-    </springProfile>
+    <root level="INFO">
+        <appender-ref ref="stdOutAppender"/>
+    </root>
+
     <springProfile name="local">
         <root level="INFO">
             <appender-ref ref="stdOutAppender"/>

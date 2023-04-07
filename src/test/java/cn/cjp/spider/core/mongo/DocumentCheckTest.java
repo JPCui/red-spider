@@ -2,32 +2,29 @@ package cn.cjp.spider.core.mongo;
 
 import com.alibaba.fastjson.JSON;
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import org.bson.BsonArray;
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 
 public class DocumentCheckTest {
+
+    MongoTemplate mongoTemplate;
 
     @Test
     public void checkBookNums() {
         Map<String, Integer> rs = new HashMap<>();
 
-        SimpleMongoDbFactory factory       = new SimpleMongoDbFactory(new MongoClientURI("mongodb://localhost:27017/test"));
-        MongoTemplate        mongoTemplate = new MongoTemplate(factory);
-
         MongoCollection<Document> bookColl         = mongoTemplate.getCollection("99lib-book");
         MongoCollection<Document> bookChaptorsColl = mongoTemplate.getCollection("99lib-book-chaptors");
         MongoCollection<Document> bookSectionsColl = mongoTemplate.getCollection("99lib-book-sections");
 
-        long bookCount = bookColl.count();
+        long bookCount = bookColl.countDocuments();
         rs.put("book", (int) bookCount);
         System.out.println("book : " + bookCount);
 
@@ -39,14 +36,15 @@ public class DocumentCheckTest {
             while (chaptorDocsIt.hasNext()) {
                 Document chaptorDoc = chaptorDocsIt.next();
                 System.out.println(JSON.toJSONString(chaptorDoc));
-                List<Document> chaptors = chaptorDoc.get("chaptors", new ArrayList<>());
+                BsonArray chaptors = chaptorDoc.get("chaptors", BsonArray.class);
                 rs.put(String.format("book-%s", bookId), chaptors.size());
                 System.out.println(String.format("book-%s : %s", bookId, chaptors.size()));
-                chaptors.forEach(chaptor -> {
+                chaptors.forEach(t -> {
+                    BsonDocument chaptor = t.asDocument();
                     MongoCursor<Document> sectionsIt = bookSectionsColl
                         .find(new BasicDBObject("chaptor_id", chaptor.getString("chaptor_id"))).iterator();
                     if (sectionsIt.hasNext()) {
-                        List<Document> sections = sectionsIt.next().get("content", new ArrayList<>());
+                        BsonArray sections = sectionsIt.next().get("content", BsonArray.class);
                         rs.put(String.format("book-%s-%s", bookId, chaptor), sections.size());
                         System.out.println(String.format("book-%s-%s : %s", bookId, chaptor, sections.size()));
                     }

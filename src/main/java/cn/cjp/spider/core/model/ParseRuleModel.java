@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 public class ParseRuleModel {
-
+    com.mongodb.MongoClientSettings s;
     private String type = "PARSE_RULE";
 
     /**

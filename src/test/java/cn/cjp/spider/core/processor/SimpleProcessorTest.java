@@ -1,14 +1,13 @@
 package cn.cjp.spider.core.processor;
 
-import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
+import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.utils.Logger;
-import com.mongodb.MongoClientURI;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Map;
@@ -16,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
@@ -30,7 +28,8 @@ public class SimpleProcessorTest {
 
     private static final int threadNum = Runtime.getRuntime().availableProcessors() * 2;
 
-    private Scheduler scheduler;
+    private Scheduler     scheduler;
+    private MongoTemplate mongoTemplate;
 
     public void run() {
         final Map<String, SiteModel> map = SpiderConfig.PAGE_RULES;
@@ -69,9 +68,7 @@ public class SimpleProcessorTest {
     }
 
     public JsonPipeline getJsonPipeline() throws UnknownHostException {
-        SimpleMongoDbFactory factory       = new SimpleMongoDbFactory(new MongoClientURI("mongodb://localhost:27017/test"));
-        MongoTemplate        mongoTemplate = new MongoTemplate(factory);
-        JsonPipeline         jsonPipeline  = new JsonPipeline(mongoTemplate);
+        JsonPipeline jsonPipeline = new JsonPipeline(mongoTemplate);
         return jsonPipeline;
     }
 
