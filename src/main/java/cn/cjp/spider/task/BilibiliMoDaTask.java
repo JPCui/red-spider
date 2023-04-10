@@ -18,6 +18,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
@@ -40,6 +41,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BilibiliMoDaTask {
+
+    long EXPIRE_7_DAYS = 1000 * 3600 * 24 * 7;
 
     /**
      * for debug
@@ -87,7 +90,7 @@ public class BilibiliMoDaTask {
     }
 
     private void setTitle(String rpId, String title) {
-        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s", rpId), title);
+        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s", rpId), title, EXPIRE_7_DAYS);
     }
 
     private String getTitle(String rpId) {
@@ -100,7 +103,7 @@ public class BilibiliMoDaTask {
     }
 
     private void setParent(String rpId, String pid) {
-        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s:parent", rpId), pid);
+        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s:parent", rpId), pid, EXPIRE_7_DAYS);
     }
 
     private String getParentId(String rpid) {
@@ -145,8 +148,6 @@ public class BilibiliMoDaTask {
         } else if (parent != null) {
             parentId = parent.getLong("rpid");
             setParent(rpid.toString(), parentId.toString());
-        } else {
-            parentId = 0L;
         }
 
         retry = 0;
@@ -154,11 +155,14 @@ public class BilibiliMoDaTask {
         if (shouldFollow(item)) {
             log.info("a post found: {} {}", "[" + uname + "] ", rpid + " - " + title);
 
-            StringBuilder titles = new StringBuilder(title);
+            StringBuilder titles = new StringBuilder(String.format("[%s]%s", rpid, title));
             String        pid    = getParentId(rpid.toString());
+            int           i      = 1;
             while (true) {
                 if (pid != null && !pid.equals("0")) {
-                    titles.append("\n\n\t|-\t ").append(getTitle(parentId.toString()));
+                    titles.append("\r\n<br/><br/>");
+                    titles.append(StringUtils.repeat("&emsp;&emsp;", i++));
+                    titles.append(String.format("[%s]%s", pid, getTitle(pid)));
                     pid = getParentId(pid);
                 } else {
                     break;

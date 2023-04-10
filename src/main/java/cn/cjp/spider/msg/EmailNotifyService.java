@@ -38,7 +38,7 @@ public class EmailNotifyService implements AbstractMsgNotifyService{
                 MailUtil.send(
                     account,
                     CollUtil.newArrayList(e),
-                    title, content, false);
+                    title, content, true);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
             }
