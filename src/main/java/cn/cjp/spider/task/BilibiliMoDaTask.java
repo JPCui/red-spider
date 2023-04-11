@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -90,7 +92,7 @@ public class BilibiliMoDaTask {
     }
 
     private void setTitle(String rpId, String title) {
-        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s", rpId), title, EXPIRE_7_DAYS);
+        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s", rpId), title, Duration.of(EXPIRE_7_DAYS, ChronoUnit.MILLIS));
     }
 
     private String getTitle(String rpId) {
@@ -102,8 +104,12 @@ public class BilibiliMoDaTask {
         return !(flag != null && flag > 0L);
     }
 
+    private void delRead(String rpId) {
+        redisTemplate.opsForSet().remove("bilibili:moda:replies:read", rpId);
+    }
+
     private void setParent(String rpId, String pid) {
-        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s:parent", rpId), pid, EXPIRE_7_DAYS);
+        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s:parent", rpId), pid, Duration.of(EXPIRE_7_DAYS, ChronoUnit.MILLIS));
     }
 
     private String getParentId(String rpid) {
@@ -111,19 +117,13 @@ public class BilibiliMoDaTask {
     }
 
     private void parseReply(JSONObject parent, JSONObject item) {
-        Long    rpid        = item.getLong("rpid");
+        String  rpid        = item.getString("rpid_str");
         Boolean top         = item.getBoolean("top");
         String  title       = item.getJSONObject("content").getString("message");
         String  uid         = item.getJSONObject("member").getString("mid");
         String  uname       = item.getJSONObject("member").getString("uname");
         long    postTimeStr = item.getLong("ctime") * 1000;
         Date    now         = new Date();
-
-        if (parent == null) {
-            log.info("parse main: " + uname + " - " + title);
-        } else {
-            log.info("parse: " + uname + " - " + title);
-        }
 
         title = "[" + uname + "]" + title;
         if (top != null && top) {
@@ -133,21 +133,23 @@ public class BilibiliMoDaTask {
 
         // 时间太久远就跳过
         if (now.getTime() - postTimeStr > 1000 * 3600 * 24 * 3) {
+            log.info(String.format("%s was timeout: [%s]%s", rpid, uname, title));
             return;
         }
 
-        if (isRead(rpid.toString())) {
+        if (isRead(rpid)) {
+            log.info(String.format("%s was read: [%s]%s", rpid, uname, title));
             return;
         }
         // 保存帖子内容
-        setTitle(rpid.toString(), title);
+        setTitle(rpid, title);
 
-        Long parentId = item.getLong("parent");
-        if (parentId != null && !parentId.equals(0L)) {
-            setParent(rpid.toString(), parentId.toString());
+        String parentId = item.getString("parent_str");
+        if (parentId != null && !parentId.equals("0")) {
+            setParent(rpid, parentId);
         } else if (parent != null) {
-            parentId = parent.getLong("rpid");
-            setParent(rpid.toString(), parentId.toString());
+            parentId = parent.getString("rpid");
+            setParent(rpid, parentId);
         }
 
         retry = 0;
@@ -156,7 +158,7 @@ public class BilibiliMoDaTask {
             log.info("a post found: {} {}", "[" + uname + "] ", rpid + " - " + title);
 
             StringBuilder titles = new StringBuilder(String.format("[%s]%s", rpid, title));
-            String        pid    = getParentId(rpid.toString());
+            String        pid    = getParentId(rpid);
             int           i      = 1;
             while (true) {
                 if (pid != null && !pid.equals("0")) {
@@ -168,13 +170,15 @@ public class BilibiliMoDaTask {
                     break;
                 }
             }
-            log.info("\nsend a post: {}\n", titles.toString());
+            log.info("\nsend a post: {}\n", titles);
             String timeStr = DateFormatUtils.format(postTimeStr, PATTERN_YMD_HMS);
             try {
                 sendMsg("[" + timeStr + "] " + title, titles.toString());
             } catch (Exception e) {
-                redisTemplate.opsForSet().remove("bilibili:moda:replies:read", rpid + "");
+                delRead(rpid);
             }
+        } else {
+            log.info(String.format("%s was not follow: [%s]%s", rpid, uname, title));
         }
 
         JSONArray subItems = item.getJSONArray("replies");
