@@ -8,15 +8,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -49,18 +51,23 @@ public class BilibiliMoDaTask {
     /**
      * for debug
      */
-    private static final String K_SMTH_STOCK_TEST     = "stock.test";
+    private static final String K_SMTH_STOCK_TEST = "stock.test";
+
+    final static         Set<String> URL_DYNAMICS_ONLY_FANS   = new HashSet<>();
     /**
      * 通知的邮箱
      */
-    private static final String K_SMTH_NOTIFY_EMAIL   = "task.bilibili.moda.notify_email";
+    private static final String      K_SMTH_NOTIFY_EMAIL      = "task.bilibili.moda.notify_email";
+    private static final String      K_SMTH_MODA_REPLY        = "bilibili:moda:replies:%s";
+    private static final String      K_SMTH_MODA_DYNAMIC_READ = "bilibili:moda:dynamic:read";
+    private static final String      K_SMTH_MODA_REPLY_PARENT = "bilibili:moda:replies:%s:parent";
     /**
      * 监听的smth用户ID
      */
-    private static final String K_SMTH_LISTEN_USER_ID = "task.bilibili.moda.listen_user";
-    private static final String K_SMTH_PWD            = "conf.mysmth";
-    private static final String HK_SMTH_KEY           = "UTMPKEY";
-    private static final String HK_SMTH_NUM           = "UTMPNUM";
+    private static final String      K_SMTH_LISTEN_USER_ID    = "task.bilibili.moda.listen_user";
+    private static final String      K_SMTH_PWD               = "conf.mysmth";
+    private static final String      HK_SMTH_KEY              = "UTMPKEY";
+    private static final String      HK_SMTH_NUM              = "UTMPNUM";
 
     private static boolean isLoginFailed = false;
 
@@ -83,7 +90,7 @@ public class BilibiliMoDaTask {
 
     private void initCookie() {
 
-        String   c     = "buvid3=A571FFFE-67F8-D9D0-D8D7-32B84ED291C557053infoc; b_nut=1666084857; _uuid=EB10102DE8-BD15-876D-DC94-D1339AD2F5F657892infoc; fingerprint=4a0e58ccf35b89468fe0862d5199b976; buvid_fp_plain=undefined; SESSDATA=f41fa54d%2C1681638461%2Cee4ee%2Aa1; bili_jct=aa5635cee65dbb9162ddabe27695385c; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; nostalgia_conf=-1; CURRENT_PID=02503bc0-c868-11ed-97d8-25c3fcaee565; CURRENT_FNVAL=4048; rpdid=|(~J~JmRmR~0J'uY~mRY|lJ|; sid=84j3i316; i-wanna-go-back=-1; b_ut=5; b_lsid=D1B82288_1874B993682; header_theme_version=CLOSE; home_feed_column=5; innersign=1; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D";
+        String   c     = "buvid3=A571FFFE-67F8-D9D0-D8D7-32B84ED291C557053infoc; b_nut=1666084857; _uuid=EB10102DE8-BD15-876D-DC94-D1339AD2F5F657892infoc; fingerprint=4a0e58ccf35b89468fe0862d5199b976; buvid_fp_plain=undefined; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; nostalgia_conf=-1; CURRENT_PID=02503bc0-c868-11ed-97d8-25c3fcaee565; CURRENT_FNVAL=4048; rpdid=|(~J~JmRmR~0J'uY~mRY|lJ|; i-wanna-go-back=-1; b_ut=5; header_theme_version=CLOSE; home_feed_column=5; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; opus-goback=1; hit-new-style-dyn=1; hit-dyn-v2=1; innersign=1; bsource=search_baidu; b_lsid=10B2DB5A1_1880492E7D3; SESSDATA=eafe6674%2C1699255949%2Cecd56%2A51; bili_jct=024fa237ffd126dff87c11e59a366727; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; sid=ft7xzy9g";
         String[] split = c.split("; ");
         for (String s : split) {
             String[] arr = s.split("=");
@@ -92,15 +99,20 @@ public class BilibiliMoDaTask {
     }
 
     private void setTitle(String rpId, String title) {
-        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s", rpId), title, Duration.of(EXPIRE_7_DAYS, ChronoUnit.MILLIS));
+        redisTemplate.opsForValue().set(String.format(K_SMTH_MODA_REPLY, rpId), title, Duration.of(EXPIRE_7_DAYS, ChronoUnit.MILLIS));
     }
 
     private String getTitle(String rpId) {
-        return redisTemplate.opsForValue().get(String.format("bilibili:moda:replies:%s", rpId));
+        return redisTemplate.opsForValue().get(String.format(K_SMTH_MODA_REPLY, rpId));
     }
 
-    private boolean isRead(String rpId) {
+    private boolean isCommentRead(String rpId) {
         Long flag = redisTemplate.opsForSet().add("bilibili:moda:replies:read", rpId);
+        return !(flag != null && flag > 0L);
+    }
+
+    private boolean isDynamicRead(String id) {
+        Long flag = redisTemplate.opsForSet().add(K_SMTH_MODA_DYNAMIC_READ, id);
         return !(flag != null && flag > 0L);
     }
 
@@ -109,11 +121,11 @@ public class BilibiliMoDaTask {
     }
 
     private void setParent(String rpId, String pid) {
-        redisTemplate.opsForValue().set(String.format("bilibili:moda:replies:%s:parent", rpId), pid, Duration.of(EXPIRE_7_DAYS, ChronoUnit.MILLIS));
+        redisTemplate.opsForValue().set(String.format(K_SMTH_MODA_REPLY_PARENT, rpId), pid, Duration.of(EXPIRE_7_DAYS, ChronoUnit.MILLIS));
     }
 
     private String getParentId(String rpid) {
-        return redisTemplate.opsForValue().get(String.format("bilibili:moda:replies:%s:parent", rpid));
+        return redisTemplate.opsForValue().get(String.format(K_SMTH_MODA_REPLY_PARENT, rpid));
     }
 
     private void parseReply(JSONObject parent, JSONObject item) {
@@ -137,7 +149,7 @@ public class BilibiliMoDaTask {
             return;
         }
 
-        if (isRead(rpid)) {
+        if (isCommentRead(rpid)) {
             log.info(String.format("%s was read: [%s]%s", rpid, uname, title));
             return;
         }
@@ -200,8 +212,8 @@ public class BilibiliMoDaTask {
         if (uid.equals("525121722")) {
             return true;
         }
-        // 傻狍子X
-        if (uid.equals("691652013")) {
+        //
+        if (uname.equals("打逗她") || uname.equals("想想莫大会怎么做")) {
             return true;
         }
         // 超过60个字也关注一下
@@ -213,7 +225,7 @@ public class BilibiliMoDaTask {
     }
 
     @SneakyThrows
-    private void listenPost(String url) {
+    private JSONObject listenPost(String url) {
         Thread.sleep(RandomUtil.randomLong(2000L));
         long now = System.currentTimeMillis() / 1000;
 
@@ -236,50 +248,18 @@ public class BilibiliMoDaTask {
             JSONObject json = JSON.parseObject(text);
 
             if (!json.getInteger("code").equals(0)) {
-                return;
+                return json;
             }
             if (!json.containsKey("data")) {
-                return;
+                return json;
             }
-            JSONArray lines = json.getJSONObject("data").getJSONArray("replies");
-            if (lines == null) {
-                return;
-            }
-            if (json.getJSONObject("data").containsKey("top")
-                && json.getJSONObject("data").getJSONObject("top").containsKey("upper")) {
-                JSONObject upperItem = json.getJSONObject("data").getJSONObject("top").getJSONObject("upper");
-                upperItem.put("top", true);
-                lines.add(0, upperItem);
-            }
-            int size = lines.size();
-            log.info("----------------------------------------");
-            for (int i = 0; i < size; i++) {
-                JSONObject item = lines.getJSONObject(i);
-                this.parseReply(null, item);
-
-                // reply总数
-                Integer rcount = item.getInteger("rcount");
-                if (rcount == null || rcount == 0) {
-                    continue;
-                }
-                int lastPage = rcount / 10 + 1;
-                // 只取后5页
-                for (int pn = lastPage; pn > 0 && pn >= lastPage - 5; pn--) {
-                    String rootId = item.getString("root_str");
-                    if (rootId.equals("0")) {
-                        rootId = item.getString("rpid_str");
-                    }
-                    String replyUrl = String.format(
-                        "https://api.bilibili.com/x/v2/reply/reply?csrf=aa5635cee65dbb9162ddabe27695385c&oid=%s&pn=%s&ps=10&root=%s&type=17&_=%s",
-                        item.getString("oid"), pn, rootId, now);
-                    listenPost(replyUrl);
-                }
-            }
+            return json;
         } catch (IOException e) {
             log.warn(e.getMessage(), e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        return null;
     }
 
     @Scheduled(fixedDelay = 60_000)
@@ -290,11 +270,116 @@ public class BilibiliMoDaTask {
 //        login();
         initCookie();
 
-        List<String> urls = Arrays.asList(
-            "https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=780591610288144421&mode=2&plat=1"
-        );
-        urls.forEach(this::listenPost);
+        // 监听up的动态，主要看有没有开新的置顶帖子
+        listenDynamic();
 
+        Set<String> urls = new HashSet<>();
+        urls.add("https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=793933281966948371&mode=2&plat=1");
+        urls.addAll(URL_DYNAMICS_ONLY_FANS.stream().map(dynamicId -> {
+            return String.format("https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=%s&mode=2&plat=1", dynamicId);
+        }).collect(Collectors.toList()));
+        urls.forEach(url -> {
+            handleComment(Objects.requireNonNull(listenPost(url)));
+        });
+
+    }
+
+    private void handleComment(JSONObject json) {
+        LocalDateTime now   = LocalDateTime.now();
+        JSONArray     lines = json.getJSONObject("data").getJSONArray("replies");
+        if (lines == null) {
+            return;
+        }
+        if (json.getJSONObject("data").containsKey("top")
+            && json.getJSONObject("data").getJSONObject("top").containsKey("upper")) {
+            JSONObject upperItem = json.getJSONObject("data").getJSONObject("top").getJSONObject("upper");
+            upperItem.put("top", true);
+            lines.add(0, upperItem);
+        }
+        int size = lines.size();
+        log.info("----------------------------------------");
+        for (int i = 0; i < size; i++) {
+            JSONObject item = lines.getJSONObject(i);
+            this.parseReply(null, item);
+
+            // reply总数
+            Integer rcount = item.getInteger("rcount");
+            if (rcount == null || rcount == 0) {
+                continue;
+            }
+            int lastPage = rcount / 10 + 1;
+            // 只取后5页
+            for (int pn = lastPage; pn > 0 && pn >= lastPage - 5; pn--) {
+                String rootId = item.getString("root_str");
+                if (rootId.equals("0")) {
+                    rootId = item.getString("rpid_str");
+                }
+                String replyUrl = String.format(
+                    "https://api.bilibili.com/x/v2/reply/reply?csrf=aa5635cee65dbb9162ddabe27695385c&oid=%s&pn=%s&ps=10&root=%s&type=17&_=%s",
+                    item.getString("oid"), pn, rootId, now);
+                listenPost(replyUrl);
+            }
+        }
+    }
+
+    private void listenDynamic() {
+        String     url         = "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=525121722";
+        JSONObject dynamicJson = listenPost(url);
+        handleDynamic(dynamicJson);
+    }
+
+    private void handleDynamic(JSONObject json) {
+        JSONArray items = json.getJSONObject("data").getJSONArray("items");
+
+        int size = items.size();
+        for (int i = 0; i < size; i++) {
+            JSONObject item = items.getJSONObject(i);
+            String     id   = item.getString("id_str");
+
+            if (!isDynamicRead(id)) {
+                this.parseUnreadDynamic(id, item);
+            }
+        }
+
+
+    }
+
+    private void parseUnreadDynamic(String id, JSONObject item) {
+        // 动态类型（DYNAMIC_TYPE_WORD: 文字；DYNAMIC_TYPE_AV：视频;）
+        String type = item.getString("type");
+        String text = null;
+
+        Boolean isOnlyFans = item.getJSONObject("basic").getBoolean("is_only_fans");
+        if (isOnlyFans != null && isOnlyFans) {
+            URL_DYNAMICS_ONLY_FANS.add(id);
+        }
+
+        switch (type) {
+            // 视频
+            case "DYNAMIC_TYPE_AV": {
+                text = item.getJSONObject("modules").getJSONObject("module_dynamic").getJSONObject("major").getJSONObject("archive")
+                    .getString("title");
+
+                break;
+            }
+            // 文字
+            case "DYNAMIC_TYPE_WORD":
+                // 图文
+            case "MAJOR_TYPE_DRAW":
+                // 转发
+            case "DYNAMIC_TYPE_FORWARD": {
+                text = item.getJSONObject("modules").getJSONObject("module_dynamic").getJSONObject("desc")
+                    .getString("text");
+
+                break;
+            }
+            default: {
+                text = "未知内容，前往B站查看";
+                break;
+            }
+        }
+
+        sendMsg(text, text);
     }
 
     private String[] initNotifyEmail() {
