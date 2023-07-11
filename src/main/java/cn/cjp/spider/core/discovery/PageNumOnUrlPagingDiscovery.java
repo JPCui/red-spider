@@ -12,11 +12,11 @@ import us.codecraft.webmagic.Page;
 
 /**
  * 通常类似json接口的格式，在url里匹配页码的部分
- * 
+ *
  * @author sucre
  *
  */
-public class JsonNormalPagingDiscovery implements Discovery {
+public class PageNumOnUrlPagingDiscovery implements Discovery {
 
     @Override
     public void discover(Page page, SeedDiscoveryRule discovery) {
@@ -45,7 +45,7 @@ public class JsonNormalPagingDiscovery implements Discovery {
 
     @Override
     public SeedDiscoveryType getDiscoveryType() {
-        return SeedDiscoveryType.JSON_NORMAL_PAGING;
+        return SeedDiscoveryType.PAGING_STRATEGY_PAGE_NUM_ON_URL;
     }
 
 }

@@ -18,9 +18,9 @@ import us.codecraft.webmagic.Page;
  *
  * @author sucre
  */
-public class HtmlNormalPagingDiscovery implements Discovery {
+public class MatchAHrefInHtmlPagingDiscovery implements Discovery {
 
-    private static final Logger LOGGER = Logger.getLogger(HtmlNormalPagingDiscovery.class);
+    private static final Logger LOGGER = Logger.getLogger(MatchAHrefInHtmlPagingDiscovery.class);
 
     @Override
     public void discover(Page page, SeedDiscoveryRule discovery) {
@@ -46,6 +46,7 @@ public class HtmlNormalPagingDiscovery implements Discovery {
             }
             if (currUrl.matches(findSeedPattern)) {
                 try {
+                    // FIXME 99lib定制化逻辑
                     URI.create(currUrl);
                     if (currUrl.matches(".*九.九.藏.书.*")) {
                         LOGGER.error(String.format("illigle argument url : , from : ", url, page.getUrl().get()));
@@ -66,7 +67,7 @@ public class HtmlNormalPagingDiscovery implements Discovery {
 
     @Override
     public SeedDiscoveryType getDiscoveryType() {
-        return SeedDiscoveryType.HTML_NORMAL_PAGING;
+        return SeedDiscoveryType.PAGING_STRATEGY_MATCH_A_HREF_IN_HTML;
     }
 
 }

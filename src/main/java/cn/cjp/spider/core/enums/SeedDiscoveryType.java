@@ -5,7 +5,8 @@ import java.util.List;
 
 /**
  * 种子发现规则的类型
- * 
+ *
+ *
  * @author sucre
  *
  */
@@ -17,25 +18,25 @@ public enum SeedDiscoveryType {
     COMMON(0, "通用"),
 
     /**
-     * 
-     * 在所有 a 标签中找出匹配的链接
-     * 
+     *
+     * 分页URL策略：从HTML中过滤所有a标签，找出匹配的href链接
+     *
      * http://xxx.com/?page=(.*)
-     * 
+     *
      */
-    HTML_NORMAL_PAGING(10, "HTML_NORMAL_PAGING"),
+    PAGING_STRATEGY_MATCH_A_HREF_IN_HTML(10, "MATCH_A_HREF_IN_HTML"),
 
     /**
-     * 在json接口上，获取分页字段，在原基础上+1
-     * 
+     * 分页URL策略：分页数据隐藏在URL上，在原基础上+1
+     *
      * http://xxx.com/xxx.json?page=(.*)
      */
-    JSON_NORMAL_PAGING(20, "JSON_NORMAL_PAGING"),
+    PAGING_STRATEGY_PAGE_NUM_ON_URL(20, "JSON_NORMAL_PAGING"),
 
     /**
      * 使用正则表达式
      */
-    REGEX(30, "REGEX"),
+//    REGEX(30, "REGEX"),
 
     ;
 
