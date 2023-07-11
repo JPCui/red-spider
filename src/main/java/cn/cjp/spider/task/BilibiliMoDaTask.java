@@ -411,7 +411,7 @@ public class BilibiliMoDaTask {
     }
 
     public void sendMsg(String title, String content) {
-        title = title.length() > 20 ? title.substring(0, 20) : title;
+        title = title.length() > 50 ? title.substring(0, 50) : title;
         List<String> listeners = Lists.newArrayList(initNotifyEmail());
         for (AbstractMsgNotifyService service : msgNotifyServices) {
             try {
