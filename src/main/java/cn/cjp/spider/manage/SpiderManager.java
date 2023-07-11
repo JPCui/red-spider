@@ -3,7 +3,7 @@ package cn.cjp.spider.manage;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
-import cn.cjp.spider.core.processor.SimpleProcessor;
+import cn.cjp.spider.core.processor.html.HtmlProcessor;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.spider.core.spider.AbstractSpider;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
@@ -128,9 +128,9 @@ public class SpiderManager {
     }
 
     private Spider buildSpider(SiteModel siteModel, ProcessorProperties props, boolean onceOnly) {
-        SimpleProcessor simpleProcessor = new SimpleProcessor();
-        simpleProcessor.setSiteModel(siteModel);
-        simpleProcessor.setOnceOnly(onceOnly);
+        HtmlProcessor htmlProcessor = new HtmlProcessor();
+        htmlProcessor.setSiteModel(siteModel);
+        htmlProcessor.setOnceOnly(onceOnly);
 
         Site site = new Site();
         site.addHeader("User-Agent", UserAgents.get());
@@ -139,9 +139,9 @@ public class SpiderManager {
         site.setRetrySleepTime(props.getRetrySleepTime()); // 重试休息时间：30s
         site.setRetryTimes(props.getRetryTimes()); // 重试 10次
         site.setTimeOut(props.getTimeout()); // 超时时间 30s
-        simpleProcessor.setSite(site);
+        htmlProcessor.setSite(site);
 
-        AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
+        AbstractSpider spider = new MyRedisSchedulerSpider(htmlProcessor, (MyRedisScheduler) scheduler);
         pipelines.forEach(spider::addPipeline);
         spider.addUrl(siteModel.getUrl()).thread(executorService, props.getThreadNum());
         // 结束不自动关闭，默认 true

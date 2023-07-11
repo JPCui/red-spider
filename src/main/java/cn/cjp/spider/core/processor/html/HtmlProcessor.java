@@ -1,4 +1,4 @@
-package cn.cjp.spider.core.processor;
+package cn.cjp.spider.core.processor.html;
 
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
@@ -47,7 +47,7 @@ import us.codecraft.webmagic.selector.Selectable;
  */
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SimpleProcessor implements PageProcessor {
+public class HtmlProcessor implements PageProcessor {
 
     Site site = Site.me().setUserAgent(UserAgents.get()).setRetryTimes(3).setSleepTime(3000);
 
@@ -61,7 +61,7 @@ public class SimpleProcessor implements PageProcessor {
     @Setter
     private boolean onceOnly;
 
-    public SimpleProcessor() {
+    public HtmlProcessor() {
         discovery = new CommonDiscovery();
     }
 
