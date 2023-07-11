@@ -1,5 +1,6 @@
 package cn.cjp.spider.core.processor;
 
+import cn.cjp.spider.core.processor.html.HtmlProcessor;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
@@ -22,9 +23,9 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
-public class SimpleProcessorTest {
+public class HtmlProcessorTest {
 
-    private static final Logger LOGGER = Logger.getLogger(SimpleProcessorTest.class);
+    private static final Logger LOGGER = Logger.getLogger(HtmlProcessorTest.class);
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -41,8 +42,8 @@ public class SimpleProcessorTest {
     }
 
     private void runSpider(SiteModel siteModel) {
-        SimpleProcessor simpleProcessor = new SimpleProcessor();
-        simpleProcessor.setSiteModel(siteModel);
+        HtmlProcessor htmlProcessor = new HtmlProcessor();
+        htmlProcessor.setSiteModel(siteModel);
 
         Site site = new Site();
         site.addHeader("User-Agent", UserAgents.get());
@@ -51,10 +52,10 @@ public class SimpleProcessorTest {
         site.setRetrySleepTime(30_000); // 重试休息时间：30s
         site.setRetryTimes(5); // 重试 10次
         site.setTimeOut(30_000); // 超时时间 30s
-        simpleProcessor.setSite(site);
+        htmlProcessor.setSite(site);
 
         try {
-            MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
+            MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(htmlProcessor, (MyRedisScheduler) scheduler);
             spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("~/tmp/spider/"))
                 .addUrl(siteModel.getUrl()).thread(executorService, threadNum);
             // 结束不自动关闭，默认 true
@@ -77,7 +78,7 @@ public class SimpleProcessorTest {
 
     @Test
     public void runTest() {
-        SimpleProcessorTest test = new SimpleProcessorTest();
+        HtmlProcessorTest test = new HtmlProcessorTest();
         test.scheduler = new MyRedisScheduler(new JedisPool());
         test.runSpider(SpiderConfig.PAGE_RULES.get("douban.movie"));
     }
@@ -88,7 +89,7 @@ public class SimpleProcessorTest {
         SiteModel siteModel = SpiderConfig.PAGE_RULES.get("douban.movie");
         siteModel.setSeedDiscoveries(Collections.emptyList());
         siteModel.setUrl("https://movie.douban.com/subject/27624661/");
-        SimpleProcessorTest test = new SimpleProcessorTest();
+        HtmlProcessorTest test = new HtmlProcessorTest();
         test.scheduler = new QueueScheduler();
         test.runSpider(siteModel);
     }
