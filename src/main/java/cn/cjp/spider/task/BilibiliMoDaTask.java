@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,7 +91,7 @@ public class BilibiliMoDaTask {
 
     private void initCookie() {
 
-        String   c     = "buvid3=A571FFFE-67F8-D9D0-D8D7-32B84ED291C557053infoc; b_nut=1666084857; _uuid=EB10102DE8-BD15-876D-DC94-D1339AD2F5F657892infoc; fingerprint=4a0e58ccf35b89468fe0862d5199b976; buvid_fp_plain=undefined; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; nostalgia_conf=-1; CURRENT_PID=02503bc0-c868-11ed-97d8-25c3fcaee565; CURRENT_FNVAL=4048; rpdid=|(~J~JmRmR~0J'uY~mRY|lJ|; i-wanna-go-back=-1; b_ut=5; header_theme_version=CLOSE; home_feed_column=5; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; opus-goback=1; hit-new-style-dyn=1; hit-dyn-v2=1; innersign=1; bsource=search_baidu; b_lsid=10B2DB5A1_1880492E7D3; SESSDATA=eafe6674%2C1699255949%2Cecd56%2A51; bili_jct=024fa237ffd126dff87c11e59a366727; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; sid=ft7xzy9g";
+        String   c     = "buvid3=C8222003-8A1D-C543-823B-244D427B1DE172523infoc; b_nut=1688532072; b_lsid=37C1991B_189245ABBCA; _uuid=51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; SESSDATA=d3997c47%2C1704084099%2C38902%2A71VcoAKCo7ffmtNG3syBOxBTVTh14tTnOjSYCbTchkH6X_9AHxIwL21vKUKM5QDCwU0i5b4QAAOgA; bili_jct=80e9e07cb92bcd22f27cc9f6427feced; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; CURRENT_FNVAL=4048; sid=6vl3w530; rpdid=|(kYkY)klkJu0J'uY))lJkukR; bp_video_offset_96918058=814731772524757000";
         String[] split = c.split("; ");
         for (String s : split) {
             String[] arr = s.split("=");
@@ -145,12 +146,12 @@ public class BilibiliMoDaTask {
 
         // 时间太久远就跳过
         if (now.getTime() - postTimeStr > 1000 * 3600 * 24 * 3) {
-            log.info(String.format("%s was timeout: [%s]%s", rpid, uname, title));
+            log.info(String.format("%s was outdated: [%s]%s", rpid, uname, title));
             return;
         }
 
         if (isCommentRead(rpid)) {
-            log.info(String.format("%s was read: [%s]%s", rpid, uname, title));
+            log.info(String.format("%s was read before: [%s]%s", rpid, uname, title));
             return;
         }
         // 保存帖子内容
@@ -212,8 +213,12 @@ public class BilibiliMoDaTask {
         if (uid.equals("525121722")) {
             return true;
         }
+        // 大师兄
+        if (uid.equals("492309991")) {
+            return true;
+        }
         //
-        if (uname.equals("打逗她") || uname.equals("想想莫大会怎么做")) {
+        if (uname.equals("打逗她") || uname.equals("想想莫大会怎么做") || uname.equals("丶C1trus")) {
             return true;
         }
         // 超过60个字也关注一下
@@ -262,7 +267,7 @@ public class BilibiliMoDaTask {
         return null;
     }
 
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelay = 20_000)
     public void execute() {
         if (isLoginFailed) {
             return;
@@ -274,7 +279,10 @@ public class BilibiliMoDaTask {
         listenDynamic();
 
         Set<String> urls = new HashSet<>();
+        // moda
         urls.add("https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=793933281966948371&mode=2&plat=1");
+        // dashixiong
+        urls.add("https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=816753847680630820&mode=2&plat=1");
         urls.addAll(URL_DYNAMICS_ONLY_FANS.stream().map(dynamicId -> {
             return String.format("https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=%s&mode=2&plat=1", dynamicId);
         }).collect(Collectors.toList()));
@@ -290,8 +298,8 @@ public class BilibiliMoDaTask {
         if (lines == null) {
             return;
         }
-        if (json.getJSONObject("data").containsKey("top")
-            && json.getJSONObject("data").getJSONObject("top").containsKey("upper")) {
+        if (json.getJSONObject("data").getJSONObject("top") != null
+            && json.getJSONObject("data").getJSONObject("top").getJSONObject("upper") != null) {
             JSONObject upperItem = json.getJSONObject("data").getJSONObject("top").getJSONObject("upper");
             upperItem.put("top", true);
             lines.add(0, upperItem);
@@ -309,11 +317,11 @@ public class BilibiliMoDaTask {
             }
             int lastPage = rcount / 10 + 1;
             // 只取后5页
-            for (int pn = lastPage; pn > 0 && pn >= lastPage - 5; pn--) {
-                String rootId = item.getString("root_str");
-                if (rootId.equals("0")) {
-                    rootId = item.getString("rpid_str");
-                }
+            String rootId = item.getString("root_str");
+            if (rootId.equals("0")) {
+                rootId = item.getString("rpid_str");
+            }
+            for (int pn = lastPage; pn > 0 && pn >= lastPage - 10; pn--) {
                 String replyUrl = String.format(
                     "https://api.bilibili.com/x/v2/reply/reply?csrf=aa5635cee65dbb9162ddabe27695385c&oid=%s&pn=%s&ps=10&root=%s&type=17&_=%s",
                     item.getString("oid"), pn, rootId, now);
@@ -323,22 +331,31 @@ public class BilibiliMoDaTask {
     }
 
     private void listenDynamic() {
-        String     url         = "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=525121722";
-        JSONObject dynamicJson = listenPost(url);
-        handleDynamic(dynamicJson);
+        List<String> urls = Arrays.asList(
+            "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=525121722",
+            "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=492309991"
+        );
+        urls.forEach(url -> {
+            JSONObject dynamicJson = listenPost(url);
+            handleDynamic(dynamicJson);
+        });
     }
 
     private void handleDynamic(JSONObject json) {
-        JSONArray items = json.getJSONObject("data").getJSONArray("items");
+        try {
+            JSONArray items = json.getJSONObject("data").getJSONArray("items");
 
-        int size = items.size();
-        for (int i = 0; i < size; i++) {
-            JSONObject item = items.getJSONObject(i);
-            String     id   = item.getString("id_str");
+            int size = items.size();
+            for (int i = 0; i < size; i++) {
+                JSONObject item = items.getJSONObject(i);
+                String     id   = item.getString("id_str");
 
-            if (!isDynamicRead(id)) {
-                this.parseUnreadDynamic(id, item);
+                if (!isDynamicRead(id)) {
+                    this.parseUnreadDynamic(id, item);
+                }
             }
+        } catch (RuntimeException e) {
+            log.error(json.toString(), e);
         }
 
 
@@ -353,6 +370,8 @@ public class BilibiliMoDaTask {
         if (isOnlyFans != null && isOnlyFans) {
             URL_DYNAMICS_ONLY_FANS.add(id);
         }
+
+        String author = item.getJSONObject("modules").getJSONObject("module_author").getString("name");
 
         switch (type) {
             // 视频
@@ -379,7 +398,7 @@ public class BilibiliMoDaTask {
             }
         }
 
-        sendMsg(text, text);
+        sendMsg("B站动态:" + author + "," + text, text);
     }
 
     private String[] initNotifyEmail() {
@@ -392,9 +411,14 @@ public class BilibiliMoDaTask {
     }
 
     public void sendMsg(String title, String content) {
+        title = title.length() > 20 ? title.substring(0, 20) : title;
         List<String> listeners = Lists.newArrayList(initNotifyEmail());
         for (AbstractMsgNotifyService service : msgNotifyServices) {
-            service.send(listeners, title, content);
+            try {
+                service.send(listeners, title, content);
+            } catch (RuntimeException e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
     }

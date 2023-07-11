@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * 帖子监听
  */
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class XueqMoDaTask {
 

@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
  * 这里还有个站点，也可以用来爬数据 TODO
  */
 @Slf4j
-@Component
+//@Component
 public class StockTask {
 
     /**

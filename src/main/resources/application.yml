@@ -8,6 +8,7 @@ spring:
     password: redis@bt.wbvNRa3tqygUjjNP
 
 server:
+  serverPath: /spid
   port: 8800
 
 management:
@@ -19,16 +20,16 @@ management:
       cache:
         time-to-live: 5000
 
-symphony:
-  enable: true
-  staticServerPath: /rs
-  serverPath: /rs
-  login:
-    secret: ssssss
-  tuling:
-    api: http://www.tuling123.com/openapi/api
-    apikey: 96c7f65aa25b497ba5a0f236881ba657
-    secret: ae16601956ef4d8c
+# symphony:
+#   enable: true
+#   staticServerPath: /rs
+#   serverPath: /rs
+#   login:
+#     secret: ssssss
+#   tuling:
+#     api: http://www.tuling123.com/openapi/api
+#     apikey: 96c7f65aa25b497ba5a0f236881ba657
+#     secret: ae16601956ef4d8c
 
 # 公众号配置(必填)
 wx.mp.appId: wx55d1cca59e29bbdb
