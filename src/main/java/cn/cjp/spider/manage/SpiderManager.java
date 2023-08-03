@@ -3,7 +3,7 @@ package cn.cjp.spider.manage;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
-import cn.cjp.spider.core.processor.html.HtmlProcessor;
+import cn.cjp.spider.core.processor.SimpleProcessor;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.spider.core.spider.AbstractSpider;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
@@ -41,6 +41,9 @@ public class SpiderManager {
 
     final Map<String, Spider> runningSpiders = new HashMap<>();
 
+    /**
+     * TODO 现状：所有task都共用该参数，改为：由各自的配置文件指定；
+     */
     final List<Pipeline> pipelines;
 
     final Scheduler scheduler;
@@ -113,9 +116,13 @@ public class SpiderManager {
 
         siteModelOptional.ifPresent(siteModel -> {
             Spider spider = buildSpider(siteModel, new ProcessorProperties());
-            log.error(spider.getSite().getDomain() + " running.");
             spider.setExitWhenComplete(true);
-            spider.run();
+            if (siteModel.isAutoStartup()) {
+                spider.run();
+                log.error(spider.getSite().getDomain() + " is ready and running.");
+            } else {
+                log.error(spider.getSite().getDomain() + " is ready.");
+            }
         });
 
         if (!siteModelOptional.isPresent()) {
@@ -124,24 +131,23 @@ public class SpiderManager {
     }
 
     private Spider buildSpider(SiteModel siteModel, ProcessorProperties props) {
-        return this.buildSpider(siteModel, props,true);
+        return this.buildSpider(siteModel, props, true);
     }
 
     private Spider buildSpider(SiteModel siteModel, ProcessorProperties props, boolean onceOnly) {
-        HtmlProcessor htmlProcessor = new HtmlProcessor();
-        htmlProcessor.setSiteModel(siteModel);
-        htmlProcessor.setOnceOnly(onceOnly);
+        SimpleProcessor simpleProcessor = new SimpleProcessor(siteModel);
+        simpleProcessor.setOnceOnly(onceOnly);
 
-        Site site = new Site();
+        // FIXME 应该在 SimpleProcessor 构造函数中实现这段逻辑
+        Site site = simpleProcessor.getSite();
         site.addHeader("User-Agent", UserAgents.get());
         site.setDomain(siteModel.getSiteName());
         site.setSleepTime(props.getSleepTime()); // 每次抓取完畢，休息
         site.setRetrySleepTime(props.getRetrySleepTime()); // 重试休息时间：30s
         site.setRetryTimes(props.getRetryTimes()); // 重试 10次
         site.setTimeOut(props.getTimeout()); // 超时时间 30s
-        htmlProcessor.setSite(site);
 
-        AbstractSpider spider = new MyRedisSchedulerSpider(htmlProcessor, (MyRedisScheduler) scheduler);
+        AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
         pipelines.forEach(spider::addPipeline);
         spider.addUrl(siteModel.getUrl()).thread(executorService, props.getThreadNum());
         // 结束不自动关闭，默认 true

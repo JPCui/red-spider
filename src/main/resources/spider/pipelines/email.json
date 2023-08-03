@@ -1,0 +1,10 @@
+{
+    "pipelineId": "pipeline_email_1",
+    "host": "smtp.qq.com",
+    "port": 587,
+    "auth": true,
+    "from": "624498030@qq.com",
+    "user": "624498030@qq.com",
+    "pass": "cogqsnusvkgebbbc",
+    "sslEnable": false
+}

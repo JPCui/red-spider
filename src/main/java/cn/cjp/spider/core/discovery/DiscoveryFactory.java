@@ -15,7 +15,7 @@ import us.codecraft.webmagic.Page;
  * @author sucre
  *
  */
-public class CommonDiscovery implements Discovery {
+public class DiscoveryFactory implements Discovery {
 
     public static final Set<Discovery> discoveries = new HashSet<Discovery>() {
         private static final long serialVersionUID = 2863967778498649876L;

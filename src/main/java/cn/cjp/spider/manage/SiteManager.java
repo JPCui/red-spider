@@ -1,8 +1,8 @@
 package cn.cjp.spider.manage;
 
 import cn.cjp.spider.core.config.SpiderConfig;
-import cn.cjp.spider.core.discovery.CommonDiscovery;
 import cn.cjp.spider.core.discovery.Discovery;
+import cn.cjp.spider.core.discovery.DiscoveryFactory;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.utils.URLUtil;
 import java.util.Optional;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SiteManager {
 
-    Discovery discovery = new CommonDiscovery();
+    Discovery discovery = new DiscoveryFactory();
 
     public Optional<SiteModel> getSiteModel(String url) {
         return SpiderConfig.PAGE_RULES.values().stream().filter(siteModel -> {

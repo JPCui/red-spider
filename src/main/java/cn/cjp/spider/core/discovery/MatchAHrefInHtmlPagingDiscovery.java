@@ -17,6 +17,8 @@ import us.codecraft.webmagic.Page;
  * 以一般分页URL的方式解析
  *
  * @author sucre
+ *
+ * FIXME 完善注释
  */
 public class MatchAHrefInHtmlPagingDiscovery implements Discovery {
 

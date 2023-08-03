@@ -1,15 +1,13 @@
 package cn.cjp.spider.core.processor;
 
-import cn.cjp.spider.core.processor.html.HtmlProcessor;
-import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
+import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.utils.Logger;
-import com.mongodb.MongoClientURI;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Map;
@@ -17,21 +15,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
-public class HtmlProcessorTest {
+public class SimpleProcessorTest {
 
-    private static final Logger LOGGER = Logger.getLogger(HtmlProcessorTest.class);
+    private static final Logger LOGGER = Logger.getLogger(SimpleProcessorTest.class);
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static final int threadNum = Runtime.getRuntime().availableProcessors() * 2;
 
-    private Scheduler scheduler;
+    private Scheduler     scheduler;
+    private MongoTemplate mongoTemplate;
 
     public void run() {
         final Map<String, SiteModel> map = SpiderConfig.PAGE_RULES;
@@ -42,8 +40,7 @@ public class HtmlProcessorTest {
     }
 
     private void runSpider(SiteModel siteModel) {
-        HtmlProcessor htmlProcessor = new HtmlProcessor();
-        htmlProcessor.setSiteModel(siteModel);
+        SimpleProcessor simpleProcessor = new SimpleProcessor(siteModel);
 
         Site site = new Site();
         site.addHeader("User-Agent", UserAgents.get());
@@ -52,10 +49,10 @@ public class HtmlProcessorTest {
         site.setRetrySleepTime(30_000); // 重试休息时间：30s
         site.setRetryTimes(5); // 重试 10次
         site.setTimeOut(30_000); // 超时时间 30s
-        htmlProcessor.setSite(site);
+        simpleProcessor.setSite(site);
 
         try {
-            MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(htmlProcessor, (MyRedisScheduler) scheduler);
+            MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
             spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("~/tmp/spider/"))
                 .addUrl(siteModel.getUrl()).thread(executorService, threadNum);
             // 结束不自动关闭，默认 true
@@ -70,15 +67,13 @@ public class HtmlProcessorTest {
     }
 
     public JsonPipeline getJsonPipeline() throws UnknownHostException {
-        SimpleMongoDbFactory factory       = new SimpleMongoDbFactory(new MongoClientURI("mongodb://localhost:27017/test"));
-        MongoTemplate        mongoTemplate = new MongoTemplate(factory);
-        JsonPipeline         jsonPipeline  = new JsonPipeline(mongoTemplate);
+        JsonPipeline jsonPipeline = new JsonPipeline(mongoTemplate);
         return jsonPipeline;
     }
 
     @Test
     public void runTest() {
-        HtmlProcessorTest test = new HtmlProcessorTest();
+        SimpleProcessorTest test = new SimpleProcessorTest();
         test.scheduler = new MyRedisScheduler(new JedisPool());
         test.runSpider(SpiderConfig.PAGE_RULES.get("douban.movie"));
     }
@@ -89,7 +84,7 @@ public class HtmlProcessorTest {
         SiteModel siteModel = SpiderConfig.PAGE_RULES.get("douban.movie");
         siteModel.setSeedDiscoveries(Collections.emptyList());
         siteModel.setUrl("https://movie.douban.com/subject/27624661/");
-        HtmlProcessorTest test = new HtmlProcessorTest();
+        SimpleProcessorTest test = new SimpleProcessorTest();
         test.scheduler = new QueueScheduler();
         test.runSpider(siteModel);
     }

@@ -1,0 +1,102 @@
+{
+    "version": "2023-07-27",
+    "siteName": "bilibili.com",
+    "description": "bilibili动态、评论",
+    "url": "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=525121722",
+    "domain": "bilibili.com",
+    "cookies": [
+        {
+            "name": "buvid3",
+            "value": "C8222003-8A1D-C543-823B-244D427B1DE172523infoc"
+        },
+        {
+            "name": "b_nut",
+            "value": "1688532072"
+        },
+        {
+            "name": "_uuid",
+            "value": "51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc"
+        },
+        {
+            "name": "buvid_fp",
+            "value": "4a0e58ccf35b89468fe0862d5199b976"
+        },
+        {
+            "name": "buvid4",
+            "value": "E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D"
+        },
+        {
+            "name": "DedeUserID",
+            "value": "96918058"
+        },
+        {
+            "name": "DedeUserID__ckMd5",
+            "value": "d13f881e25b6ce9e"
+        },
+        {
+            "name": "CURRENT_FNVAL",
+            "value": "4048"
+        },
+        {
+            "name": "rpdid",
+            "value": "|(kYkY)klkJu0J'uY))lJkukR"
+        },
+        {
+            "name": "b_lsid",
+            "value": "2C24A5FC_18942E3FB36"
+        },
+        {
+            "name": "SESSDATA",
+            "value": "9c31bd65%2C1704596394%2C00efd%2A72KVZSDtnNGgwoIvnxDSXP-mCrZTYaviTRKNfTsd7OdlfP7EYNSoeUwu0RgxcCCVMsgzRvSAAAOgA"
+        },
+        {
+            "name": "bili_jct",
+            "value": "bfcd4b7a4ab0fe909caee63c46ed27d5"
+        },
+        {
+            "name": "hit-new-style-dyn",
+            "value": "0"
+        },
+        {
+            "name": "bp_video_offset_96918058",
+            "value": "816924907392729093"
+        },
+        {
+            "name": "hit-dyn-v2",
+            "value": "1"
+        },
+        {
+            "name": "sid",
+            "value": "fkr5fd31"
+        }
+    ],
+    "isRecycle": true,
+    "seedDiscoveries": [
+        {
+            "//ref": "根据[ref]指向的解析结果来生成种子",
+            "ref": [
+                "bilibili_dynamic"
+            ],
+            "//type": "评论类型；参考：https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/readme.md#%E8%AF%84%E8%AE%BA%E5%8C%BA%E7%B1%BB%E5%9E%8B%E4%BB%A3%E7%A0%81",
+            "url": "https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid={id}&mode=2&plat=1",
+            "type": 40
+        },
+        {
+            "//url": "评论回复；oid: 动态ID；root：评论ID；",
+            "url": "https://api.bilibili.com/x/v2/reply/reply?oid={oid}&pn=(.*)&ps=10&root={root}&type=17&_=%s",
+            "type": 1,
+            "//nested": "先获取下一页；再替换变量",
+            "nested": [
+                20,
+                40
+            ]
+        }
+    ],
+    "//parseRules": "指定爬取规则",
+    "parseRules": [
+        "bilibili_dynamic"
+    ],
+    "//skip": "是否跳过存储",
+    "skip": 0,
+    "autoStartup": true
+}

@@ -1,0 +1,80 @@
+{
+    "type_x": "bilibili动态",
+    "type": "parser",
+    "ruleName_x": "规则名称",
+    "ruleName": "bilibili_dynamic",
+    "urlPattern_x": "判断url是否使用当前配置的规则来解析",
+    "urlPattern": "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space.*",
+    "//parentAttr": "用于：1. 区别文档类型；2. 缩小范围",
+    "parentAttr": {
+        "parserType": 10,
+        "parserPath": "data.items"
+    },
+    "//attrs": "属性列表",
+    "attrs": [
+        {
+            "field": "_tableName",
+            "defaultValue": "bili_dynamic",
+            "parserType": 0
+        },
+        {
+            "field": "dynamic_id",
+            "description": "动态id",
+            "parserType": 10,
+            "parserPath": "id_str"
+        },
+        {
+            "field": "dynamic_type",
+            "description": "动态类型",
+            "parserType": 10,
+            "parserPath": "type"
+        },
+        {
+            "field": "up_id",
+            "description": "up id",
+            "parserType": 10,
+            "parserPath": "modules.module_author.mid"
+        },
+        {
+            "field": "up_name",
+            "description": "up name",
+            "parserType": 10,
+            "parserPath": "modules.module_author.name"
+        },
+        {
+            "field": "module",
+            "hasEmbeddedAttr": true,
+            "hasMultiValue": true,
+            "parserType": 10,
+            "parserPath": "modules",
+            "embeddedAttrs": [
+                {
+                    "condition_x": "TODO 通过条件来解析不同类型的结构",
+                    "condition": "dynamic_type=='DYNAMIC_TYPE_AV'",
+                    "field": "av_title",
+                    "parserPath": "module_dynamic.major.archive.title",
+                    "description": "视频动态内容",
+                    "parserType": 10
+                },
+                {
+                    "field": "title",
+                    "parserPath": "module_dynamic.desc.text",
+                    "description": "动态内容",
+                    "parserType": 10
+                }
+            ]
+        }
+    ],
+    "pipelines": [
+        {
+            "pipelineId": "pipeline_email_1",
+            "params": {
+                "to": ["624498030@qq.com"],
+                "title": "$up_name + ': ' + $module.title",
+                "content": "$up_name + ': ' + $module.title"
+            }
+        }
+    ],
+    "isList_x": "是否是列表页",
+    "isList": 1
+}

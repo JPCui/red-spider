@@ -6,9 +6,7 @@ import java.util.List;
 /**
  * 种子发现规则的类型
  *
- *
  * @author sucre
- *
  */
 public enum SeedDiscoveryType {
 
@@ -16,31 +14,42 @@ public enum SeedDiscoveryType {
      * 尝试所有方法
      */
     COMMON(0, "通用"),
+    NESTED(1, "嵌套"),
 
     /**
+     * 在所有 a 标签中找出匹配的链接
      *
-     * 分页URL策略：从HTML中过滤所有a标签，找出匹配的href链接
-     *
-     * http://xxx.com/?page=(.*)
-     *
+     * http://xx.com/?page=(.*)
      */
-    PAGING_STRATEGY_MATCH_A_HREF_IN_HTML(10, "MATCH_A_HREF_IN_HTML"),
+    HTML_NORMAL_PAGING(10, "HTML_NORMAL_PAGING"),
 
     /**
-     * 分页URL策略：分页数据隐藏在URL上，在原基础上+1
+     * 在json接口上，获取分页字段，在原基础上+1
      *
-     * http://xxx.com/xxx.json?page=(.*)
+     * 比如：匹配出当前url的页码，http://xx.com/xx.json?page=9，那么下一页则是 10
      */
-    PAGING_STRATEGY_PAGE_NUM_ON_URL(20, "JSON_NORMAL_PAGING"),
+    JSON_NORMAL_PAGING(20, "JSON_NORMAL_PAGING"),
 
     /**
      * 使用正则表达式
      */
-//    REGEX(30, "REGEX"),
+    REGEX(30, "REGEX"),
+
+    /**
+     * 提供url正则 + 从抓取的字段中提取参数，比如：
+     * <pre>
+     *     {
+     *       "url": "https://api.xx.com/main?id={id}",
+     *       "type": "40"
+     *     }
+     * </pre>
+     * 那么就会将当前页面抓取的id，替换到pattern的{id}中，形成下次要抓取的url
+     */
+    REGEX_AND_FIELD(40, "REGEX_AND_FIELD"),
 
     ;
 
-    private final int code;
+    private final int    code;
     private final String message;
 
     public static SeedDiscoveryType fromValue(final int code) {

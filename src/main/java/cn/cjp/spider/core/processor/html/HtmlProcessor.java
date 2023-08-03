@@ -1,13 +1,14 @@
-package cn.cjp.spider.core.processor.html;
+package cn.cjp.spider.core.processor;
 
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
-import cn.cjp.spider.core.discovery.CommonDiscovery;
 import cn.cjp.spider.core.discovery.Discovery;
+import cn.cjp.spider.core.discovery.DiscoveryFactory;
 import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
+import cn.cjp.spider.core.model.Cookie;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.spider.core.model.SiteModel;
@@ -18,6 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,11 +49,11 @@ import us.codecraft.webmagic.selector.Selectable;
  */
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HtmlProcessor implements PageProcessor {
+public class SimpleProcessor implements PageProcessor {
 
     Site site = Site.me().setUserAgent(UserAgents.get()).setRetryTimes(3).setSleepTime(3000);
 
-    private SiteModel siteModel;
+    private final SiteModel siteModel;
 
     private Discovery discovery;
 
@@ -61,8 +63,23 @@ public class HtmlProcessor implements PageProcessor {
     @Setter
     private boolean onceOnly;
 
-    public HtmlProcessor() {
-        discovery = new CommonDiscovery();
+    public SimpleProcessor(SiteModel siteModel) {
+        discovery = new DiscoveryFactory();
+        this.siteModel = siteModel;
+        this.site = Site.me()
+            .setUserAgent(UserAgents.get())
+            .setRetryTimes(3)
+            .setSleepTime(3000);
+
+        site.addHeader("User-Agent", UserAgents.get());
+        site.setDomain(siteModel.getSiteName());
+
+        Optional.ofNullable(this.siteModel.getCookies()).ifPresent(cookies -> {
+            for (Cookie cookie : cookies) {
+                this.site.addCookie(cookie.getName(), cookie.getValue());
+            }
+        });
+
     }
 
     @Override
@@ -123,7 +140,7 @@ public class HtmlProcessor implements PageProcessor {
      * 发现新URL
      */
     private void findSeeds(Page page) {
-        if(onceOnly) {
+        if (onceOnly) {
             return;
         }
         final List<SeedDiscoveryRule> seedDiscoveries = siteModel.getSeedDiscoveries();
@@ -310,11 +327,6 @@ public class HtmlProcessor implements PageProcessor {
      * 可嵌套的解析方法
      */
     private Selectable parse(Page page, Selectable dom, Attr attr) {
-        if ("#content div".equalsIgnoreCase(attr.getParserPath())) {
-            // DEBUG 在此加断点
-            log.debug(dom.toString());
-        }
-
         try {
             Selectable value      = null;
             ParserType parserType = ParserType.fromValue(attr.getParserType());
@@ -392,18 +404,6 @@ public class HtmlProcessor implements PageProcessor {
     @Override
     public Site getSite() {
         return site;
-    }
-
-    public void setSite(Site site) {
-        this.site = site;
-    }
-
-    public SiteModel getSiteModel() {
-        return siteModel;
-    }
-
-    public void setSiteModel(SiteModel siteModel) {
-        this.siteModel = siteModel;
     }
 
 }

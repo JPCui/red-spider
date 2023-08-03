@@ -2,6 +2,7 @@ package cn.cjp.spider.core.model;
 
 import java.util.List;
 
+import java.util.Map;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,10 @@ public class SiteModel {
 
     private String db;
 
+    private boolean isRecycle = false;
+
+    private List<Cookie> cookies;
+
     @NotNull
     private String url;
 
@@ -43,5 +48,7 @@ public class SiteModel {
     private int isList;
 
     private int skip = 1;
+
+    private boolean autoStartup = false;
 
 }
