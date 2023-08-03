@@ -34,16 +34,26 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * 帖子监听
+ * b站动态监听
  *
- * 不再使用之前的模拟手机端的api来调接口，而使用直接爬取官网html的方式，这样我们就不用每次都去手机拿token，而是直接模拟登陆获取cookie
+ * <pre>
+ * 主要包含动态、评论两个内容；
  *
- * https://exp.newsmth.net/board/members/3bcda03dcf4ca0e36c3cc96eaa4cf6f8
+ * 动态列表：            https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=525121722
+ *  1. code==0
+ *  2. data
+ * 评论（按时间倒序）：https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=793933281966948371&mode=2&plat=1
+ * 评论的回复：       https://api.bilibili.com/x/v2/reply/reply?csrf=aa5635cee65dbb9162ddabe27695385c&oid=%s&pn=%s&ps=10&root=%s&type=17&_=%s
  *
- * 这里还有个站点，也可以用来爬数据 TODO
+ *
+ *
+ *
+ *
+ * </pre>
+ *
  */
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class BilibiliMoDaTask {
 
@@ -91,7 +101,7 @@ public class BilibiliMoDaTask {
 
     private void initCookie() {
 
-        String   c     = "buvid3=C8222003-8A1D-C543-823B-244D427B1DE172523infoc; b_nut=1688532072; b_lsid=37C1991B_189245ABBCA; _uuid=51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; SESSDATA=d3997c47%2C1704084099%2C38902%2A71VcoAKCo7ffmtNG3syBOxBTVTh14tTnOjSYCbTchkH6X_9AHxIwL21vKUKM5QDCwU0i5b4QAAOgA; bili_jct=80e9e07cb92bcd22f27cc9f6427feced; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; CURRENT_FNVAL=4048; sid=6vl3w530; rpdid=|(kYkY)klkJu0J'uY))lJkukR; bp_video_offset_96918058=814731772524757000";
+        String   c     = "buvid3=C8222003-8A1D-C543-823B-244D427B1DE172523infoc; b_nut=1688532072; _uuid=51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; CURRENT_FNVAL=4048; rpdid=|(kYkY)klkJu0J'uY))lJkukR; b_lsid=2C24A5FC_18942E3FB36; SESSDATA=9c31bd65%2C1704596394%2C00efd%2A72KVZSDtnNGgwoIvnxDSXP-mCrZTYaviTRKNfTsd7OdlfP7EYNSoeUwu0RgxcCCVMsgzRvSAAAOgA; bili_jct=bfcd4b7a4ab0fe909caee63c46ed27d5; hit-new-style-dyn=0; bp_video_offset_96918058=816924907392729093; hit-dyn-v2=1; sid=fkr5fd31";
         String[] split = c.split("; ");
         for (String s : split) {
             String[] arr = s.split("=");
@@ -325,7 +335,8 @@ public class BilibiliMoDaTask {
                 String replyUrl = String.format(
                     "https://api.bilibili.com/x/v2/reply/reply?csrf=aa5635cee65dbb9162ddabe27695385c&oid=%s&pn=%s&ps=10&root=%s&type=17&_=%s",
                     item.getString("oid"), pn, rootId, now);
-                listenPost(replyUrl);
+                JSONObject cmts = listenPost(replyUrl);
+                this.handleComment(cmts);
             }
         }
     }
