@@ -22,8 +22,8 @@ public class SpiderManagerTest {
     }
 
     @Test
-    public void initSpiders() throws InterruptedException {
-        spiderManager.initSpiders();
+    public void startAll() throws InterruptedException {
+        spiderManager.startAll();
         log.debug("");
 
         Thread.sleep(10_000L);
