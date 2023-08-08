@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import cn.cjp.spider.core.enums.SeedDiscoveryType;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
-import cn.cjp.utils.StringUtil;
+import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 
 /**
@@ -23,7 +23,7 @@ public class PageNumOnUrlPagingDiscovery implements Discovery {
     public void discover(Page page, SeedDiscoveryRule discovery) {
         final String findSeedPattern = discovery.getPattern();
 
-        if (StringUtil.isEmpty(findSeedPattern)) {
+        if (StringUtils.isEmpty(findSeedPattern)) {
             return;
         }
 
@@ -46,7 +46,7 @@ public class PageNumOnUrlPagingDiscovery implements Discovery {
 
     @Override
     public SeedDiscoveryType getDiscoveryType() {
-        return SeedDiscoveryType.PAGING_STRATEGY_PAGE_NUM_ON_URL;
+        return SeedDiscoveryType.JSON_NORMAL_PAGING;
     }
 
 }
