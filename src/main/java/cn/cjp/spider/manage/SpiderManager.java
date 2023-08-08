@@ -46,7 +46,7 @@ public class SpiderManager {
     final Map<String, Spider> runningRecycleSpiders = new HashMap<>();
 
     /**
-     * TODO 现状：所有task都共用该参数，改为：由各自的配置文件指定；
+     * TODO remove it；现状：所有task都共用同样的pipeline，改为：每个model都可以自定义pipeline；
      */
     final List<Pipeline> pipelines;
 
