@@ -1,6 +1,6 @@
 package cn.cjp.spider.core.scheduler;
 
-import cn.cjp.utils.Logger;
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import us.codecraft.webmagic.Request;
@@ -10,9 +10,8 @@ import us.codecraft.webmagic.scheduler.RedisScheduler;
 /**
  * 衹有在URL爬取成功后，URL才會sadd進set集合裏
  */
+@Slf4j
 public class MyRedisScheduler extends RedisScheduler {
-
-	private static final Logger LOGGER = Logger.getLogger(MyRedisScheduler.class);
 
 	/**
 	 * 真实抓取到的URL集合（抓取成功才会入队）
@@ -29,7 +28,7 @@ public class MyRedisScheduler extends RedisScheduler {
 
 	/**
 	 * sadd
-	 * 
+	 *
 	 * @param request
 	 * @param task
 	 */
@@ -38,9 +37,9 @@ public class MyRedisScheduler extends RedisScheduler {
 			// Long r = jedis.sadd(getSetKey(task), request.getUrl());
 			Long r = jedis.sadd(getActualSetKey(task), request.getUrl());
 			if (Long.valueOf(1L).equals(r)) {
-				LOGGER.info(String.format("download url success : %s", request.getUrl()));
+				log.info(String.format("download url success : %s", request.getUrl()));
 			} else {
-				LOGGER.warn(String.format("download url duplicate : %s", request.getUrl()));
+				log.warn(String.format("download url duplicate : %s", request.getUrl()));
 			}
 		}
 	}
