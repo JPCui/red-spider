@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.cjp.utils.StringUtil;
+import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
 public class RedisTest {
@@ -45,7 +45,7 @@ public class RedisTest {
 		Long listLength = jedis.llen(listName);
 		while (true) {
 			String v = jedis.rpop(listName);
-			if (StringUtil.isEmpty(v)) {
+			if (StringUtils.isEmpty(v)) {
 				break;
 			}
 			jedis.sadd(setName, v);
@@ -68,7 +68,7 @@ public class RedisTest {
 		Long setLength = jedis.scard(setName);
 		while (true) {
 			String v = jedis.spop(setName);
-			if (StringUtil.isEmpty(v)) {
+			if (StringUtils.isEmpty(v)) {
 				break;
 			}
 			jedis.lpush(listName, v);

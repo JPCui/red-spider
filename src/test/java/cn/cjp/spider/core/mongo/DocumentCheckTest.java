@@ -2,7 +2,6 @@ package cn.cjp.spider.core.mongo;
 
 import com.alibaba.fastjson.JSON;
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import java.util.ArrayList;
@@ -11,8 +10,9 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import org.junit.Test;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 public class DocumentCheckTest {
 
@@ -20,14 +20,14 @@ public class DocumentCheckTest {
     public void checkBookNums() {
         Map<String, Integer> rs = new HashMap<>();
 
-        SimpleMongoDbFactory factory       = new SimpleMongoDbFactory(new MongoClientURI("mongodb://localhost:27017/test"));
+        MongoDatabaseFactory factory       = new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/test");
         MongoTemplate        mongoTemplate = new MongoTemplate(factory);
 
         MongoCollection<Document> bookColl         = mongoTemplate.getCollection("99lib-book");
         MongoCollection<Document> bookChaptorsColl = mongoTemplate.getCollection("99lib-book-chaptors");
         MongoCollection<Document> bookSectionsColl = mongoTemplate.getCollection("99lib-book-sections");
 
-        long bookCount = bookColl.count();
+        long bookCount = bookColl.countDocuments();
         rs.put("book", (int) bookCount);
         System.out.println("book : " + bookCount);
 
