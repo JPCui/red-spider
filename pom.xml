@@ -23,20 +23,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>cn.cjp</groupId>
-            <artifactId>jp-base</artifactId>
-            <version>v2018.0208</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/jp-base-v2018.0208.jar</systemPath>
-        </dependency>
-
-        <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
         </dependency>
