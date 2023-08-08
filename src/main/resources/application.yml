@@ -1,11 +1,15 @@
 spring:
-  profiles: 
+  profiles:
     active: dev
   data:
     mongodb:
       database: test
       host: localhost
       port: 27017
+  mvc:
+    pathmatch:
+      #FIX because "this.condition" is null ，退回老版本，待Springfox修复
+      matching-strategy: ant_path_matcher
 
 server:
   port: 8800
