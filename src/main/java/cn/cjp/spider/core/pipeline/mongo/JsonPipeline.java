@@ -1,8 +1,6 @@
 package cn.cjp.spider.core.pipeline.mongo;
 
 import cn.cjp.spider.core.config.SpiderConst;
-import cn.cjp.utils.Logger;
-import cn.cjp.utils.StringUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
@@ -10,8 +8,10 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import java.util.Date;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
@@ -23,9 +23,8 @@ import us.codecraft.webmagic.pipeline.Pipeline;
  * @deprecated use MongoPipeline instead
  * @see MongoPipeline
  */
+@Slf4j
 public class JsonPipeline implements Pipeline {
-
-    private static final Logger LOGGER = Logger.getLogger(JsonPipeline.class);
 
     private MongoTemplate mongoTemplate;
 
@@ -57,7 +56,7 @@ public class JsonPipeline implements Pipeline {
         // TODO 對於索引，可優化為結構化
         // 獲取唯一鍵
         String uniqueKey = json.getString(SpiderConst.KEY_UNIQUE);
-        if (!StringUtil.isEmpty(uniqueKey)) {
+        if (!StringUtils.isEmpty(uniqueKey)) {
             Document keyDbo = new Document();
             keyDbo.put(uniqueKey, 1);
             dbc.createIndex(keyDbo, new IndexOptions().name("uk_".concat(uniqueKey)).unique(true));
@@ -66,7 +65,7 @@ public class JsonPipeline implements Pipeline {
         Document     queryDBO     = new Document(uniqueKey, json.get(uniqueKey));
         Document     updateDBO    = toDBObject(json);
         UpdateResult updateResult = dbc.updateOne(queryDBO, updateDBO, new UpdateOptions().upsert(true));
-        LOGGER.info(String.format("insert status %s", updateResult.getModifiedCount()));
+        log.info(String.format("insert status %s", updateResult.getModifiedCount()));
     }
 
     private void insert(List<JSONObject> jsons) {

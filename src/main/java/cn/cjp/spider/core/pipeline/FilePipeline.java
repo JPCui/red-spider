@@ -2,29 +2,23 @@ package cn.cjp.spider.core.pipeline;
 
 import cn.cjp.spider.core.config.SpiderConst;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 import us.codecraft.webmagic.utils.FilePersistentBase;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  *
  */
+@Slf4j
 public class FilePipeline extends FilePersistentBase implements Pipeline {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * create a FilePipeline with default path"/data/webmagic/"
@@ -61,7 +55,7 @@ public class FilePipeline extends FilePersistentBase implements Pipeline {
             printWriter.println();
             printWriter.close();
         } catch (IOException e) {
-            logger.error("write file error", e);
+            log.error("write file error", e);
         }
     }
 }

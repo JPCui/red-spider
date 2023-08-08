@@ -5,14 +5,15 @@ import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
+import cn.cjp.spider.core.processor.html.SimpleProcessor;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
-import cn.cjp.utils.Logger;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import redis.clients.jedis.JedisPool;
@@ -20,9 +21,8 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
-public class SimpleProcessorTest {
-
-    private static final Logger LOGGER = Logger.getLogger(SimpleProcessorTest.class);
+@Slf4j
+public class HtmlProcessorTest {
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -42,15 +42,6 @@ public class SimpleProcessorTest {
     private void runSpider(SiteModel siteModel) {
         SimpleProcessor simpleProcessor = new SimpleProcessor(siteModel);
 
-        Site site = new Site();
-        site.addHeader("User-Agent", UserAgents.get());
-        site.setDomain(siteModel.getSiteName());
-        site.setSleepTime(1000); // 每次抓取完畢，休息
-        site.setRetrySleepTime(30_000); // 重试休息时间：30s
-        site.setRetryTimes(5); // 重试 10次
-        site.setTimeOut(30_000); // 超时时间 30s
-        simpleProcessor.setSite(site);
-
         try {
             MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
             spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("~/tmp/spider/"))
@@ -59,9 +50,9 @@ public class SimpleProcessorTest {
             spider.setExitWhenComplete(false);
             spider.run();
 
-            LOGGER.error(spider.getSite().getDomain() + " running.");
+            log.error(spider.getSite().getDomain() + " running.");
         } catch (UnknownHostException e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
     }
@@ -73,7 +64,7 @@ public class SimpleProcessorTest {
 
     @Test
     public void runTest() {
-        SimpleProcessorTest test = new SimpleProcessorTest();
+        HtmlProcessorTest test = new HtmlProcessorTest();
         test.scheduler = new MyRedisScheduler(new JedisPool());
         test.runSpider(SpiderConfig.PAGE_RULES.get("douban.movie"));
     }
@@ -84,7 +75,7 @@ public class SimpleProcessorTest {
         SiteModel siteModel = SpiderConfig.PAGE_RULES.get("douban.movie");
         siteModel.setSeedDiscoveries(Collections.emptyList());
         siteModel.setUrl("https://movie.douban.com/subject/27624661/");
-        SimpleProcessorTest test = new SimpleProcessorTest();
+        HtmlProcessorTest test = new HtmlProcessorTest();
         test.scheduler = new QueueScheduler();
         test.runSpider(siteModel);
     }

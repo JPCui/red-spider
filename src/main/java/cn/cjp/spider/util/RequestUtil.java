@@ -1,7 +1,8 @@
 package cn.cjp.spider.util;
 
-import cn.cjp.utils.StringUtil;
+import com.google.common.collect.Lists;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -126,13 +127,13 @@ public class RequestUtil {
         return floatValue;
     }
 
-    public static Integer[] getIntArray(HttpServletRequest request, String name) {
+    public static List<Integer> getIntArray(HttpServletRequest request, String name) {
         String str = request.getParameter(name);
         if (StringUtils.isEmpty(str)) {
-            return new Integer[0];
+            return Lists.newArrayList();
         }
 
-        Integer[] nums = StringUtil.split(str, ",");
+        List<Integer> nums = IntSplitter.split(str, ",");
         return nums;
     }
 

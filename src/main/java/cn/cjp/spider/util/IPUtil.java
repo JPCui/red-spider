@@ -1,6 +1,5 @@
 package cn.cjp.spider.util;
 
-import cn.cjp.utils.Logger;
 import com.alibaba.fastjson.JSON;
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,12 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
+@Slf4j
 public class IPUtil {
-
-    private static final Logger LOGGER = Logger.getLogger(IPUtil.class);
 
     /**
      * @return province
@@ -33,14 +32,14 @@ public class IPUtil {
                 return json.get("province").toString();
             }
         } catch (IOException e) {
-            LOGGER.warn(e.toString(), e);
+            log.warn(e.toString(), e);
         }
         return null;
     }
 
     public static Map<String, String> getCityByIps(String[] ips) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("Query ips(%d) info.", ips.length));
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Query ips(%d) info.", ips.length));
         }
 
         final ExecutorService       service = Executors.newCachedThreadPool();
@@ -57,7 +56,7 @@ public class IPUtil {
                 String info = future.get(5, TimeUnit.SECONDS);
                 infoMap.put(ip, info);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOGGER.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
         service.shutdown();
@@ -68,7 +67,7 @@ public class IPUtil {
         String[] ips = {"202.196.35.35", "202.196.35.36", "202.196.35.37", "202.196.35.37", "101.200.143.36",
                         "101.201.143.36"};
         Object r = getCityByIps(ips);
-        LOGGER.info(r.toString());
+        log.info(r.toString());
 
         // for (String ip : ips) {
         // LOGGER.info(getCityByIp(ip));

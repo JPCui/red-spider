@@ -3,7 +3,7 @@ package cn.cjp.spider.manage;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
-import cn.cjp.spider.core.processor.SimpleProcessor;
+import cn.cjp.spider.core.processor.html.SimpleProcessor;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.spider.core.spider.AbstractSpider;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;

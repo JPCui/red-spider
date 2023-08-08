@@ -4,7 +4,9 @@ import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.discovery.Discovery;
 import cn.cjp.spider.core.discovery.DiscoveryFactory;
 import cn.cjp.spider.core.model.SiteModel;
-import cn.cjp.utils.URLUtil;
+import cn.hutool.core.util.URLUtil;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +23,12 @@ public class SiteManager {
     public Optional<SiteModel> getSiteModel(String url) {
         return SpiderConfig.PAGE_RULES.values().stream().filter(siteModel -> {
             String domain = siteModel.getDomain();
-            return URLUtil.getHost(url).endsWith(domain);
+            try {
+                return URLUtil.getHost(new URL(url)).getHost().endsWith(domain);
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
         }).findFirst();
 
     }

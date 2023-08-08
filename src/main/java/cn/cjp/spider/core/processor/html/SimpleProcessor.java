@@ -1,4 +1,4 @@
-package cn.cjp.spider.core.processor;
+package cn.cjp.spider.core.processor.html;
 
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
@@ -13,8 +13,7 @@ import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.util._99libUtil;
-import cn.cjp.utils.Assert;
-import cn.cjp.utils.StringUtil;
+import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -99,7 +99,7 @@ public class SimpleProcessor implements PageProcessor {
             final Attr       parentAttr = parseRule.getParentAttr();
             final int        isList     = parseRule.getIsList();
 
-            Assert.assertNotNull(attrs);
+            Assert.notNull(attrs);
 
             Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
             root = denosingBefore(root, parseRule);
@@ -129,7 +129,7 @@ public class SimpleProcessor implements PageProcessor {
 
     private void setDefaultValue(Page page, SiteModel siteModel, JSONObject json) {
         json.put(SpiderConst.KEY_REFER_URL, page.getUrl().get());
-        if (StringUtil.isEmpty(siteModel.getDb())) {
+        if (StringUtils.isEmpty(siteModel.getDb())) {
             json.put(SpiderConst.KEY_DB_NAME, siteModel.getSiteName());
         } else {
             json.put(SpiderConst.KEY_DB_NAME, siteModel.getDb());
@@ -277,12 +277,12 @@ public class SimpleProcessor implements PageProcessor {
         if (attr.isHasMultiValue()) {
             if (attr.getFilterRepeat() == 1) {
                 // 去重（还要保证顺序不变）
-                List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s))
+                List<String> values = selectable.all().stream().filter(s -> !StringUtils.isEmpty(s))
                     .collect(Collectors.toList());
                 // json.put(attr.getField(), values);
                 result = values;
             } else {
-                List<String> values = selectable.all().stream().filter(s -> !StringUtil.isEmpty(s))
+                List<String> values = selectable.all().stream().filter(s -> !StringUtils.isEmpty(s))
                     .collect(Collectors.toList());
                 // json.put(attr.getField(), values);
                 result = values;
