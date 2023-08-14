@@ -8,7 +8,6 @@ import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.Attr;
-import cn.cjp.spider.core.model.Cookie;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import cn.cjp.spider.core.model.SiteModel;
@@ -22,15 +21,15 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
+import us.codecraft.webmagic.selector.Json;
 import us.codecraft.webmagic.selector.PlainText;
 import us.codecraft.webmagic.selector.Selectable;
 
@@ -48,10 +47,9 @@ import us.codecraft.webmagic.selector.Selectable;
  * @author sucre
  */
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SimpleProcessor implements PageProcessor {
 
-    Site site = Site.me().setUserAgent(UserAgents.get()).setRetryTimes(3).setSleepTime(3000);
+    private Site site;
 
     private final SiteModel siteModel;
 
@@ -74,11 +72,11 @@ public class SimpleProcessor implements PageProcessor {
         site.addHeader("User-Agent", UserAgents.get());
         site.setDomain(siteModel.getSiteName());
 
-        Optional.ofNullable(this.siteModel.getCookies()).ifPresent(cookies -> {
-            for (Cookie cookie : cookies) {
-                this.site.addCookie(cookie.getName(), cookie.getValue());
-            }
-        });
+        // FIXME site.addCookie 不能用？暂时用addHeader代替
+        Optional<String> cookieStrOpt = Optional.ofNullable(this.siteModel.getCookieStr());
+        if (cookieStrOpt.isPresent()) {
+            site.addHeader("Cookie", this.siteModel.getCookieStr());
+        }
 
     }
 
@@ -357,7 +355,12 @@ public class SimpleProcessor implements PageProcessor {
                         break;
                     }
                     case JSON: {
-                        value = dom.jsonPath(attr.getParserPath());
+                        // webmagic自带的Selector，解析json后的数据会变成PlainText，所以下次使用的时候还需要转换为Json
+                        var t = dom;
+                        if (PlainText.class.equals(t.getClass())) {
+                            t = new Json(t.get());
+                        }
+                        value = t.jsonPath(attr.getParserPath());
                         break;
                     }
                     case REGEX: {

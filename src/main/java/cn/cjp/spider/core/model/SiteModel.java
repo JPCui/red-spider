@@ -26,6 +26,7 @@ public class SiteModel {
 
     private boolean isRecycle = false;
 
+    private String cookieStr;
     private List<Cookie> cookies;
 
     @NotNull
