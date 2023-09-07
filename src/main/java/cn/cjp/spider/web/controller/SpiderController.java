@@ -3,6 +3,7 @@ package cn.cjp.spider.web.controller;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.dto.ProcessorProperties;
 import cn.cjp.spider.dto.request.SpiderRequest.ConfigRequest;
+import cn.cjp.spider.dto.request.SpiderRequest.RestartRequest;
 import cn.cjp.spider.dto.request.SpiderRequest.RunRequest;
 import cn.cjp.spider.dto.request.SpiderRequest.StartRequest;
 import cn.cjp.spider.dto.request.SpiderRequest.StopRequest;
@@ -70,6 +71,13 @@ public class SpiderController {
     @PostMapping("/stop")
     public Response stop(@RequestBody StopRequest stopRequest) {
         spiderManager.stop(stopRequest.getSiteName());
+        return Response.success();
+    }
+
+    @PostMapping("/restart")
+    public Response restart(@RequestBody RestartRequest restartRequest) {
+        spiderManager.stop(restartRequest.getSiteName());
+        spiderManager.start(restartRequest.getSiteName());
         return Response.success();
     }
 

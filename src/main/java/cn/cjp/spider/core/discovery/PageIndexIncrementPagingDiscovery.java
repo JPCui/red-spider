@@ -1,23 +1,20 @@
 package cn.cjp.spider.core.discovery;
 
+import cn.cjp.spider.core.enums.SeedDiscoveryType;
+import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import cn.cjp.spider.core.enums.SeedDiscoveryType;
-import cn.cjp.spider.core.model.SeedDiscoveryRule;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 
 /**
- * 通常类似json接口的格式，在url里匹配页码的部分
+ * 当前url的页码+1
  *
  * @author sucre
- *
- * FIXME 完善注释
  */
-public class PageNumOnUrlPagingDiscovery implements Discovery {
+public class PageIndexIncrementPagingDiscovery implements Discovery {
 
     @Override
     public void discover(Page page, SeedDiscoveryRule discovery) {
@@ -46,7 +43,7 @@ public class PageNumOnUrlPagingDiscovery implements Discovery {
 
     @Override
     public SeedDiscoveryType getDiscoveryType() {
-        return SeedDiscoveryType.JSON_NORMAL_PAGING;
+        return SeedDiscoveryType.PAGE_INDEX_INCREMENT;
     }
 
 }

@@ -7,7 +7,7 @@ import us.codecraft.webmagic.Page;
 public interface Discovery {
 
     public void discover(Page page, SeedDiscoveryRule discovery);
-    
+
     public SeedDiscoveryType getDiscoveryType();
 
 }

@@ -1,17 +1,18 @@
 package cn.cjp.spider.core.pipeline;
 
-import com.alibaba.fastjson.JSON;
-import lombok.extern.slf4j.Slf4j;
+import com.alibaba.fastjson.JSONObject;
+import java.util.List;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
-@Slf4j
-public class SimplePipeline implements Pipeline {
+public class EmailPipeline implements Pipeline {
 
     @Override
     public void process(ResultItems resultItems, Task task) {
-        log.info(JSON.toJSONString(resultItems));
-    }
+        List<JSONObject> jsons = resultItems.get("jsons");
 
+        jsons.forEach(System.out::println);
+
+    }
 }

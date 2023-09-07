@@ -14,7 +14,6 @@ public enum SeedDiscoveryType {
      * 尝试所有方法
      */
     COMMON(0, "通用"),
-    NESTED(1, "嵌套"),
 
     /**
      * 在所有 a 标签中找出匹配的链接
@@ -24,11 +23,11 @@ public enum SeedDiscoveryType {
     HTML_NORMAL_PAGING(10, "HTML_NORMAL_PAGING"),
 
     /**
-     * 在json接口上，获取分页字段，在原基础上+1
+     * 当前url页码+1
      *
      * 比如：匹配出当前url的页码，http://xx.com/xx.json?page=9，那么下一页则是 10
      */
-    JSON_NORMAL_PAGING(20, "JSON_NORMAL_PAGING"),
+    PAGE_INDEX_INCREMENT(20, "PAGE_INDEX_INCREMENT"),
 
     /**
      * 使用正则表达式
@@ -45,7 +44,7 @@ public enum SeedDiscoveryType {
      * </pre>
      * 那么就会将当前页面抓取的id，替换到pattern的{id}中，形成下次要抓取的url
      */
-    REGEX_AND_FIELD(40, "REGEX_AND_FIELD"),
+    URL_TEMPLATE(40, "URL_TEMPLATE"),
 
     ;
 

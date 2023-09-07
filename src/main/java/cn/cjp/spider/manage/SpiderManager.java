@@ -3,12 +3,12 @@ package cn.cjp.spider.manage;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
+import cn.cjp.spider.core.pipeline.SimplePipeline;
 import cn.cjp.spider.core.processor.html.SimpleProcessor;
-import cn.cjp.spider.core.scheduler.MyRedisScheduler;
-import cn.cjp.spider.core.spider.AbstractSpider;
-import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
+import cn.cjp.spider.core.spider.listener.DefaultMonitorListener;
 import cn.cjp.spider.dto.ProcessorProperties;
 import cn.cjp.spider.exception.ServiceException;
+import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,11 +44,6 @@ public class SpiderManager {
      * 正在运行的循环任务spider
      */
     final Map<String, Spider> runningRecycleSpiders = new HashMap<>();
-
-    /**
-     * TODO remove it；现状：所有task都共用同样的pipeline，改为：每个model都可以自定义pipeline；
-     */
-    final List<Pipeline> pipelines;
 
     final Scheduler scheduler;
 
@@ -157,7 +152,16 @@ public class SpiderManager {
     }
 
     private Spider buildSpider(SiteModel siteModel, ProcessorProperties props) {
-        return this.buildSpider(siteModel, props, true);
+        return this.buildSpider(siteModel, props, false);
+    }
+
+    /**
+     * 根据配置构造所需pipeline
+     */
+    private List<Pipeline> buildPipeline(SiteModel siteModel) {
+        return Lists.newArrayList(
+            new SimplePipeline()
+        );
     }
 
     private Spider buildSpider(SiteModel siteModel, ProcessorProperties props, boolean onceOnly) {
@@ -173,11 +177,15 @@ public class SpiderManager {
         site.setRetryTimes(props.getRetryTimes()); // 重试 10次
         site.setTimeOut(props.getTimeout()); // 超时时间 30s
 
-        AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
-        pipelines.forEach(spider::addPipeline);
+        Spider spider = new Spider(simpleProcessor);
+//        AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
+        buildPipeline(siteModel).forEach(spider::addPipeline);
         spider.addUrl(siteModel.getUrl()).thread(executorService, props.getThreadNum());
         // 重复执行的任务（比如抓取评论），需要在抓取完毕时，结束本次抓取，开启新的抓取任务
         spider.setExitWhenComplete(siteModel.isRecycle());
+
+        //
+        DefaultMonitorListener.regist(spider);
 
         return spider;
     }

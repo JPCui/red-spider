@@ -7,25 +7,6 @@
     "cookieStr": "buvid3=C8222003-8A1D-C543-823B-244D427B1DE172523infoc; b_nut=1688532072; _uuid=51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; CURRENT_FNVAL=4048; rpdid=|(kYkY)klkJu0J'uY))lJkukR; hit-dyn-v2=1; hit-new-style-dyn=1; SESSDATA=4fdf2bf8%2C1705990344%2Cad194%2A72BbUPZhO5toXGIxrmy4ZMTUwkCBFh1DhVhxX3H8zOGb9Cl5W9bvLBX7T3Iwe0Syq-A-Z8QAAAOgA; bili_jct=6852fa6f078fe044685484aa44245119; sid=5rzolbnl; b_lsid=F864A6DE_189AAD3AF35",
     "isRecycle": true,
     "seedDiscoveries": [
-        {
-            "//ref": "根据[ref]指向的解析结果来生成种子",
-            "ref": [
-                "bilibili_dynamic"
-            ],
-            "//type": "评论类型；参考：https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/comment/readme.md#%E8%AF%84%E8%AE%BA%E5%8C%BA%E7%B1%BB%E5%9E%8B%E4%BB%A3%E7%A0%81",
-            "url": "https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid={id}&mode=2&plat=1",
-            "type": 40
-        },
-        {
-            "//url": "评论回复；oid: 动态ID；root：评论ID；",
-            "url": "https://api.bilibili.com/x/v2/reply/reply?oid={oid}&pn=(.*)&ps=10&root={root}&type=17&_=%s",
-            "type": 1,
-            "//nested": "先获取下一页；再替换变量",
-            "nested": [
-                20,
-                40
-            ]
-        }
     ],
     "//parseRules": "指定爬取规则",
     "parseRules": [

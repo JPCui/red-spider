@@ -48,6 +48,11 @@ public class SiteModel {
 
     private int isList;
 
+    /**
+     * 跳过存储
+     *
+     * @deprecated 没有必要了，通过配置pipeline来决定是否存储以及存储方式
+     */
     private int skip = 1;
 
     private boolean autoStartup = false;

@@ -2,7 +2,6 @@ package cn.cjp.spider.core.processor.html;
 
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.config.SpiderConst;
-import cn.cjp.spider.core.discovery.Discovery;
 import cn.cjp.spider.core.discovery.DiscoveryFactory;
 import cn.cjp.spider.core.enums.DenoisingType;
 import cn.cjp.spider.core.enums.ParserType;
@@ -53,7 +52,7 @@ public class SimpleProcessor implements PageProcessor {
 
     private final SiteModel siteModel;
 
-    private Discovery discovery;
+    private final DiscoveryFactory discoveryFactory = new DiscoveryFactory();
 
     /**
      * 声明该处理器是一次性的，不会进行URL发现
@@ -62,7 +61,6 @@ public class SimpleProcessor implements PageProcessor {
     private boolean onceOnly;
 
     public SimpleProcessor(SiteModel siteModel) {
-        discovery = new DiscoveryFactory();
         this.siteModel = siteModel;
         this.site = Site.me()
             .setUserAgent(UserAgents.get())
@@ -99,7 +97,9 @@ public class SimpleProcessor implements PageProcessor {
 
             Assert.notNull(attrs);
 
-            Selectable root = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
+            // 是否提取到有效内容，true：1.列表为空；2.异常情况;
+            boolean    findNothing = false;
+            Selectable root        = this.parse(page, ParserType.fromValue(parentAttr.getParserType()));
             root = denosingBefore(root, parseRule);
             if (isList == 1) {
                 List<Selectable> domList = this.parse(page, root, parentAttr).nodes();
@@ -109,6 +109,8 @@ public class SimpleProcessor implements PageProcessor {
                 });
 
                 page.putField("jsons", jsons);
+
+                findNothing = jsons.isEmpty();
             } else {
                 Selectable dom  = this.parse(page, root, parentAttr);
                 JSONObject json = this.parseNode(page, dom, attrs);
@@ -117,12 +119,15 @@ public class SimpleProcessor implements PageProcessor {
                 page.putField("json", json);
             }
 
-            if (siteModel.getSkip() == 1) {
+            if (siteModel.getSkip() == 1 || findNothing) {
                 page.setSkip(true);
+            }
+
+            if (!findNothing) {
+                this.findSeeds(page);
             }
         });
 
-        this.findSeeds(page);
     }
 
     private void setDefaultValue(Page page, SiteModel siteModel, JSONObject json) {
@@ -144,7 +149,7 @@ public class SimpleProcessor implements PageProcessor {
         final List<SeedDiscoveryRule> seedDiscoveries = siteModel.getSeedDiscoveries();
         if (seedDiscoveries != null) {
             seedDiscoveries.forEach(seedDiscovery -> {
-                discovery.discover(page, seedDiscovery);
+                discoveryFactory.discover(page, seedDiscovery);
             });
         }
     }

@@ -1,10 +1,10 @@
 package cn.cjp.spider.core.discovery;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import cn.cjp.spider.core.enums.SeedDiscoveryType;
 import cn.cjp.spider.core.model.SeedDiscoveryRule;
+import com.google.common.collect.Lists;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import us.codecraft.webmagic.Page;
 
 /**
@@ -13,21 +13,19 @@ import us.codecraft.webmagic.Page;
  * 从所有discovery中查找相应的解析方法
  *
  * @author sucre
- *
  */
+@RequiredArgsConstructor
 public class DiscoveryFactory implements Discovery {
 
-    public static final Set<Discovery> discoveries = new HashSet<Discovery>() {
-        private static final long serialVersionUID = 2863967778498649876L;
-        {
-            add(new MatchAHrefInHtmlPagingDiscovery());
-            add(new PageNumOnUrlPagingDiscovery());
-        }
-    };
+    private final List<Discovery> discoveries = Lists.newArrayList(
+        new MatchAHrefInHtmlPagingDiscovery(),
+        new PageIndexIncrementPagingDiscovery(),
+        new UrlTemplateDiscovery()
+    );
 
     @Override
     public void discover(Page page, SeedDiscoveryRule discovery) {
-        int type = discovery.getType();
+        int               type          = discovery.getType();
         SeedDiscoveryType discoveryType = SeedDiscoveryType.fromValue(type);
 
         // 用合适的Discovery解析子页面

@@ -37,7 +37,7 @@
 
     <!-- 分环境日志配置 -->
     <springProfile name="dev">
-        <root level="debug">
+        <root level="INFO">
             <appender-ref ref="stdOutAppender"/>
         </root>
     </springProfile>

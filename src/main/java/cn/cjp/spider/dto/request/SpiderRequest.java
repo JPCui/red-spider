@@ -50,6 +50,15 @@ public class SpiderRequest {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     @Getter
     @Setter
+    public static class RestartRequest {
+
+        @NotEmpty
+        String siteName;
+    }
+
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @Getter
+    @Setter
     public static class RunRequest {
 
         @NotEmpty
