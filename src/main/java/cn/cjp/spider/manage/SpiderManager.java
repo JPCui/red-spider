@@ -9,11 +9,7 @@ import cn.cjp.spider.core.spider.listener.DefaultMonitorListener;
 import cn.cjp.spider.dto.ProcessorProperties;
 import cn.cjp.spider.exception.ServiceException;
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,27 +33,21 @@ public class SpiderManager {
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    static String DEFAULT_RECYCLE_CRON = "0 0 0/1 * * ";
+
     final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    final Map<String, Spider> runningSpiders        = new HashMap<>();
-    /**
-     * 正在运行的循环任务spider
-     */
-    final Map<String, Spider> runningRecycleSpiders = new HashMap<>();
+    final SpiderMonitor monitor;
 
     final Scheduler scheduler;
 
     final SiteManager siteManager;
 
-    public Collection<String> runningList() {
-        return Collections.unmodifiableCollection(runningSpiders.keySet());
-    }
-
     public void startAll() {
         ProcessorProperties props = new ProcessorProperties();
 
         SpiderConfig.PAGE_RULES.forEach((siteName, siteModel) -> {
-            if (!_isRunning(siteModel)) {
+            if (!monitor.isRunning(siteModel)) {
                 start(siteName);
                 log.info(String.format("spider[%s] start.", siteName));
             }
@@ -66,48 +56,35 @@ public class SpiderManager {
     }
 
     public void start(String siteName) {
+        SiteModel siteModel = SpiderConfig.PAGE_RULES.get(siteName);
+        siteModel.setStarted(true);
         try {
             this.lock.writeLock().lock();
-            SiteModel siteModel = SpiderConfig.PAGE_RULES.get(siteName);
-            if (!_isRunning(siteModel)) {
+            if (!monitor.isRunning(siteModel)) {
                 Spider spider = initProcessor(siteModel, new ProcessorProperties());
-                _push(siteModel, spider);
+                monitor.push(siteModel, spider);
                 spider.start();
-                log.info(String.format("spider[%s] start.", siteName));
+                log.info(String.format("spider[%s] start.", siteModel.getSiteName()));
             }
         } finally {
             this.lock.writeLock().unlock();
         }
     }
 
-    private boolean _isRunning(SiteModel siteModel) {
-        return this.runningSpiders.containsKey(siteModel.getSiteName());
-    }
-
-    private void _push(SiteModel siteModel, Spider spider) {
-        runningSpiders.put(siteModel.getSiteName(), spider);
-        if (siteModel.isRecycle()) {
-            runningRecycleSpiders.put(siteModel.getSiteName(), spider);
-        }
-    }
-
-    private Spider _pop(SiteModel siteModel) {
-        String siteName      = siteModel.getSiteName();
-        Spider spider        = runningSpiders.remove(siteName);
-        Spider recycleSpider = runningRecycleSpiders.remove(siteName);
-
-        return spider == null ? recycleSpider : spider;
-    }
-
     public void stop(String siteName) {
         try {
             this.lock.writeLock().lock();
             SiteModel siteModel = SpiderConfig.PAGE_RULES.get(siteName);
-            Optional.ofNullable(_pop(siteModel)).ifPresent(Spider::stop);
+            siteModel.setStarted(false);
+            Optional.ofNullable(monitor.pop(siteModel)).ifPresent(Spider::stop);
             log.info(String.format("spider[%s] stop.", siteName));
         } finally {
             this.lock.writeLock().unlock();
         }
+    }
+
+    private SiteModel getSiteModel(String siteName) {
+        return SpiderConfig.PAGE_RULES.get(siteName);
     }
 
     /**
@@ -116,8 +93,9 @@ public class SpiderManager {
      * TODO 2 当前修改配置是临时保存在内存里，需要切换为数据库操作
      */
     public void config(String siteName, ProcessorProperties props) {
-        if (runningSpiders.containsKey(siteName)) {
-            Spider spider = runningSpiders.get(siteName);
+        SiteModel siteModel = getSiteModel(siteName);
+        if (monitor.isRunning(siteModel)) {
+            Spider spider = monitor.get(siteModel);
             Site   site   = spider.getSite();
             site.setSleepTime(props.getSleepTime()); // 每次抓取完畢，休息
             site.setRetrySleepTime(props.getRetrySleepTime()); // 重试休息时间：30s
@@ -189,6 +167,5 @@ public class SpiderManager {
 
         return spider;
     }
-
 
 }

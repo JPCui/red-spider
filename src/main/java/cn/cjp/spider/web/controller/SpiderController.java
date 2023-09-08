@@ -9,8 +9,12 @@ import cn.cjp.spider.dto.request.SpiderRequest.StartRequest;
 import cn.cjp.spider.dto.request.SpiderRequest.StopRequest;
 import cn.cjp.spider.dto.response.Response;
 import cn.cjp.spider.manage.SpiderManager;
+import cn.cjp.spider.manage.SpiderMonitor;
 import com.alibaba.fastjson.JSONObject;
 import java.util.Collection;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,17 +25,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/spider")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class SpiderController {
 
     @Autowired
-    SpiderManager spiderManager;
+    final SpiderManager spiderManager;
+
+    @Autowired
+    final SpiderMonitor spiderMonitor;
 
     @GetMapping("/all")
     public Response all() {
-        Collection<String> runningSpiders = spiderManager.runningList();
+        Collection<String> runningSpiders = spiderMonitor.runningList();
 
         JSONObject json = new JSONObject();
-        SpiderConfig.PAGE_RULES.keySet().stream().forEach(siteName -> {
+        SpiderConfig.PAGE_RULES.keySet().forEach(siteName -> {
             if (runningSpiders.contains(siteName)) {
                 json.put(siteName, 1);
             } else {

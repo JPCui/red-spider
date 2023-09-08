@@ -18,7 +18,6 @@ public class SpiderManagerTest {
 
     @Test
     public void runningList() {
-        log.debug(spiderManager.runningList().toString());
     }
 
     @Test
