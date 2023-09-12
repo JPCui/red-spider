@@ -1,11 +1,9 @@
 package cn.cjp.spider.core.model;
 
-import cn.cjp.spider.core.pipeline.AbstractPipeline;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -40,7 +38,7 @@ public class SiteModel {
      * 初始种子
      */
     @NotNull
-    private String url;
+    private List<String> originUrls;
 
     @NotNull
     private String urlPattern;

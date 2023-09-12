@@ -32,7 +32,7 @@ public class RecycleSpiderService {
                 Spider spider = spiderMonitor.get(siteModel);
                 if (spider != null) {
                     ((MyRedisScheduler) scheduler).clearAllQueue(spider);
-                    spider.addUrl(siteModel.getUrl());
+                    spider.addUrl(siteModel.getOriginUrls().toArray(new String[0]));
                     log.info(spider.getUUID() + " clear");
                 }
             }

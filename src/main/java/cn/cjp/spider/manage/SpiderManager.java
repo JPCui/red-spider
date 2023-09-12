@@ -164,7 +164,7 @@ public class SpiderManager {
 //        Spider spider = new Spider(simpleProcessor);
         AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
         buildPipeline(siteModel).forEach(spider::addPipeline);
-        spider.addUrl(siteModel.getUrl()).thread(executorService, props.getThreadNum());
+        spider.addUrl(siteModel.getOriginUrls().toArray(new String[0])).thread(executorService, props.getThreadNum());
         // 重复执行的任务（比如抓取评论），需要在抓取完毕时，结束本次抓取，开启新的抓取任务
 //        spider.setExitWhenComplete(siteModel.isRecycle());
         spider.setExitWhenComplete(false);

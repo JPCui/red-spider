@@ -1,6 +1,6 @@
 {
     "siteName" : "站点名称",
-    "url" : "爬取的页面URL",
+    "originUrls" : "爬取的页面URL",
     // 待爬取的URL正则表达式
     "findSeedPattern" : "",
     // URL规则，别的线程爬取到的URL符合该规则，则由当前规则解析

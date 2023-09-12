@@ -1,6 +1,6 @@
 {
     "siteName" : "xicidaili.com",
-    "url" : "http://www.xicidaili.com/nn",
+    "originUrls" : ["http://www.xicidaili.com/nn"],
     "findSeedPattern" : "http://www.xicidaili.com/nn/(.*)",
     // 列表页中，用于定位列表DOM
     "parentAttr" : {

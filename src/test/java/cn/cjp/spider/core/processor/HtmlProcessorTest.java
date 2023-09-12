@@ -1,13 +1,13 @@
 package cn.cjp.spider.core.processor;
 
 import cn.cjp.spider.core.config.SpiderConfig;
-import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.core.pipeline.FilePipeline;
 import cn.cjp.spider.core.pipeline.mongo.JsonPipeline;
 import cn.cjp.spider.core.processor.html.SimpleProcessor;
 import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
+import com.google.common.collect.Lists;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Map;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import redis.clients.jedis.JedisPool;
-import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
@@ -45,7 +44,7 @@ public class HtmlProcessorTest {
         try {
             MyRedisSchedulerSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
             spider.setScheduler(scheduler).addPipeline(getJsonPipeline()).addPipeline(new FilePipeline("~/tmp/spider/"))
-                .addUrl(siteModel.getUrl()).thread(executorService, threadNum);
+                .addUrl(siteModel.getOriginUrls().toArray(new String[0])).thread(executorService, threadNum);
             // 结束不自动关闭，默认 true
             spider.setExitWhenComplete(false);
             spider.run();
@@ -74,7 +73,7 @@ public class HtmlProcessorTest {
 
         SiteModel siteModel = SpiderConfig.PAGE_RULES.get("douban.movie");
         siteModel.setSeedDiscoveries(Collections.emptyList());
-        siteModel.setUrl("https://movie.douban.com/subject/27624661/");
+        siteModel.setOriginUrls(Lists.newArrayList("https://movie.douban.com/subject/27624661/"));
         HtmlProcessorTest test = new HtmlProcessorTest();
         test.scheduler = new QueueScheduler();
         test.runSpider(siteModel);

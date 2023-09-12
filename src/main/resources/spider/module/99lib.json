@@ -2,7 +2,7 @@
   "version": "2019-03-01",
   "siteName": "99lib.net",
   "description": "爬取列表",
-  "url": "http://www.99lib.net/book/index.php?page=576",
+  "originUrls": ["http://www.99lib.net/book/index.php?page=576"],
   "domain": "99lib.net",
   "seedDiscoveries": [
     {
