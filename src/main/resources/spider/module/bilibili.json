@@ -4,13 +4,25 @@
     "description": "bilibili动态、评论",
     "url": "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=525121722",
     "domain": "bilibili.com",
-    "cookieStr": "buvid3=C8222003-8A1D-C543-823B-244D427B1DE172523infoc; b_nut=1688532072; _uuid=51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; CURRENT_FNVAL=4048; rpdid=|(kYkY)klkJu0J'uY))lJkukR; hit-dyn-v2=1; hit-new-style-dyn=1; SESSDATA=4fdf2bf8%2C1705990344%2Cad194%2A72BbUPZhO5toXGIxrmy4ZMTUwkCBFh1DhVhxX3H8zOGb9Cl5W9bvLBX7T3Iwe0Syq-A-Z8QAAAOgA; bili_jct=6852fa6f078fe044685484aa44245119; sid=5rzolbnl; b_lsid=F864A6DE_189AAD3AF35",
+    "cookieStr": "buvid3=C8222003-8A1D-C543-823B-244D427B1DE172523infoc; b_nut=1688532072; _uuid=51433B68-A2F4-43910-86C7-1010C768FDC61273429infoc; buvid_fp=4a0e58ccf35b89468fe0862d5199b976; buvid4=E58D58DB-1E3D-F9BF-E48F-C7F86AEBFF5100378-022012714-Qq6NpevE95yb%2FImr47FGLQ%3D%3D; DedeUserID=96918058; DedeUserID__ckMd5=d13f881e25b6ce9e; rpdid=|(kYkY)klkJu0J'uY))lJkukR; hit-dyn-v2=1; hit-new-style-dyn=1; innersign=0; b_lsid=D9655D32_18A5DFF3681; header_theme_version=CLOSE; home_feed_column=5; browser_resolution=1440-796; bp_video_offset_96918058=837322896782131202; SESSDATA=2ee8fbb0%2C1709346126%2Cd479e%2A92KL7jrS1Q2nfHUKG6xZDdZVY8Lh5topJnBtOw4DArjU5JeSFHxtvokXZdDs_MHmJfnhTpAgAAOgA; bili_jct=3fdfd64cbab4bed0f135acbb15d81459; CURRENT_FNVAL=16; sid=g2xpmfnd",
     "isRecycle": true,
+    "recycleCron": "0 0/3 * * * ",
     "seedDiscoveries": [
     ],
     "//parseRules": "指定爬取规则",
     "parseRules": [
         "bilibili_dynamic"
+    ],
+    "pipelines": [
+        {
+            "id": "pipeline_email_1",
+            "params": {
+                "@type": "email",
+                "to": ["624498030@qq.com"],
+                "title": "$up_name + ': ' + $module.title",
+                "content": "$up_name + ': ' + $module.title"
+            }
+        }
     ],
     "//skip": "是否跳过存储",
     "skip": 0,

@@ -1,5 +1,5 @@
 {
-    "pipelineId": "pipeline_email_1",
+    "id": "pipeline_email_1",
     "host": "smtp.qq.com",
     "port": 587,
     "auth": true,

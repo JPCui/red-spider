@@ -1,16 +1,17 @@
 {
+    "//": "b站规则太麻烦了，暂不抓评论了，弃了！！！",
     "type_x": "bilibili动态",
     "type": "parser",
     "ruleName_x": "规则名称",
-    "ruleName": "bilibili_dynamic",
+    "ruleName": "bilibili_reply_main",
     "urlPattern_x": "判断url是否使用当前配置的规则来解析",
-    "urlPattern": "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space.*",
+    "urlPattern": "https://api.bilibili.com/x/v2/reply/main\\?.*",
     "examples": [
         "https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid=814399531036704769&mode=2&plat=1"
     ],
     "//parentAttr": "用于：1. 区别文档类型；2. 缩小范围",
     "parentAttr": {
-        "parserType": 10,
+        "parserType": 11,
         "parserPath": ".data.replies"
     },
     "//attrs": "属性列表",
@@ -54,25 +55,15 @@
     "seedDiscoveries": [
         {
             "//": "当前页码+1",
-            "urlTemplate": "https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid={dynamic_id}&mode=2&plat=1",
+            "urlTemplate": "https://api.bilibili.com/x/v2/reply/main?next=0&type=17&oid={dynamic_id}&mode=3&plat=1",
             "type": 40
         },
         {
             "//": "获取第一页的评论回复；",
             "//dynamic_id": "动态ID；",
             "//root": "评论ID；",
-            "urlTemplate": "https://api.bilibili.com/x/v2/reply/reply?oid={dynamic_id}&pn=(.*)&ps=10&root={root}&type=17&_=%s",
+            "urlTemplate": "https://api.bilibili.com/x/v2/reply/reply?oid={dynamic_id}&pn=(.*)&ps=10&root={rpid}&type=17&_=%s",
             "type": 40
-        }
-    ],
-    "pipelines": [
-        {
-            "pipelineId": "pipeline_email_1",
-            "params": {
-                "to": ["624498030@qq.com"],
-                "title": "$up_name + ': ' + $module.title",
-                "content": "$up_name + ': ' + $module.title"
-            }
         }
     ],
     "isList_x": "是否是列表页",

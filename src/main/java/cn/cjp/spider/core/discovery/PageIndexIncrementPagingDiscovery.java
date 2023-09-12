@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 
@@ -14,6 +15,7 @@ import us.codecraft.webmagic.Page;
  *
  * @author sucre
  */
+@Slf4j
 public class PageIndexIncrementPagingDiscovery implements Discovery {
 
     @Override
@@ -38,6 +40,7 @@ public class PageIndexIncrementPagingDiscovery implements Discovery {
             }
         }
 
+        log.info(String.format("found new urls : ", foundUrlList));
         page.addTargetRequests(foundUrlList);
     }
 

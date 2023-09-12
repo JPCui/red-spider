@@ -34,12 +34,12 @@ public class XicidailiProcessor implements PageProcessor {
 
         if (isList == 1) {
             List<Selectable> domList = this
-                    .parse(this.parse(page, ParserType.fromValue(parentAttr.getParserType())), parentAttr).nodes();
+                .parse(this.parse(page, ParserType.fromValue(parentAttr.getParserType())), parentAttr).nodes();
             List<JSONObject> jsons = this.parseNodes(domList, attrs);
 
             page.putField("jsons", jsons);
         } else {
-            Selectable dom = this.parse(this.parse(page, ParserType.fromValue(parentAttr.getParserType())), parentAttr);
+            Selectable dom  = this.parse(this.parse(page, ParserType.fromValue(parentAttr.getParserType())), parentAttr);
             JSONObject json = this.parseNode(dom, attrs);
 
             page.putField("json", json);
@@ -60,9 +60,7 @@ public class XicidailiProcessor implements PageProcessor {
     }
 
     /**
-     * 
-     * @param attrs
-     * @return
+     *
      */
     public JSONObject parseNode(Selectable dom, List<Attr> attrs) {
         JSONObject json = new JSONObject();
@@ -75,34 +73,31 @@ public class XicidailiProcessor implements PageProcessor {
 
     /**
      * 解析Page -> Selectable (Html / Json)
-     * 
-     * @param dom
-     * @param attr
-     * @return
      */
     private Selectable parse(Page page, ParserType parserType) {
         Selectable value = null;
 
         if (parserType != null) {
             switch (parserType) {
-            case XPATH: {
-                value = page.getHtml();
-                break;
-            }
-            case DOM: {
-                value = page.getHtml();
-                break;
-            }
-            case JSON: {
-                value = page.getJson();
-                break;
-            }
-            case REGEX: {
-                value = page.getHtml();
-                break;
-            }
-            default:
-                throw new UnsupportedOperationException();
+                case XPATH: {
+                    value = page.getHtml();
+                    break;
+                }
+                case DOM: {
+                    value = page.getHtml();
+                    break;
+                }
+                case JSON:
+                case JSON_ARRAY: {
+                    value = page.getJson();
+                    break;
+                }
+                case REGEX: {
+                    value = page.getHtml();
+                    break;
+                }
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
         return value;
@@ -114,24 +109,25 @@ public class XicidailiProcessor implements PageProcessor {
         ParserType parserType = ParserType.fromValue(attr.getParserType());
         if (parserType != null) {
             switch (parserType) {
-            case XPATH: {
-                value = dom.xpath(attr.getParserPath());
-                break;
-            }
-            case DOM: {
-                value = dom.css(attr.getParserPath(), "text");
-                break;
-            }
-            case JSON: {
-                value = dom.jsonPath(attr.getParserPath());
-                break;
-            }
-            case REGEX: {
-                value = dom.regex(attr.getParserPath());
-                break;
-            }
-            default:
-                throw new UnsupportedOperationException();
+                case XPATH: {
+                    value = dom.xpath(attr.getParserPath());
+                    break;
+                }
+                case DOM: {
+                    value = dom.css(attr.getParserPath(), "text");
+                    break;
+                }
+                case JSON:
+                case JSON_ARRAY: {
+                    value = dom.jsonPath(attr.getParserPath());
+                    break;
+                }
+                case REGEX: {
+                    value = dom.regex(attr.getParserPath());
+                    break;
+                }
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
         return value;

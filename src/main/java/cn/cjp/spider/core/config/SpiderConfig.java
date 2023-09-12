@@ -25,6 +25,9 @@ public class SpiderConfig {
      */
     public static final String PARSE_RULE_FILE_SUFFIX = ".parse.json";
 
+    /**
+     * @deprecated 转到数据库中
+     */
     public static final Map<String, SiteModel> PAGE_RULES = new HashMap<>();
 
     public static final Map<String, ParseRuleModel> PARSE_RULES = new HashMap<>();

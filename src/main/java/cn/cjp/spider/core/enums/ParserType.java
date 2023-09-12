@@ -10,67 +10,64 @@ import java.util.List;
  */
 public enum ParserType {
 
-	BASE(0, "BASE"),
+    BASE(0, "BASE"),
 
-	JSON(10, "JSON"),
+    JSON(10, "JSON"),
+    JSON_ARRAY(11, "JSON_ARRAY"),
 
-	DOM(20, "CSS"),
+    DOM(20, "CSS"),
 
-	REGEX(30, "REGEX"),
+    REGEX(30, "REGEX"),
 
-	XPATH(40, "XPATH"),
+    XPATH(40, "XPATH"),
 
-	/**
-	 * 从URL中提取<br>
-	 * url = http://abc.com?page=100<br>
-	 * pattern = http://abc.com?page=(.*)<br>
-	 * 指定parserPath 即 group = 1<br>
-	 * => 100<br>
-	 */
-	URL_PATTERN(50, "URL_PATTERN"),
+    /**
+     * 从URL中提取<br> url = http://abc.com?page=100<br> pattern = http://abc.com?page=(.*)<br> 指定parserPath 即 group = 1<br> => 100<br>
+     */
+    URL_PATTERN(50, "URL_PATTERN"),
 
-	;
+    ;
 
-	private final int code;
-	private final String message;
+    private final int    code;
+    private final String message;
 
-	public static ParserType fromValue(final int code) {
-		for (ParserType salaryUnit : ParserType.values()) {
-			if (code == salaryUnit.getValue()) {
-				return salaryUnit;
-			}
-		}
+    public static ParserType fromValue(final int code) {
+        for (ParserType salaryUnit : ParserType.values()) {
+            if (code == salaryUnit.getValue()) {
+                return salaryUnit;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public static List<ParserType> fromValues(final Iterable<Integer> codes) {
+    public static List<ParserType> fromValues(final Iterable<Integer> codes) {
 
-		List<ParserType> jobTags = new ArrayList<>();
+        List<ParserType> jobTags = new ArrayList<>();
 
-		for (Integer code : codes) {
+        for (Integer code : codes) {
 
-			final ParserType jobTag = fromValue(code);
+            final ParserType jobTag = fromValue(code);
 
-			if (jobTag != null) {
-				jobTags.add(jobTag);
-			}
-		}
+            if (jobTag != null) {
+                jobTags.add(jobTag);
+            }
+        }
 
-		return jobTags;
-	}
+        return jobTags;
+    }
 
-	ParserType(int code, String message) {
-		this.code = code;
-		this.message = message;
-	}
+    ParserType(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 
-	public int getValue() {
-		return code;
-	}
+    public int getValue() {
+        return code;
+    }
 
-	public String getDescription() {
-		return message;
-	}
+    public String getDescription() {
+        return message;
+    }
 
 }

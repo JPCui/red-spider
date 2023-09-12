@@ -32,7 +32,9 @@ public class ParseRuleModel {
     private int[] denoisingTypes;
 
     @NotNull
-    private List<Attr> attrs;
+    private List<Attr>              attrs;
+    @NotNull
+    private List<SeedDiscoveryRule> seedDiscoveries;
 
     @NotNull
     private Attr parentAttr;

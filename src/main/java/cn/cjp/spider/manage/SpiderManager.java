@@ -3,18 +3,21 @@ package cn.cjp.spider.manage;
 import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.http.UserAgents;
 import cn.cjp.spider.core.model.SiteModel;
-import cn.cjp.spider.core.pipeline.SimplePipeline;
+import cn.cjp.spider.core.pipeline.PipelineFactory;
 import cn.cjp.spider.core.processor.html.SimpleProcessor;
+import cn.cjp.spider.core.scheduler.MyRedisScheduler;
+import cn.cjp.spider.core.spider.AbstractSpider;
+import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.spider.listener.DefaultMonitorListener;
 import cn.cjp.spider.dto.ProcessorProperties;
 import cn.cjp.spider.exception.ServiceException;
-import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.pipeline.Pipeline;
+import us.codecraft.webmagic.proxy.Proxy;
+import us.codecraft.webmagic.proxy.SimpleProxyProvider;
 import us.codecraft.webmagic.scheduler.Scheduler;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -33,8 +39,6 @@ public class SpiderManager {
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    static String DEFAULT_RECYCLE_CRON = "0 0 0/1 * * ";
-
     final ExecutorService executorService = Executors.newCachedThreadPool();
 
     final SpiderMonitor monitor;
@@ -42,6 +46,8 @@ public class SpiderManager {
     final Scheduler scheduler;
 
     final SiteManager siteManager;
+
+    final PipelineFactory pipelineFactory;
 
     public void startAll() {
         ProcessorProperties props = new ProcessorProperties();
@@ -137,9 +143,9 @@ public class SpiderManager {
      * 根据配置构造所需pipeline
      */
     private List<Pipeline> buildPipeline(SiteModel siteModel) {
-        return Lists.newArrayList(
-            new SimplePipeline()
-        );
+        return siteModel.getPipelines().stream()
+            .map(pipelineFactory::get)
+            .collect(Collectors.toList());
     }
 
     private Spider buildSpider(SiteModel siteModel, ProcessorProperties props, boolean onceOnly) {
@@ -155,12 +161,18 @@ public class SpiderManager {
         site.setRetryTimes(props.getRetryTimes()); // 重试 10次
         site.setTimeOut(props.getTimeout()); // 超时时间 30s
 
-        Spider spider = new Spider(simpleProcessor);
-//        AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
+//        Spider spider = new Spider(simpleProcessor);
+        AbstractSpider spider = new MyRedisSchedulerSpider(simpleProcessor, (MyRedisScheduler) scheduler);
         buildPipeline(siteModel).forEach(spider::addPipeline);
         spider.addUrl(siteModel.getUrl()).thread(executorService, props.getThreadNum());
         // 重复执行的任务（比如抓取评论），需要在抓取完毕时，结束本次抓取，开启新的抓取任务
-        spider.setExitWhenComplete(siteModel.isRecycle());
+//        spider.setExitWhenComplete(siteModel.isRecycle());
+        spider.setExitWhenComplete(false);
+
+        // 设置本地代理
+        HttpClientDownloader downloader = new HttpClientDownloader();
+        downloader.setProxyProvider(SimpleProxyProvider.from(new Proxy("127.0.0.1", 7890)));
+        spider.setDownloader(downloader);
 
         //
         DefaultMonitorListener.regist(spider);

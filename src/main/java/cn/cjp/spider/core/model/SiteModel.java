@@ -1,18 +1,23 @@
 package cn.cjp.spider.core.model;
 
+import cn.cjp.spider.core.pipeline.AbstractPipeline;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
-
-import java.util.Map;
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
 /**
  * 目标页爬取规则定义
  *
  * @author sucre
  */
-@Data
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SiteModel {
 
     @NotNull
@@ -25,10 +30,15 @@ public class SiteModel {
     private String db;
 
     private boolean isRecycle = false;
+    @ApiModelProperty("循环cron")
+    private String  recycleCron;
 
-    private String cookieStr;
+    private String       cookieStr;
     private List<Cookie> cookies;
 
+    /**
+     * 初始种子
+     */
     @NotNull
     private String url;
 
@@ -37,6 +47,8 @@ public class SiteModel {
 
     @NotNull
     private List<SeedDiscoveryRule> seedDiscoveries;
+
+    private List<PipelineDomain> pipelines;
 
     /**
      * 为了遵循 webmagic 的设计，同一站点的url队列使用同一个，所以把规则全部定义到一个page model里，由processor觉得该使用哪一个parse rule
@@ -56,5 +68,9 @@ public class SiteModel {
     private int skip = 1;
 
     private boolean autoStartup = false;
+    /**
+     * @deprecated 该字段迁移到domain
+     */
+    private boolean started = false;
 
 }

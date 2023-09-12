@@ -13,6 +13,7 @@ import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.util._99libUtil;
 import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class SimpleProcessor implements PageProcessor {
         try {
             log.info(String.format("parse url: %s", page.getUrl().get()));
             this._process(page);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error(String.format("parse fail, url=%s", page.getUrl().get()), e);
         }
     }
@@ -146,7 +147,18 @@ public class SimpleProcessor implements PageProcessor {
         if (onceOnly) {
             return;
         }
+        String                        currUrl         = page.getRequest().getUrl();
         final List<SeedDiscoveryRule> seedDiscoveries = siteModel.getSeedDiscoveries();
+
+        siteModel.getParseRuleModels().stream().forEach(parseRuleModel -> {
+            if (currUrl.matches(parseRuleModel.getUrlPattern())) {
+                parseRuleModel.getSeedDiscoveries().forEach(seedDiscovery -> {
+                    discoveryFactory.discover(page, seedDiscovery);
+                });
+            }
+        });
+
+        // FIXME 废弃
         if (seedDiscoveries != null) {
             seedDiscoveries.forEach(seedDiscovery -> {
                 discoveryFactory.discover(page, seedDiscovery);
@@ -196,7 +208,7 @@ public class SimpleProcessor implements PageProcessor {
                 }
             } catch (RuntimeException e) {
                 log.error(String.format("parse fail, field=%s, parserPath=%s, dom=%s", attr.getField(),
-                                        attr.getParserPath(), dom.toString()));
+                                        attr.getParserPath(), dom.toString()), e);
                 throw e;
             }
         });
@@ -264,12 +276,16 @@ public class SimpleProcessor implements PageProcessor {
     private Object parseNodeWithEmbeddedAttr(Page page, Selectable selectable, Attr attr) {
         Object result = null;
         if (attr.isHasMultiValue()) {
-            List<Selectable> domList = this.parse(page, selectable, attr).nodes();
+            // FIXME 处理JSON时，发现selectable已经是embed了，所以第一行没必要再使用parse处理，html难道是没问题的？
+//            List<Selectable> domList = this.parse(page, selectable, attr).nodes();
+//            List<JSONObject> jsons   = this.parseNodes(page, domList, attr.getEmbeddedAttrs());
+            List<Selectable> domList = selectable.nodes();
             List<JSONObject> jsons   = this.parseNodes(page, domList, attr.getEmbeddedAttrs());
             result = jsons;
         } else {
-            Selectable dom  = this.parse(page, selectable, attr);
-            JSONObject json = this.parseNode(page, dom, attr.getEmbeddedAttrs());
+//            Selectable dom  = this.parse(page, selectable, attr);
+//            JSONObject json = this.parseNode(page, dom, attr.getEmbeddedAttrs());
+            JSONObject json = this.parseNode(page, selectable, attr.getEmbeddedAttrs());
             result = json;
         }
         return result;
@@ -315,7 +331,8 @@ public class SimpleProcessor implements PageProcessor {
                     value = page.getHtml();
                     break;
                 }
-                case JSON: {
+                case JSON:
+                case JSON_ARRAY: {
                     value = page.getJson();
                     break;
                 }
@@ -368,6 +385,17 @@ public class SimpleProcessor implements PageProcessor {
                         value = t.jsonPath(attr.getParserPath());
                         break;
                     }
+                    case JSON_ARRAY: {
+                        // webmagic自带的Selector，解析json后的数据会变成PlainText，所以下次使用的时候还需要转换为Json
+                        var t = dom;
+                        if (PlainText.class.equals(t.getClass())) {
+                            t = new Json(t.get());
+                        }
+                        value = t.jsonPath(attr.getParserPath());
+                        // webmagic不支持解析JSON数组，我们就需要单独处理成List
+                        value = new Json(JSONArray.parseArray(value.toString(), String.class));
+                        break;
+                    }
                     case REGEX: {
                         value = dom.regex(attr.getParserPath());
                         break;
@@ -404,7 +432,7 @@ public class SimpleProcessor implements PageProcessor {
             return value;
         } catch (Throwable t) {
             log.error(String.format("parser fail, page=%s, dom=%s, attr=%s", page.getRequest().getUrl(), dom.toString(),
-                                    JSON.toJSONString(attr)));
+                                    JSON.toJSONString(attr)), t);
             throw t;
         }
     }
