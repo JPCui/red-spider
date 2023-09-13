@@ -7,13 +7,11 @@
         "pattern": "http://blog.csdn.net/.*/article/list/(.*)",
         "type" : "10"
 	}],
-    // 列表页中，用于定位列表DOM
     "parentAttr" : {
         "parserPath" : "#article_list div.list_item.article_item",
         "field" : "",
         "parserType" : 20
     },
-    // 属性列表
     "attrs" : [{
             "parserPath" : ".article_title .link_title a",
             "parserPathAttr" : "text",
@@ -39,8 +37,6 @@
             }
         }
     ],
-    // 是否是列表页
     "isList" : 1,
-    // 是否跳过存储
     "skip" : 0
 }

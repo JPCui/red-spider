@@ -9,12 +9,9 @@
       "type": "10"
     }
   ],
-  // 指定爬取规则
   "parseRules": [
-    "douban.movie",
+    "douban.movie"
   ],
-  // 是否是列表页
   "isList": 0,
-  // 是否跳过存储
   "skip": 1
 }

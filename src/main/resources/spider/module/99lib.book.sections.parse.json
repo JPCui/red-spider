@@ -1,15 +1,12 @@
 {
-  // 章节标题列表
   "type": "parser",
   "ruleName": "99lib-book-sections",
   "urlPattern": "http://www.99lib.net/book/(.*)/(.*).htm",
-  // 用于：1. 区别文档类型；2. 缩小范围
   "parentAttr": {
     "parserType": 20,
     "parserPath": "#content"
   },
   "denoisingTypes" : [20],
-  // 属性列表
   "attrs": [
     {
       "field": "_tableName",
@@ -33,7 +30,6 @@
       "parserType": 50
     },
     {
-      // <d>((?=[\\s\\S])[^<]*)</d>
       "parserPath": "#content div",
       "parserPathAttr": "allText",
       "field": "content",
@@ -42,6 +38,5 @@
       "denoisingType" : 10
     }
   ],
-  // 是否是列表页
   "isList": 0
 }

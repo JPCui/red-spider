@@ -18,12 +18,10 @@
       "type": "10"
     }
   ],
-  // 指定爬取规则
   "parseRules": [
     "99lib-book",
     "99lib-book-chaptors",
     "99lib-book-sections"
   ],
-  // 是否跳过存储
   "skip": 0
 }

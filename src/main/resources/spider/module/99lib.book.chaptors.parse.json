@@ -1,15 +1,12 @@
 {
-  // 章节标题列表
   "type": "parser",
   "ruleName": "99lib-book-chaptors",
   "urlPattern": "http://www.99lib.net/book/(.*)/index.htm",
-  // 列表页中，用于定位列表DOM，非必须
   "parentAttr": {
     "parserPath": "#dir",
     "field": "",
     "parserType": 20
   },
-  // 属性列表
   "attrs": [
     {
       "field": "_tableName",
@@ -52,6 +49,5 @@
     ]
     }
   ],
-  // 是否是列表页
   "isList": 0
 }

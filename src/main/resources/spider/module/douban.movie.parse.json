@@ -1,10 +1,8 @@
 {
   "version": "2019-03-30",
-  // 图书列表
   "type": "parser",
   "ruleName": "douban.movie",
   "urlPattern": "https://movie.douban.com/subject/(\\d*)(/)+((\\?)?|\\?.*)",
-  // 列表页中，用于定位列表DOM，非必须
   "parentAttr": {
     "parserPath": "#content",
     "field": "",

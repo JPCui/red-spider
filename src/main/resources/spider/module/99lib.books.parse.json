@@ -1,15 +1,12 @@
 {
-  // 图书列表
   "type": "parser",
   "ruleName": "99lib-book",
   "urlPattern": "http://www.99lib.net/book/index.php(\\?page=(.*))?",
-  // 列表页中，用于定位列表DOM，非必须
   "parentAttr": {
     "parserPath": "#right .list_box li",
     "field": "",
     "parserType": 20
   },
-  // 属性列表
   "attrs": [
     {
       "field": "_tableName",
@@ -64,6 +61,5 @@
       "parserType": 20
     }
   ],
-  // 是否是列表页
   "isList": 1
 }
