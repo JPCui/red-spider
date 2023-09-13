@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -48,6 +49,15 @@ public class SpiderManager {
     final SiteManager siteManager;
 
     final PipelineFactory pipelineFactory;
+
+    @PostConstruct
+    public void startWhenServerStartup() {
+        SpiderConfig.PAGE_RULES.forEach((siteName, siteModel) -> {
+            if (siteModel.isAutoStartup()) {
+                start(siteName);
+            }
+        });
+    }
 
     public void startAll() {
         ProcessorProperties props = new ProcessorProperties();
