@@ -1,5 +1,6 @@
 package cn.cjp.spider.core.config;
 
+import cn.cjp.spider.core.model.CredentialDomain;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.util.ValidatorUtil;
@@ -115,4 +116,19 @@ public class SpiderConfig {
         return ignoreFiles.contains(file.getName());
     }
 
+    /**
+     * @deprecated 从数据库读取
+     */
+    public static CredentialDomain mockEmailCredential() {
+        CredentialDomain domain = new CredentialDomain();
+        domain.setId("pipeline_email_1");
+        domain.setHost("smtp.qq.com");
+        domain.setPort(587);
+        domain.setAuth(true);
+        domain.setFrom("624498030@qq.com");
+        domain.setUser("624498030@qq.com");
+        domain.setPass("cogqsnusvkgebbbc");
+        domain.setSslEnable(false);
+        return domain;
+    }
 }

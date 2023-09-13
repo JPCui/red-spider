@@ -22,9 +22,9 @@
             "id": "pipeline_email_1",
             "params": {
                 "@type": "email",
-                "to": ["624498030@qq.com"],
-                "title": "$up_name + ': ' + $module.title",
-                "content": "$up_name + ': ' + $module.title"
+                "to": ["'624498030@qq.com'"],
+                "title": "#up_name + ' : ' + #module",
+                "content": "#up_name + ' : ' + #module"
             }
         }
     ],

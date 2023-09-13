@@ -1,12 +1,10 @@
 package cn.cjp.spider.core.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
-
 import cn.cjp.spider.core.enums.ParserType;
 import cn.cjp.spider.core.model.Attr;
+import com.alibaba.fastjson.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
@@ -133,6 +131,9 @@ public class XicidailiProcessor implements PageProcessor {
         return value;
     }
 
+    /**
+     * @deprecated
+     */
     public static void main(String[] args) {
 
         String url = "http://www.xicidaili.com/nn";

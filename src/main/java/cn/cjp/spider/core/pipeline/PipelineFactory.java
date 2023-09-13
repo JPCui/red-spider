@@ -1,5 +1,6 @@
 package cn.cjp.spider.core.pipeline;
 
+import cn.cjp.spider.core.config.SpiderConfig;
 import cn.cjp.spider.core.model.PipelineDomain;
 import cn.cjp.spider.core.model.PipelineDomain.EmailParams;
 import cn.cjp.spider.core.model.PipelineDomain.Params;
@@ -21,7 +22,7 @@ public class PipelineFactory {
     public AbstractPipeline get(PipelineDomain pipelineDomain) {
         Params params = pipelineDomain.getParams();
         if (params instanceof EmailParams) {
-            return new EmailPipeline(pipelineDomain, jedisPool);
+            return new EmailPipeline(pipelineDomain, SpiderConfig.mockEmailCredential(), jedisPool);
         } else {
             return new SimplePipeline(pipelineDomain);
         }
