@@ -7,14 +7,16 @@ import cn.cjp.spider.util.ValidatorUtil;
 import com.alibaba.fastjson.JSON;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.springframework.util.ResourceUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.util.StreamUtils;
 
 @Slf4j
 public class SpiderConfig {
@@ -72,48 +74,47 @@ public class SpiderConfig {
 
     private static void readConfigs() {
         try {
-            File configPath = ResourceUtils.getFile("classpath:spider/module");
-
-            if (!configPath.exists()) {
-                throw new IOException("file not found");
-            }
-            File[] configFiles = configPath.listFiles();
-
-            for (File configFile : configFiles) {
-                if (ignore(configFile)) {
+            Resource[] resources = new PathMatchingResourcePatternResolver().getResources("classpath:spider/module/*");
+            for (Resource resource : resources) {
+                String filename = resource.getFilename();
+                log.info("file: " + filename);
+                if(ignore(filename)) {
                     continue;
                 }
-                List<String> list = FileUtils.readLines(configFile);
-                String jsonStr = list.stream().filter(s -> {
-                    // 过滤注释语句
-                    return !s.trim().startsWith("//");
-                }).reduce((a, b) -> a.concat(b)).get();
-                if (configFile.getName().endsWith(PARSE_RULE_FILE_SUFFIX)) {
+                String jsonStr = StreamUtils.copyToString(resource.getInputStream(), Charset.defaultCharset());
+                if (filename.endsWith(PARSE_RULE_FILE_SUFFIX)) {
                     ParseRuleModel parseRuleModel = JSON.parseObject(jsonStr, ParseRuleModel.class);
                     ValidatorUtil.validateWithTemplateByParam(parseRuleModel);
                     log.debug(String.format("read parse rule[%s]: %s", parseRuleModel.getRuleName(),
                                             JSON.toJSONString(parseRuleModel)));
                     PARSE_RULES.put(parseRuleModel.getRuleName(), parseRuleModel);
-                } else if (configFile.getName().endsWith(SPIDER_RULE_FILE_SUFFIX)) {
+                } else if (filename.endsWith(SPIDER_RULE_FILE_SUFFIX)) {
                     SiteModel siteModel = JSON.parseObject(jsonStr, SiteModel.class);
                     ValidatorUtil.validateWithTemplateByParam(siteModel);
                     log.debug(String.format("read parse rule[%s]: %s", siteModel.getSiteName(),
                                             JSON.toJSONString(siteModel)));
                     PAGE_RULES.put(siteModel.getSiteName(), siteModel);
                 }
+
+
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
     }
 
-    private static boolean ignore(File file) {
+    private static boolean ignore(String file) {
         List<String> ignoreFiles = new ArrayList<>();
         ignoreFiles.add("blog.csdn.com.json");
         ignoreFiles.add("demo.json");
         ignoreFiles.add("proxy.json");
 
-        return ignoreFiles.contains(file.getName());
+        return ignoreFiles.stream().anyMatch(ignoreFile -> {
+            if (ignoreFile.equalsIgnoreCase(file)) {
+                return true;
+            }
+            return false;
+        });
     }
 
     /**
