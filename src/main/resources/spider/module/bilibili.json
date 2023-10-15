@@ -32,6 +32,7 @@
             "enabled": true,
             "params": {
                 "@type": "email",
+                "credentialId": "100001",
                 "to": ["'624498030@qq.com'"],
                 "title": "#up_name + ' : ' + #module['title']",
                 "content": "#up_name + ' : ' + #module"

@@ -1,11 +1,9 @@
 package cn.cjp.spider.core.config;
 
-import cn.cjp.spider.core.model.CredentialDomain;
 import cn.cjp.spider.core.model.ParseRuleModel;
 import cn.cjp.spider.core.model.SiteModel;
 import cn.cjp.spider.util.ValidatorUtil;
 import com.alibaba.fastjson.JSON;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -78,7 +76,7 @@ public class SpiderConfig {
             for (Resource resource : resources) {
                 String filename = resource.getFilename();
                 log.info("file: " + filename);
-                if(ignore(filename)) {
+                if (ignore(filename)) {
                     continue;
                 }
                 String jsonStr = StreamUtils.copyToString(resource.getInputStream(), Charset.defaultCharset());
@@ -117,19 +115,4 @@ public class SpiderConfig {
         });
     }
 
-    /**
-     * @deprecated 从数据库读取
-     */
-    public static CredentialDomain mockEmailCredential() {
-        CredentialDomain domain = new CredentialDomain();
-        domain.setId("pipeline_email_1");
-        domain.setHost("smtp.qq.com");
-        domain.setPort(587);
-        domain.setAuth(true);
-        domain.setFrom("624498030@qq.com");
-        domain.setUser("624498030@qq.com");
-        domain.setPass("cogqsnusvkgebbbc");
-        domain.setSslEnable(false);
-        return domain;
-    }
 }

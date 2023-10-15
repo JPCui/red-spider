@@ -1,6 +1,6 @@
 package cn.cjp.spider.core.pipeline;
 
-import cn.cjp.spider.core.model.PipelineDomain;
+import cn.cjp.spider.domain.PipelineDomain;
 import cn.hutool.extra.expression.engine.spel.SpELEngine;
 import java.util.Map;
 import lombok.AccessLevel;

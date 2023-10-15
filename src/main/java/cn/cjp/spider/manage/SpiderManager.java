@@ -9,6 +9,7 @@ import cn.cjp.spider.core.scheduler.MyRedisScheduler;
 import cn.cjp.spider.core.spider.AbstractSpider;
 import cn.cjp.spider.core.spider.MyRedisSchedulerSpider;
 import cn.cjp.spider.core.spider.listener.DefaultMonitorListener;
+import cn.cjp.spider.domain.PipelineDomain;
 import cn.cjp.spider.dto.ProcessorProperties;
 import cn.cjp.spider.exception.ServiceException;
 import java.util.List;
@@ -182,7 +183,7 @@ public class SpiderManager {
 
         // 设置本地代理
         HttpClientDownloader downloader = new HttpClientDownloader();
-        downloader.setProxyProvider(SimpleProxyProvider.from(new Proxy("127.0.0.1", 7890)));
+//        downloader.setProxyProvider(SimpleProxyProvider.from(new Proxy("127.0.0.1", 7890)));
         spider.setDownloader(downloader);
 
         //

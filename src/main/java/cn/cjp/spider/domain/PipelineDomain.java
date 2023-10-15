@@ -1,4 +1,4 @@
-package cn.cjp.spider.core.model;
+package cn.cjp.spider.domain;
 
 import com.alibaba.fastjson.annotation.JSONType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -40,6 +40,7 @@ public class PipelineDomain {
     @Getter
     @Setter
     public static class SimpleParams implements Params {
+
         String s = "";
     }
 
@@ -50,6 +51,7 @@ public class PipelineDomain {
     @Setter
     public static class EmailParams implements Params {
 
+        String       credentialId;
         List<String> to;
         String       title;
         String       content;

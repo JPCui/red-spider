@@ -6,6 +6,12 @@ spring:
     hostName: 127.0.0.1
     port: 6379
     password: 123456
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASS}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT:13306}/${MYSQL_DB}?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true&allowPublicKeyRetrieval=true
 
 server:
   port: 8800

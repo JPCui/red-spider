@@ -1,9 +1,12 @@
 package cn.cjp.spider.core.pipeline;
 
+import cn.cjp.spider.Constants;
 import cn.cjp.spider.core.config.SpiderConfig;
-import cn.cjp.spider.core.model.PipelineDomain;
-import cn.cjp.spider.core.model.PipelineDomain.EmailParams;
-import cn.cjp.spider.core.model.PipelineDomain.Params;
+import cn.cjp.spider.domain.CredentialDomain;
+import cn.cjp.spider.domain.CredentialRepo;
+import cn.cjp.spider.domain.PipelineDomain;
+import cn.cjp.spider.domain.PipelineDomain.EmailParams;
+import cn.cjp.spider.domain.PipelineDomain.Params;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,12 +20,16 @@ import redis.clients.jedis.JedisPool;
 @RequiredArgsConstructor
 public class PipelineFactory {
 
-    final JedisPool jedisPool;
+    final JedisPool      jedisPool;
+    final CredentialRepo credentialRepo;
 
     public AbstractPipeline get(PipelineDomain pipelineDomain) {
         Params params = pipelineDomain.getParams();
         if (params instanceof EmailParams) {
-            return new EmailPipeline(pipelineDomain, SpiderConfig.mockEmailCredential(), jedisPool);
+            CredentialDomain credential = credentialRepo.getOrDefaultByUserId(
+                Constants.DEFAULT_USER_ID,
+                ((EmailParams) params).getCredentialId());
+            return new EmailPipeline(pipelineDomain, credential, jedisPool);
         } else {
             return new SimplePipeline(pipelineDomain);
         }

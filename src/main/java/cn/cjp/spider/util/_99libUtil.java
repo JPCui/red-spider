@@ -1,7 +1,7 @@
 package cn.cjp.spider.util;
 
-import com.alibaba.fastjson.util.Base64;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,7 +23,7 @@ public class _99libUtil {
      */
     private static List<Integer> extractValidSectionIndexs(String metaContent) {
 
-        byte[]        bts = Base64.decodeFast(metaContent);
+        byte[]        bts = Base64.getDecoder().decode(metaContent);
         String        s   = new String(bts);
         List<Integer> e   = IntSplitter.split(s, "[A-Z]+%");
 

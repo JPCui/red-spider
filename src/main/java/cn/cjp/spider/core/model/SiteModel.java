@@ -1,5 +1,6 @@
 package cn.cjp.spider.core.model;
 
+import cn.cjp.spider.domain.PipelineDomain;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;

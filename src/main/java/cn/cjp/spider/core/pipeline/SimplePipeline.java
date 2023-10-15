@@ -1,6 +1,6 @@
 package cn.cjp.spider.core.pipeline;
 
-import cn.cjp.spider.core.model.PipelineDomain;
+import cn.cjp.spider.domain.PipelineDomain;
 import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;

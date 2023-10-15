@@ -1,8 +1,8 @@
 package cn.cjp.spider.core.pipeline;
 
-import cn.cjp.spider.core.model.CredentialDomain;
-import cn.cjp.spider.core.model.PipelineDomain;
-import cn.cjp.spider.core.model.PipelineDomain.EmailParams;
+import cn.cjp.spider.domain.CredentialDomain;
+import cn.cjp.spider.domain.PipelineDomain;
+import cn.cjp.spider.domain.PipelineDomain.EmailParams;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
@@ -64,8 +64,8 @@ public class EmailPipeline extends AbstractPipeline {
 
         filterJsons.forEach(json -> {
             try {
-                EmailParams  params  = (EmailParams) getPipelineDomain().getParams();
-                String       title   = getValue(params.getTitle(), json);
+                EmailParams params = (EmailParams) getPipelineDomain().getParams();
+                String      title  = getValue(params.getTitle(), json);
                 String       content = getValue(params.getContent(), json);
                 List<String> toUsers = params.getTo().stream().map(to -> getValue(to, json)).collect(Collectors.toList());
 
