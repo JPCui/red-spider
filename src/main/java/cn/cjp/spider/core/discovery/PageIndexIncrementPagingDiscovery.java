@@ -40,7 +40,7 @@ public class PageIndexIncrementPagingDiscovery implements Discovery {
             }
         }
 
-        log.info(String.format("found new urls : ", foundUrlList));
+        log.info(String.format("found new urls : %s", foundUrlList));
         page.addTargetRequests(foundUrlList);
     }
 

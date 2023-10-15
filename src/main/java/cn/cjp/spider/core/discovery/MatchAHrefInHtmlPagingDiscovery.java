@@ -50,18 +50,18 @@ public class MatchAHrefInHtmlPagingDiscovery implements Discovery {
                     // FIXME 99lib定制化逻辑
                     URI.create(currUrl);
                     if (currUrl.matches(".*九.九.藏.书.*")) {
-                        log.error(String.format("illigle argument url : , from : ", url, page.getUrl().get()));
+                        log.error(String.format("illigle argument url : %s, from : %s", url, page.getUrl().get()));
                         log.error(page.toString());
                     }
                     foundUrlList.add(currUrl);
                 } catch (Exception e) {
-                    log.error(String.format("illigle argument url : , from : ", url, page.getUrl().get()));
+                    log.error(String.format("illigle argument url : %s, from : %s", url, page.getUrl().get()));
                     log.error(page.toString());
                 }
             }
         });
 
-        log.info(String.format("found new urls : ", foundUrlList));
+        log.info(String.format("found new urls : %s", foundUrlList));
         page.addTargetRequests(Lists.newArrayList(foundUrlList));
 
     }
