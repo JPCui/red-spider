@@ -16,10 +16,9 @@
   - [x] 配置抓取策略（域名、入口、cookie、是否循环抓取等）
     - [x] 配置子模块抓取规则（字段、pipeline）
 
-- [20%]爬取类型
-  - html
-  - json
-- 
+- [50%]爬取类型
+  - [x]html
+  - [ ]json
 - 种子发现策略
   - 从当前url生成 
     - [x] 当前url上匹配pageNum，然后+1
@@ -47,18 +46,19 @@
   - worker管理 
     - 启动、暂停、停止worker
     - task配置
-      - 配置模块、规则
-      - 配置完成后是否自动启动/开机自动启动（"autoStartup": true）
+      - [ ]配置模块、规则
+      - [ ]配置完成后是否自动启动/开机自动启动（"autoStartup": true）
     - pipeline配置：每个 task/module 管理各自的pipeline ，可配置默认的pipeline
       - ~~全局：LogPipeline~~
-      - 默认：LogPipeline
-      - 邮箱
-      - 企微
+      - [x]默认：LogPipeline
+      - [ ]**飞书机器人**
+      - [x]邮箱（频率高会被禁，qq要重新生成授权码）
+      - [ ]企微
       - 。。。
     - worker配置
       - 配置可用pipeline
       - 
-  - 监控每个线程的工作情况
+  - 监控每个线程的工作情况(V3)
     - 正在解析的url
     - 种子数（待爬取）、已爬取
     - 处理数监控
