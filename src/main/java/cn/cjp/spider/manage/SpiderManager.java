@@ -154,6 +154,7 @@ public class SpiderManager {
      */
     private List<Pipeline> buildPipeline(SiteModel siteModel) {
         return siteModel.getPipelines().stream()
+            .filter(PipelineDomain::getEnabled)
             .map(pipelineFactory::get)
             .collect(Collectors.toList());
     }
