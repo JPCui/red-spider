@@ -17,19 +17,30 @@ import lombok.experimental.FieldDefaults;
 @Setter
 public class PipelineDomain {
 
-    String id;
-    Params params;
+    String  id;
+    Boolean enabled = false;
+    Params  params;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     // fastjson
-    @JSONType(seeAlso = {EmailParams.class})
+    @JSONType(seeAlso = {EmailParams.class, SimpleParams.class})
     // jackson
     @JsonTypeInfo(use = Id.NAME, include = As.EXISTING_PROPERTY, property = "type", visible = true)
     @JsonSubTypes({
         @JsonSubTypes.Type(value = EmailParams.class, name = "email"),
+        @JsonSubTypes.Type(value = SimpleParams.class, name = "simple"),
     })
     public interface Params {
 
+    }
+
+    // fastjson
+    @JSONType(typeName = "simple")
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @Getter
+    @Setter
+    public static class SimpleParams implements Params {
+        String s = "";
     }
 
     // fastjson
