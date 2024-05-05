@@ -1,0 +1,31 @@
+{
+    "version": "2023-07-27",
+    "siteName": "cls.cn",
+    "description": "财联社",
+    "originUrls": [
+        "https://www.cls.cn/nodeapi/updateTelegraphList?app=CailianpressWeb&category=&hasFirstVipArticle=1&lastTime=1705395372&os=web&rn=20&subscribedColumnIds=&sv=7.7.5&sign=9a1ce71ae5c2fcf758215e72992d352f"
+    ],
+    "domain": "cls.cn",
+    "cookieStr": "",
+    "isRecycle": true,
+    "recycleCron": "0/10 * * * * ",
+    "seedDiscoveries": [
+    ],
+    "//parseRules": "指定爬取规则",
+    "parseRules": [
+        "cls_tel"
+    ],
+    "pipelines": [
+        {
+            "id": "pipeline_1",
+            "enabled": false,
+            "params": {
+                "@type": "simple",
+                "s": "xxx"
+            }
+        }
+    ],
+    "//skip": "是否跳过存储",
+    "skip": 0,
+    "autoStartup": true
+}
