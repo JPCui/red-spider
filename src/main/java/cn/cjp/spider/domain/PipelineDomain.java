@@ -58,4 +58,15 @@ public class PipelineDomain {
 
     }
 
+    // fastjson
+    @JSONType(typeName = "mysql")
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @Getter
+    @Setter
+    public static class MysqlParams implements Params {
+
+        String content;
+
+    }
+
 }

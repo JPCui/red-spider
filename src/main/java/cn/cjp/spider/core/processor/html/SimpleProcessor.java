@@ -158,7 +158,7 @@ public class SimpleProcessor implements PageProcessor {
             }
         });
 
-        // FIXME 废弃
+        // FIXME 废弃,全局发现策略
         if (seedDiscoveries != null) {
             seedDiscoveries.forEach(seedDiscovery -> {
                 discoveryFactory.discover(page, seedDiscovery);

@@ -22,9 +22,15 @@ public class CredentialDomain {
     Integer port;
     Boolean auth;
     String  from;
-    String  user;
+    // for redis, mysql
     String  pass;
+    // for redis, mysql
+    String  user;
+    // for redis, mysql
     Boolean sslEnable = false;
+
+    // for mysql
+    String url;
 
     public static CredentialDomain newEmailCredentialDomain(
         String id,
